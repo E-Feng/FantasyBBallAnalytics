@@ -27,3 +27,17 @@ data_scraper.init_tables()
 data_scraper.get_team_data()
 data_scraper.get_scoreboard_data()
 data_scraper.get_player_data()
+
+# Obtaining tables from MySQL
+teams = pd.read_sql_table("teams", engine)
+schedule_away = pd.read_sql_table("schedules", engine)
+scoreboard = pd.read_sql_table("scoreboard", engine)
+
+num_teams = teams.shape[0]
+
+# Creating dataframe for home teams and concatenating
+schedule_home = schedule_away.copy()
+schedule_home = schedule_home.rename(columns={"away_id":"home_id", "home_id":"away_id", "away_team":"home_team", "home_team":"away_team"})
+
+schedule = schedule_away.append(schedule_home, sort=False).sort_values("id")
+
