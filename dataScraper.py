@@ -78,10 +78,10 @@ class DataScraper(object):
         Table "schedules" in MySQL with columns
             id            INT            PK
             week          INT 
-            away_id       INT            FK to scoreboard.stat_id
             home_id       INT            FK to scoreboard.stat_id
-            away_team     INT            FK to teams.id
-            home_temm     INT            FK to teams.id  
+            away_id       INT            FK to scoreboard.stat_id
+            home_team     INT            FK to teams.id
+            away_team     INT            FK to teams.id  
 
         Table "player_info" in MySQL with columns
             player_id     INT            PK
@@ -144,10 +144,10 @@ class DataScraper(object):
             self.mycursor.execute("CREATE TABLE schedules ("
                                   "id INT PRIMARY KEY,"
                                   "week INT,"
-                                  "away_id INT,"
                                   "home_id INT,"
-                                  "away_team INT,"
-                                  "home_team INT)")  
+                                  "away_id INT,"                                  
+                                  "home_team INT,"
+                                  "away_team INT)")  
 
         if (tables is None) or ("player_info",) not in tables:
             self.mycursor.execute("CREATE TABLE player_info ("
@@ -231,18 +231,18 @@ class DataScraper(object):
                         
         d = json.loads(r.text)
 
-        sql_sch = ("INSERT INTO schedules (id, week, away_id, home_id, away_team, home_team)"
+        sql_sch = ("INSERT INTO schedules (id, week, home_id, away_id, home_team, away_team)"
                 " VALUES (%s, %s, %s, %s, %s, %s)")
 
         sql_sco = ("INSERT INTO scoreboard (fg_per, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts)"
                 " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
 
-        sides = ("away", "home")
+        sides = ("home", "away")
         for match in d["schedule"]:
             sch_id = match["id"]
             week = math.ceil(sch_id/(self.num_teams/2))
 
-            # Grabbing data for both away and home teams
+            # Grabbing data for both home and away teams
             scores_id = {}
             for side in sides:
                 if side == sides[0]:
@@ -251,7 +251,7 @@ class DataScraper(object):
                     opp = sides[0]
 
                 # Check if scheduled matchup has occured
-                if "cumulativeScore" in match["away"]:
+                if "cumulativeScore" in match["home"]:
                     fg_per = match[side]["cumulativeScore"]["scoreByStat"][self.CONST_FG_PER]["score"]
                     ft_per = match[side]["cumulativeScore"]["scoreByStat"][self.CONST_FT_PER]["score"]
                     three_pm = match[side]["cumulativeScore"]["scoreByStat"][self.CONST_3PM]["score"]
@@ -275,7 +275,7 @@ class DataScraper(object):
             team_id = match[side]["teamId"]
             opp_id = match[opp]["teamId"]
 
-            val_sch = (sch_id, week, scores_id["away"], scores_id["home"], team_id, opp_id)
+            val_sch = (sch_id, week, scores_id["home"], scores_id["away"], team_id, opp_id)
             
             self.mycursor.execute(sql_sch, val_sch)
             self.mydb.commit()
