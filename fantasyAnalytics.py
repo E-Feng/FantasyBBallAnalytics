@@ -53,6 +53,8 @@ for index, row in schedule.iterrows():
     home_team = row["home_team"]
     away_team = row["away_team"]
     week = row["week"]
+
+    away_name = teams.loc[teams["id"] == away_team, "first_name"].values[0]
     if week not in schedule_analytics: schedule_analytics[week] = {}
 
     # Check schedule stat has occured
@@ -64,21 +66,29 @@ for index, row in schedule.iterrows():
         weekly_matchups = schedule.loc[(schedule["week"] == week) & (schedule["away_id"] != row["home_id"])]
 
         # Obtaining stats for all other matchups and calculating difference
-        away_stats_all = pd.merge(weekly_matchups["away_id"], scoreboard, left_on="away_id", right_on="scores_id")
-        away_stats_all = away_stats_all.drop(columns=["away_id", "scores_id"])
-        away_stats_all = away_stats_all.sub(home_stats.values)
-        away_stats_all["tos"] *= -1
-        away_stats_all["ejs"] *= -1
+        away_stats_raw = pd.merge(weekly_matchups["away_id"], scoreboard, left_on="away_id", right_on="scores_id")
+        away_stats_raw = away_stats_raw.drop(columns=["away_id", "scores_id"])
+
+        away_stats_sub = away_stats_raw.sub(home_stats.values)
+        away_stats_sub["tos"] *= -1
+        away_stats_sub["ejs"] *= -1
+
+        wins = (away_stats_sub < 0).sum(axis=1)
+        losses = (away_stats_sub > 0).sum(axis=1)
+        away_stats_sub["wins"] = wins
+        away_stats_sub["losses"] = losses
 
         # Cleaning up before joining df
         weekly_matchups = weekly_matchups.reset_index(drop=True)
         weekly_matchups = weekly_matchups.drop(columns=["week", "home_id", "away_id", "home_team", "away_team"])
 
-        away_final = pd.concat([weekly_matchups, away_stats_all], axis=1)
+        away_final_sub = pd.concat([weekly_matchups, away_stats_sub], axis=1)
+        away_final_raw = pd.concat([weekly_matchups, away_stats_raw], axis=1)
 
-        schedule_analytics[week][home_team]["away_team"] = away_team
-        schedule_analytics[week][home_team]["home_stats"] = home_stats.to_json()
-        schedule_analytics[week][home_team]["away_stats"] = away_final.to_json()
+        schedule_analytics[week][home_team]["away_name"] = away_name
+        schedule_analytics[week][home_team]["home_stats"] = home_stats.to_json(orient="table", index=False)
+        schedule_analytics[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
+        schedule_analytics[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
 
 
 # Saving final dict to json file

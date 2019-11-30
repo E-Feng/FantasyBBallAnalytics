@@ -245,11 +245,6 @@ class DataScraper(object):
             # Grabbing data for both home and away teams
             scores_id = {}
             for side in sides:
-                if side == sides[0]:
-                    opp = sides[1]
-                else:
-                    opp = sides[0]
-
                 # Check if scheduled matchup has occured
                 if "cumulativeScore" in match["home"]:
                     fg_per = match[side]["cumulativeScore"]["scoreByStat"][self.CONST_FG_PER]["score"]
@@ -272,8 +267,8 @@ class DataScraper(object):
                     scores_id[side] = None
 
             # Adding to schedule table after both sides are done
-            team_id = match[side]["teamId"]
-            opp_id = match[opp]["teamId"]
+            team_id = match["home"]["teamId"]
+            opp_id = match["away"]["teamId"]
 
             val_sch = (sch_id, week, scores_id["home"], scores_id["away"], team_id, opp_id)
             
