@@ -46,7 +46,7 @@ schedule = schedule.reset_index()
 schedule = pd.merge(schedule, teams[["id", "location", "nickname", "first_name"]], how="left", left_on="away_team", right_on="id")
 schedule = schedule.drop(columns=["index", "id_x", "id_y"])
 
-schedule_analytics = {}
+matchup_analytics = {}
 
 for index, row in schedule.iterrows():
     home_id = row["home_id"]
@@ -55,11 +55,11 @@ for index, row in schedule.iterrows():
     week = row["week"]
 
     away_name = teams.loc[teams["id"] == away_team, "first_name"].values[0]
-    if week not in schedule_analytics: schedule_analytics[week] = {}
+    if week not in matchup_analytics: matchup_analytics[week] = {}
 
     # Check schedule stat has occured
     if not pd.isna(home_id):
-        schedule_analytics[week][home_team] = {}
+        matchup_analytics[week][home_team] = {}
 
         # Obtaining stats for the home team and matchups
         home_stats = scoreboard.loc[scoreboard["scores_id"] == home_id].drop(columns="scores_id")
@@ -85,14 +85,14 @@ for index, row in schedule.iterrows():
         away_final_sub = pd.concat([weekly_matchups, away_stats_sub], axis=1)
         away_final_raw = pd.concat([weekly_matchups, away_stats_raw], axis=1)
 
-        schedule_analytics[week][home_team]["away_name"] = away_name
-        schedule_analytics[week][home_team]["home_stats"] = home_stats.to_json(orient="table", index=False)
-        schedule_analytics[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
-        schedule_analytics[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
+        matchup_analytics[week][home_team]["away_name"] = away_name
+        matchup_analytics[week][home_team]["home_stats"] = home_stats.to_json(orient="table", index=False)
+        matchup_analytics[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
+        matchup_analytics[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
 
 
 # Saving final dict to json file
-file_name = "schedule_analytics.json"
+file_name = "matchup_data.json"
 
 with open(file_name, "w") as fp:
-    json.dump(schedule_analytics, fp)
+    json.dump(matchup_analytics, fp)

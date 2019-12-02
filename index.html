@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="manifest" href="site.webmanifest">
-  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="apple-touch-icon" href="img/icon.png">
   <!-- Place favicon.ico in the root directory -->
 
   <link rel="stylesheet" href="css/normalize.css">
@@ -21,13 +21,11 @@
   <script>
     window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
   </script>
-  <script src="js/main.js"></script>
+  <script src="js/matchup_data.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-    google.charts.load('current', {
-      packages: ['table']
-    });
-    google.charts.setOnLoadCallback(drawTable);
+    google.charts.load('current', {packages: ['table']});
+    google.charts.setOnLoadCallback(drawAllTables);
   </script>
 </head>
 
@@ -62,8 +60,33 @@
   <section id="data">
     <div class="container">
       <h2>Schedule Matchups</h2>
-      <h4>Weekly comparisions to every other team</h4>
-      <div id="table_div"></div>
+      <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
+      <div class="flex-container">
+        <div class="box">
+          <h1>Week 1 Team 1</h1>
+          <div class="box" id="table_div1"></div>
+        </div>
+        <div class="box">
+          <h1>Week 2 Team 1</h1>
+          <div class="box" id="table_div2"></div>
+        </div>
+        <div class="box">
+          <h1>Week 3 Team 1</h1>
+          <div class="box" id="table_div3"></div>
+        </div>
+        <div class="box">
+          <h1>Week 4 Team 1</h1>
+          <div class="box" id="table_div4"></div>
+        </div>
+        <div class="box">
+          <h1>Week 5 Team 1</h1>
+          <div class="box" id="table_div5"></div>
+        </div>
+        <div class="box">
+          <h1>Week 6 Team 1</h1>
+          <div class="box" id="table_div6"></div>
+        </div>
+      </div>
     </div>
   </section>
 

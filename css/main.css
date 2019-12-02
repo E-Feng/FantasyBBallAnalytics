@@ -23,12 +23,12 @@ body {
   background: #FDB927;
 }
 
-
 .container {
   width: 80%;
   margin: auto;
   overflow: hidden;
 }
+
 
 /* Header */
 header {
@@ -54,6 +54,20 @@ header li{
 
 header nav {
   float: right;
+}
+
+/* Flex Containers */
+
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  border: 5px solid black;
+}
+
+.box {
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 /* Google Charts */
@@ -86,6 +100,15 @@ header nav {
 .right-border {
   border-color: black !important;
   border-width: 3px 3px 3px 0 !important; 
+}
+
+/* Footer */
+footer {
+  padding: 10px;
+  margin-top: 10px;
+  color: white;
+  background-color: black;
+  text-align: center;
 }
 
 /*

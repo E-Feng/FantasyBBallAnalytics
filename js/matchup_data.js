@@ -1,5 +1,7 @@
-let sch_json;
 let data_table = {};
+let num_weeks;
+let num_teams;
+let cur_week;
 let headers = {
   "Team": "string",
   "Name": "string",
@@ -16,19 +18,19 @@ let headers = {
   "PTS": "number",
 };
 
-$.getJSON("schedule_analytics.json", function (sch_json) {
-  console.log("JSON Data received, name is " + sch_json.name);
+$.getJSON("matchup_data.json", function (matchup_json) {
+  console.log("JSON Data received, name is " + matchup_json.name);
 
-  for (let week in sch_json) {
+  for (let week in matchup_json) {
     data_table[week] = {};
-    for (let team_id in sch_json[week]) {
+    for (let team_id in matchup_json[week]) {
       data_table[week][team_id] = {};
 
-      match_up = sch_json[week][team_id];
-      opp_name = match_up["away_name"];
-      home_stats = JSON.parse(match_up["home_stats"]);
-      away_raw = JSON.parse(match_up["away_raw"]);
-      away_sub = JSON.parse(match_up["away_sub"]);
+      matchup = matchup_json[week][team_id];
+      opp_name = matchup["away_name"];
+      home_stats = JSON.parse(matchup["home_stats"]);
+      away_raw = JSON.parse(matchup["away_raw"]);
+      away_sub = JSON.parse(matchup["away_sub"]);
 
       away_raw_arr = [];
       for (stat of away_raw["data"]) {
@@ -44,12 +46,26 @@ $.getJSON("schedule_analytics.json", function (sch_json) {
       data_table[week][team_id]["home_stats"] = Object.values(home_stats["data"][0]);
       data_table[week][team_id]["away_raw"] = away_raw_arr;
       data_table[week][team_id]["away_sub"] = away_sub_arr;
+
+      num_teams = team_id;
+      cur_week = week;
     }
+    num_weeks = week;
   }
 });
 
+function drawAllTables() {
+  let counter = 1;
+  for (let team_id = 3; team_id <= num_teams; team_id++) {
+    for (let week = 1; week <= cur_week; week++) {
+      drawTable(week, team_id, counter);
+      counter++;
+    }
+  }
+}
 
-function drawTable() {
+
+function drawTable(week, team_id, counter) {
   let cssClassNames = {
     headerRow: '',
     tableRow: '',
@@ -68,9 +84,6 @@ function drawTable() {
     width: "100%",
     height: "100%",
   }
-
-  let week = 4;
-  let team_id = 1;
 
   let data = new google.visualization.DataTable();
   for (let key in headers) {
@@ -119,16 +132,14 @@ function drawTable() {
     let win_diff = away_sub[i][last_col-2] - away_sub[i][last_col-1]
 
     // Assume win then change if loss
-    //prop = data.getProperties(i+1,0);
-    //console.log('green-background' + prop["classname"])
-    //data.setProperty(i+1, 0, 'className', 'green-background' + prop["classname"]);
     addNewProperty(data, i+1, 0, 'green-background');
     if (win_diff < 0 | (win_diff == 0 & home_stats[last_col-2] < away_sub[i][last_col-2])) {
       addNewProperty(data, i+1, 0, 'red-background');
     }
   }
 
-  let table = new google.visualization.Table(document.getElementById('table_div'));
+  let table_id = "table_div" + String(counter);
+  let table = new google.visualization.Table(document.getElementById(table_id));
   
   let formatter = new google.visualization.NumberFormat(
     {fractionDigits: 4, negativeParens: false});
