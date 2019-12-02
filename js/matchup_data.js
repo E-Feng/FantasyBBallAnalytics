@@ -1,4 +1,5 @@
 let data_table = {};
+let teams = {};
 let num_weeks;
 let num_teams;
 let cur_week;
@@ -17,6 +18,15 @@ let headers = {
   "EJ": "number",
   "PTS": "number",
 };
+
+$.getJSON("team_data.json", function (team_json) {
+  console.log("JSON Data received, name is " + team_json.name);
+
+  let data = JSON.parse(team_json["teams"]);
+  for (let team of data["data"]){
+    teams[team["id"]] = team["location"] + " " + team["nickname"];
+  }
+})
 
 $.getJSON("matchup_data.json", function (matchup_json) {
   console.log("JSON Data received, name is " + matchup_json.name);
@@ -56,8 +66,16 @@ $.getJSON("matchup_data.json", function (matchup_json) {
 
 function drawAllTables() {
   let counter = 1;
-  for (let team_id = 3; team_id <= num_teams; team_id++) {
+  for (let team_id = 1; team_id <= num_teams; team_id++) {
     for (let week = 1; week <= cur_week; week++) {
+      // Create HTML div from template
+      //let html = $("#matchup-table-template").html();
+      let html = $("template")[0].innerHTML;
+      html = html.replace("%w", week);
+      html = html.replace("%t", teams[team_id]);
+      html = html.replace("google-charts-table", "google-charts-table" + counter)
+      $new = $("#matchup-tables").append(html);
+
       drawTable(week, team_id, counter);
       counter++;
     }
@@ -138,7 +156,7 @@ function drawTable(week, team_id, counter) {
     }
   }
 
-  let table_id = "table_div" + String(counter);
+  let table_id = "google-charts-table" + String(counter);
   let table = new google.visualization.Table(document.getElementById(table_id));
   
   let formatter = new google.visualization.NumberFormat(

@@ -24,7 +24,9 @@
   <script src="js/matchup_data.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-    google.charts.load('current', {packages: ['table']});
+    google.charts.load('current', {
+      packages: ['table']
+    });
     google.charts.setOnLoadCallback(drawAllTables);
   </script>
 </head>
@@ -61,32 +63,13 @@
     <div class="container">
       <h2>Schedule Matchups</h2>
       <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
-      <div class="flex-container">
-        <div class="box">
-          <h1>Week 1 Team 1</h1>
-          <div class="box" id="table_div1"></div>
+      <template>
+        <div class="box" id="matchup-table-template">
+          <h1>%t - Week %w</h1>
+          <div class="box" id="google-charts-table"></div>
         </div>
-        <div class="box">
-          <h1>Week 2 Team 1</h1>
-          <div class="box" id="table_div2"></div>
-        </div>
-        <div class="box">
-          <h1>Week 3 Team 1</h1>
-          <div class="box" id="table_div3"></div>
-        </div>
-        <div class="box">
-          <h1>Week 4 Team 1</h1>
-          <div class="box" id="table_div4"></div>
-        </div>
-        <div class="box">
-          <h1>Week 5 Team 1</h1>
-          <div class="box" id="table_div5"></div>
-        </div>
-        <div class="box">
-          <h1>Week 6 Team 1</h1>
-          <div class="box" id="table_div6"></div>
-        </div>
-      </div>
+      </template>
+      <div class="flex-container" id="matchup-tables"></div>
     </div>
   </section>
 

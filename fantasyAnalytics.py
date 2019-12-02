@@ -90,9 +90,16 @@ for index, row in schedule.iterrows():
         matchup_analytics[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
         matchup_analytics[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
 
+teams_json = {}
+teams_json["teams"] = teams.to_json(orient="table", index=False)
 
 # Saving final dict to json file
 file_name = "matchup_data.json"
 
 with open(file_name, "w") as fp:
     json.dump(matchup_analytics, fp)
+
+file_name = "team_data.json"
+
+with open(file_name, "w") as fp:
+    json.dump(teams_json, fp)

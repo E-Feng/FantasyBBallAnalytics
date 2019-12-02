@@ -178,7 +178,7 @@ class DataScraper(object):
                                   "tos FLOAT,"
                                   "ejs FLOAT,"
                                   "pts FLOAT,"
-                                  "zscore FLOAT)")                                   
+                                  "zscore FLOAT)")                               
 
 
     def get_team_data(self):
@@ -297,43 +297,44 @@ class DataScraper(object):
                 " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")                
 
         for player in d["players"]:
-            # Check for active player
-            if player["ratings"]["0"]["positionalRanking"] != 0 or player["status"] == "ONTEAM":
-                player_id = player["id"]
-                team_id = player["onTeamId"] or None
-                first_name = player["player"]["firstName"]
-                last_name = player["player"]["lastName"]
-                state = player["player"]["injuryStatus"]
-                avail_slots = json.dumps(player["player"]["eligibleSlots"])
+            # Check for active player (has rating or rostered)
+            if "ratings" in player:
+                if player["ratings"]["0"]["positionalRanking"] != 0 or player["status"] == "ONTEAM":
+                    player_id = player["id"]
+                    team_id = player["onTeamId"] or None
+                    first_name = player["player"]["firstName"]
+                    last_name = player["player"]["lastName"]
+                    state = player["player"]["injuryStatus"]
+                    avail_slots = json.dumps(player["player"]["eligibleSlots"])
 
-                val_pinfo = (player_id, team_id, first_name, last_name, state, avail_slots)
+                    val_pinfo = (player_id, team_id, first_name, last_name, state, avail_slots)
 
-                self.mycursor.execute(sql_pinfo, val_pinfo)
-                self.mydb.commit()    
+                    self.mycursor.execute(sql_pinfo, val_pinfo)
+                    self.mydb.commit()    
 
-                for stat in player["player"]["stats"]:
-                    if stat["id"] in self.periods and "averageStats" in stat:
-                        period = stat["id"]
-                        mins = stat["averageStats"][self.CONST_MINS]
-                        fgm = stat["averageStats"][self.CONST_FGM]
-                        fga = stat["averageStats"][self.CONST_FGA]
-                        fg_per = stat["averageStats"][self.CONST_FG_PER]
-                        ftm = stat["averageStats"][self.CONST_FTA]
-                        fta = stat["averageStats"][self.CONST_FTM]
-                        ft_per = stat["averageStats"][self.CONST_FT_PER]
-                        three_pm = stat["averageStats"][self.CONST_3PM]
-                        rebs = stat["averageStats"][self.CONST_REB]
-                        asts = stat["averageStats"][self.CONST_AST]
-                        stls = stat["averageStats"][self.CONST_STL]
-                        blks = stat["averageStats"][self.CONST_BLK]
-                        tos = stat["averageStats"][self.CONST_TO]
-                        ejs = stat["averageStats"][self.CONST_EJ]
-                        pts = stat["averageStats"][self.CONST_PTS]
+                    for stat in player["player"]["stats"]:
+                        if stat["id"] in self.periods and "averageStats" in stat:
+                            period = stat["id"]
+                            mins = stat["averageStats"][self.CONST_MINS]
+                            fgm = stat["averageStats"][self.CONST_FGM]
+                            fga = stat["averageStats"][self.CONST_FGA]
+                            fg_per = stat["averageStats"][self.CONST_FG_PER]
+                            ftm = stat["averageStats"][self.CONST_FTA]
+                            fta = stat["averageStats"][self.CONST_FTM]
+                            ft_per = stat["averageStats"][self.CONST_FT_PER]
+                            three_pm = stat["averageStats"][self.CONST_3PM]
+                            rebs = stat["averageStats"][self.CONST_REB]
+                            asts = stat["averageStats"][self.CONST_AST]
+                            stls = stat["averageStats"][self.CONST_STL]
+                            blks = stat["averageStats"][self.CONST_BLK]
+                            tos = stat["averageStats"][self.CONST_TO]
+                            ejs = stat["averageStats"][self.CONST_EJ]
+                            pts = stat["averageStats"][self.CONST_PTS]
 
-                        rating_key = period[1]
-                        zscore = player["ratings"][rating_key]["totalRating"]
+                            rating_key = period[1]
+                            zscore = player["ratings"][rating_key]["totalRating"]
 
-                        val_pstats = (player_id, period, mins, fgm, fga, fg_per, ftm, fta, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts, zscore)
+                            val_pstats = (player_id, period, mins, fgm, fga, fg_per, ftm, fta, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts, zscore)
 
-                        self.mycursor.execute(sql_pstats, val_pstats)
-                        self.mydb.commit()               
+                            self.mycursor.execute(sql_pstats, val_pstats)
+                            self.mydb.commit()               
