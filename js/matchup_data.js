@@ -151,8 +151,9 @@ function drawTable(week, team_id, counter) {
 
     // Assume win then change if loss
     addNewProperty(data, i+1, 0, 'green-background');
-    if (win_diff < 0 | (win_diff == 0 & home_stats[last_col-2] < away_sub[i][last_col-2])) {
+    if (win_diff < 0 | (win_diff == 0 & (away_sub[i][12] > 0))) {
       addNewProperty(data, i+1, 0, 'red-background');
+      console.log("Loss")
     }
   }
 
