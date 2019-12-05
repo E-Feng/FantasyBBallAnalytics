@@ -23,6 +23,17 @@ body {
   background: #FDB927;
 }
 
+.page {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  position: absolute;
+}
+
+.active {
+  display: block;
+}
+
 .container {
   width: 80%;
   margin: auto;
@@ -56,23 +67,42 @@ header nav {
   float: right;
 }
 
+/* Body */
+.wrap {
+  height: auto;
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+#standings-table {
+  font-size: 20px;
+}
+
+/* Footer */
+
 /* Flex Containers */
 
 .flex-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
   border: 5px solid black;
 }
 
-.box {
+.flex-item {
   text-align: center;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px 5px 5px 5px;
 }
 
 /* Google Charts */
-.table-text {
+.matchup-table-text {
   font-size: 12px;
+}
+
+.standings-table-text {
+  font-size: 16px;
 }
 
 .green-background {
@@ -102,14 +132,6 @@ header nav {
   border-width: 3px 3px 3px 0 !important; 
 }
 
-/* Footer */
-footer {
-  padding: 10px;
-  margin-top: 10px;
-  color: white;
-  background-color: black;
-  text-align: center;
-}
 
 /*
  * Remove text-shadow in selection highlight:

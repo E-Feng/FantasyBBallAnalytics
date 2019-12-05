@@ -21,13 +21,16 @@
   <script>
     window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
   </script>
+  <script src="js/main.js"></script>
   <script src="js/matchup_data.js"></script>
+  <script src="js/standings_data.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
     google.charts.load('current', {
       packages: ['table']
     });
-    google.charts.setOnLoadCallback(drawAllTables);
+    google.charts.setOnLoadCallback(drawAllMatchupTables);
+    google.charts.setOnLoadCallback(drawStandingsTable);
   </script>
 </head>
 
@@ -44,8 +47,8 @@
       </div>
       <nav>
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
+          <li><a href="#" data-target="home" class="nav-link">Home</a></li>
+          <li><a href="#" data-target="about" class="nav-link">About</a></li>
         </ul>
       </nav>
     </div>
@@ -54,28 +57,47 @@
   <section id="tabs">
     <div class="container">
       <div class="button">
-        <a href="index.html">Schedule Matchups</a>
+        <a href="#" data-target="standings" class="nav-link">Standings</a>
+        <a href="#" data-target="matchups" class="nav-link">Schedule Matchups</a>
       </div>
     </div>
   </section>
 
-  <section id="data">
-    <div class="container">
+  <section class="container">
+    <div class="page" id="home">
+      <h1>Home to Interesting Fantasy Basketball Stats</h1>
+    </div>
+
+    <div class="page active" id="standings">
+      <div class="flex-container">
+        <h1>League Standings</h1>
+        <p>Current league standings and win-loss record for each category</p>
+        <div id="standings-table"></div>
+      </div>
+    </div>
+
+    <div class="page" id="matchups">
       <h2>Schedule Matchups</h2>
       <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
       <template>
-        <div class="box" id="matchup-table-template">
+        <div class="flex-item" id="matchup-table-template">
           <h1>%t - Week %w</h1>
           <div class="box" id="google-charts-table"></div>
         </div>
       </template>
       <div class="flex-container" id="matchup-tables"></div>
     </div>
+
+    <div class="page" id="about">
+      <h1>About Page</h1>
+    </div>
   </section>
 
-  <footer>
+  <!--
+  <footer class="footer">
     <p>Fantasy Basketball Analytics - Elvin Feng</p>
-  </footer>
+  </footer> -->
+  
 
   <script src="js/vendor/modernizr-3.7.1.min.js"></script>
   <script src="js/plugins.js"></script>

@@ -57,10 +57,11 @@ class DataScraper(object):
             id            INT            PK
             id_key        VARCHAR(255)
             abbrev        VARCHAR(4)
-            location      VARCHAR(255)
-            nickname      VARCHAR(255)
+            team_name     VARCHAR(255)
             first_name    VARCHAR(255)
             last_name     VARCHAR(255)
+            wins          INT
+            losses        INT
 
         Table "scoreboard" in MySQL with columns
             scores_id     INT            PK AI
@@ -121,10 +122,11 @@ class DataScraper(object):
                                   "id INT PRIMARY KEY,"
                                   "id_key VARCHAR(255),"
                                   "abbrev VARCHAR(4),"
-                                  "location VARCHAR(255),"
-                                  "nickname VARCHAR(255),"
+                                  "team_name VARCHAR(255),"
                                   "first_name VARCHAR(255),"
-                                  "last_name VARCHAR(255))")  
+                                  "last_name VARCHAR(255),"
+                                  "wins INT,"
+                                  "losses INT)")  
 
         if (tables is None) or ("scoreboard",) not in tables:
             self.mycursor.execute("CREATE TABLE scoreboard ("
@@ -194,8 +196,8 @@ class DataScraper(object):
 
         self.num_teams = len(d["teams"])
 
-        sql = ("INSERT INTO teams (id, id_key, abbrev, location, nickname, first_name, last_name)"
-                " VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        sql = ("INSERT INTO teams (id, id_key, abbrev, team_name, first_name, last_name, wins, losses)"
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
                 " ON DUPLICATE KEY UPDATE id=id")
         vals = []
 
@@ -203,15 +205,16 @@ class DataScraper(object):
             id = team["id"]
             id_key = team["primaryOwner"]
             abbrev = team["abbrev"]
-            location = team["location"]
-            nickname = team["nickname"]
+            team_name = team["location"] + " " + team["nickname"]
+            wins = team["record"]["overall"]["wins"]
+            losses = team["record"]["overall"]["losses"]
 
             for member in d["members"]:
                 if id_key in member["id"]:
                     first_name = member["firstName"]
                     last_name = member["lastName"]
 
-            vals.append((id, id_key, abbrev, location, nickname, first_name, last_name))
+            vals.append((id, id_key, abbrev, team_name, first_name, last_name, wins, losses))
 
         self.mycursor.executemany(sql, vals)
         self.mydb.commit()
