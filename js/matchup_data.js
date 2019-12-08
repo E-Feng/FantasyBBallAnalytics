@@ -1,80 +1,47 @@
-let matchup_data = {};
-let teams = {};
-let num_weeks;
-let num_teams;
-let cur_week;
-let matchup_headers = {
-  "Team Name": "string",
-  "Owner": "string",
-  "FG%": "number",
-  "FT%": "number",
-  "3PM": "number",
-  "REB": "number",
-  "AST": "number",
-  "STL": "number",
-  "BLK": "number",
-  "TO": "number",
-  "EJ": "number",
-  "PTS": "number",
-};
-
-$.getJSON("json/team_data.json", function (team_json) {
-  let data = JSON.parse(team_json["teams"]);
-  for (let team of data["data"]){
-    teams[team["id"]] = team["team_name"];
-  }
-})
-
-$.getJSON("json/matchup_data.json", function (matchup_json) {
-  for (let week in matchup_json) {
-    matchup_data[week] = {};
-    for (let team_id in matchup_json[week]) {
-      matchup_data[week][team_id] = {};
-
-      matchup = matchup_json[week][team_id];
-      opp_name = matchup["away_name"];
-      home_stats = JSON.parse(matchup["home_stats"]);
-      away_raw = JSON.parse(matchup["away_raw"]);
-      away_sub = JSON.parse(matchup["away_sub"]);
-
-      away_raw_arr = [];
-      for (stat of away_raw["data"]) {
-        away_raw_arr.push(Object.values(stat));
-      }
-
-      away_sub_arr = [];
-      for (stat of away_sub["data"]) {
-        away_sub_arr.push(Object.values(stat));
-      }      
-
-      matchup_data[week][team_id]["away_name"] = opp_name;
-      matchup_data[week][team_id]["home_stats"] = Object.values(home_stats["data"][0]);
-      matchup_data[week][team_id]["away_raw"] = away_raw_arr;
-      matchup_data[week][team_id]["away_sub"] = away_sub_arr;
-
-      num_teams = team_id;
-      cur_week = week;
-    }
-    num_weeks = week;
-  }
-});
-
 function drawAllMatchupTables() {
-  let counter = 1;
+  let ele;
+  let item;
+  let weeks_added = false;
+  let fragment = document.createDocumentFragment();  
   for (let team_id = 1; team_id <= num_teams; team_id++) {
     for (let week = 1; week <= cur_week; week++) {
       // Create HTML div from template
-      //let html = $("#matchup-table-template").html();
+      let table_id = "google-charts-table" + week + "-" + team_id;
+
       let html = $("template")[0].innerHTML;
       html = html.replace("%w", week);
       html = html.replace("%t", teams[team_id]);
-      html = html.replace("google-charts-table", "google-charts-table" + counter)
-      $new = $("#matchup-tables").append(html);
+      html = html.replace("%dw", week);
+      html = html.replace("%dt", team_id);      
+      html = html.replace("google-charts-table", table_id)
+      ele = document.createElement(null);
+      ele.innerHTML = html;
+      ele = ele.firstElementChild;
+      fragment.appendChild(ele);
 
-      drawMatchupTable(week, team_id, counter);
-      counter++;
+      $("#" + table_id).ready(() => drawMatchupTable(week, team_id));
+
+      // Add weeks to filter drop down menu
+      if (!weeks_added){
+        item = document.createElement("option");
+        item.innerHTML = week;
+        item.value = week;
+        $(".matchup-weeks-filter").append(item);
+      }
     }
+    weeks_filter.selectedIndex = String(cur_week);
+    weeks_added = true;
+
+    // Add team name to filter drop down menu
+    item = document.createElement("option");
+    item.innerHTML = teams[team_id];
+    item.value = team_id;
+    $(".matchup-teams-filter").append(item);
   }
+  $("#matchup-tables").append(fragment);
+
+  let event = new Event("change");
+  weeks_filter.dispatchEvent(event);
 }
 
 
@@ -146,12 +113,12 @@ function drawMatchupTable(week, team_id, counter) {
 
     // Assume win then change if loss
     addNewProperty(data, i+1, 0, 'green-background');
-    if (win_diff < 0 | (win_diff == 0 & (away_sub[i][12] > 0))) {
+    if (win_diff < 0 | (win_diff == 0 & (away_sub[i][getColumnIndex("PTS")] > 0))) {
       addNewProperty(data, i+1, 0, 'red-background');
     }
   }
 
-  let table_id = "google-charts-table" + String(counter);
+  let table_id = "google-charts-table" + week + "-" + team_id;
   let table = new google.visualization.Table(document.getElementById(table_id));
   
   let formatter = new google.visualization.NumberFormat(
@@ -170,4 +137,13 @@ function addNewProperty(data, row, col, prop){
     new_prop = prop;
   }
   data.setProperty(row, col, "className", new_prop);
+}
+
+function getColumnIndex(str) {
+  header_keys = Object.keys(matchup_headers);
+  for (let i=0; i< header_keys.length; i++) {
+    if (str == header_keys[i]) {
+      return i;
+    }
+  }
 }

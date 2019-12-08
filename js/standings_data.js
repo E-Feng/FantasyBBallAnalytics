@@ -1,30 +1,3 @@
-let standings_data = [];
-let standings_headers = {
-  "Rank": "number",
-  "Team Name": "string",
-  "W": "number",
-  "L": "number",
-  "FG%": "string",
-  "FT%": "string",
-  "3PM": "string",
-  "REB": "string",
-  "AST": "string",
-  "STL": "string",
-  "BLK": "string",
-  "TO": "string",
-  "EJ": "string",
-  "PTS": "string",
-};
-
-
-$.getJSON("json/standings_data.json", function (standings_json) {
-  let data = JSON.parse(standings_json);
-  
-  for (let team of data["data"]) {
-    standings_data.push(Object.values(team));
-  }
-})
-
 function drawStandingsTable() {
   let cssClassNames = {
     headerRow: '',
@@ -59,18 +32,68 @@ function drawStandingsTable() {
 
       data.setCell(i, j, val);
       if ((typeof(val) == "string") & (data.getColumnLabel(j) != "Team Name")) {
-        val = val.split("-").map(x => parseInt(x));
-        if (val[0] > val[1]) {
-          addNewProperty(data, i, j, 'green-background');
-        } else if (val[0] < val[1]) {
-          addNewProperty(data, i, j, 'red-background');
-        } else if (val[0] == val[1]) {
-          addNewProperty(data, i, j, 'yellow-background');
+        let vals = val.split("-").map(x => parseInt(x));
+        let ratio = vals[1] / vals[0];
+        // Dull the colors of ejection
+        if (data.getColumnLabel(j) == "EJ"){
+          ratio = (ratio + 1)/2;
         }
+        let h = getColorValue(ratio);
+
+        data.setProperty(i, j, "style", "background-color: " + h)
       }
     }
   }
 
   let table = new google.visualization.Table(document.getElementById("standings-table"));
   table.draw(data, options)
+}
+
+function getColorValue(val) {
+  val = val > 2 ? 2 : val;
+  let h = Math.floor((2 - val) * 60) + 10;
+  let s = 100;
+  let l = 70;
+
+  return HSLToHex(h, s, l);
+}
+
+function HSLToHex(h,s,l) {
+  s /= 100;
+  l /= 100;
+
+  let c = (1 - Math.abs(2 * l - 1)) * s,
+      x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+      m = l - c/2,
+      r = 0,
+      g = 0,
+      b = 0;
+
+  if (0 <= h && h < 60) {
+    r = c; g = x; b = 0;
+  } else if (60 <= h && h < 120) {
+    r = x; g = c; b = 0;
+  } else if (120 <= h && h < 180) {
+    r = 0; g = c; b = x;
+  } else if (180 <= h && h < 240) {
+    r = 0; g = x; b = c;
+  } else if (240 <= h && h < 300) {
+    r = x; g = 0; b = c;
+  } else if (300 <= h && h < 360) {
+    r = c; g = 0; b = x;
+  }
+  // Having obtained RGB, convert channels to hex
+  r = Math.round((r + m) * 255).toString(16);
+  g = Math.round((g + m) * 255).toString(16);
+  b = Math.round((b + m) * 255).toString(16);
+
+  // Prepend 0s, if necessary
+  if (r.length == 1)
+    r = "0" + r;
+  if (g.length == 1)
+    g = "0" + g;
+  if (b.length == 1)
+    b = "0" + b;
+
+  return "#" + r + g + b;
 }

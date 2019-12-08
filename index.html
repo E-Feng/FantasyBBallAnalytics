@@ -16,22 +16,8 @@
 
   <meta name="theme-color" content="#fafafa">
 
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-  <script>
-    window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
-  </script>
-  <script src="js/main.js"></script>
-  <script src="js/matchup_data.js"></script>
-  <script src="js/standings_data.js"></script>
+
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    google.charts.load('current', {
-      packages: ['table']
-    });
-    google.charts.setOnLoadCallback(drawAllMatchupTables);
-    google.charts.setOnLoadCallback(drawStandingsTable);
-  </script>
 </head>
 
 <body>
@@ -63,12 +49,12 @@
     </div>
   </section>
 
-  <section class="container">
+  <section class="container active">
     <div class="page" id="home">
       <h1>Home to Interesting Fantasy Basketball Stats</h1>
     </div>
 
-    <div class="page active" id="standings">
+    <div class="page" id="standings">
       <div class="flex-container">
         <h1>League Standings</h1>
         <p>Current league standings and win-loss record for each category</p>
@@ -79,13 +65,23 @@
     <div class="page" id="matchups">
       <h2>Schedule Matchups</h2>
       <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
-      <template>
-        <div class="flex-item" id="matchup-table-template">
+      <form>
+        <select class="matchup-teams-filter">
+          <option value="all">All Teams</option>
+        </select>
+      </form>
+      <form>
+        <select class="matchup-weeks-filter">
+          <option value="all">All Weeks</option>
+        </select>
+      </form>
+      <div class="flex-container" id="matchup-tables"></div>
+      <template id="matchup-tables-template">
+        <div class="flex-item" data-week="%dw" data-team-id="%dt">
           <h1>%t - Week %w</h1>
           <div class="box" id="google-charts-table"></div>
         </div>
       </template>
-      <div class="flex-container" id="matchup-tables"></div>
     </div>
 
     <div class="page" id="about">
@@ -97,10 +93,27 @@
   <footer class="footer">
     <p>Fantasy Basketball Analytics - Elvin Feng</p>
   </footer> -->
-  
 
+  <!-- Scripts  -->  
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script>
+    window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
+  </script>
+  <script src="js/load_json.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/matchup_data.js"></script>
+  <script src="js/standings_data.js"></script>
   <script src="js/vendor/modernizr-3.7.1.min.js"></script>
   <script src="js/plugins.js"></script>
+
+  <script type="text/javascript">
+    google.charts.load('current', {
+      packages: ['table']
+    });
+    google.charts.setOnLoadCallback(drawAllMatchupTables);
+    google.charts.setOnLoadCallback(drawStandingsTable);
+  </script>
 
   <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
   <script>

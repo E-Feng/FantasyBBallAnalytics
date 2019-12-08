@@ -40,3 +40,32 @@ const app = {
 }
 
 document.addEventListener("DOMContentLoaded", app.init);
+
+
+let weeks_filter = document.querySelector(".matchup-weeks-filter");
+weeks_filter.addEventListener("change", filter_weeks)
+
+function filter_weeks() {
+    let selected_event = this.options[this.selectedIndex].value;
+    if (selected_event == "all") {
+        $("#matchup-tables div").removeClass("hidden");
+    } else {
+        $("#matchup-tables div[data-week]").addClass("hidden");
+        $('#matchup-tables div[data-week="' + selected_event + '"]').removeClass("hidden");
+        teams_filter.selectedIndex = "all";
+    }    
+}
+
+let teams_filter = document.querySelector(".matchup-teams-filter");
+teams_filter.addEventListener("change", filter_teams)
+
+function filter_teams() {
+    let selected_event = this.options[this.selectedIndex].value;
+    if (selected_event == "all") {
+        $("#matchup-tables div").removeClass("hidden");
+    } else {
+        $("#matchup-tables div[data-team-id]").addClass("hidden");
+        $('#matchup-tables div[data-team-id="' + selected_event + '"]').removeClass("hidden");
+        weeks_filter.selectedIndex = "all";
+    }    
+}
