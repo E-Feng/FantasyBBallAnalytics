@@ -164,6 +164,7 @@ header nav {
 .flex-item {
   text-align: center;
   padding: 0 10px;
+  overflow: auto;
 }
 
 

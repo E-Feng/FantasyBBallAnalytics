@@ -1,6 +1,7 @@
 let matchup_data = {};
 let standings_data = [];
 let teams = {};
+let teams_rev = {};
 let team_logos = {};
 
 let num_teams;
@@ -45,6 +46,8 @@ $.getJSON("json/team_data.json", function (team_json) {
   for (let team of data["data"]) {
     teams[team["id"]] = team["team_name"];
     team_logos[team["id"]] = team["logo_url"];
+
+    teams_rev[team["team_name"]] = team["id"];
   }
 })
 

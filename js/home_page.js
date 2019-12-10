@@ -1,11 +1,9 @@
 function initHomePage() {
-    let winner_id = standings_data[0][0]
     let winner_name = standings_data[0][1]
-    let loser_id = standings_data[num_teams-1][0]
     let loser_name = standings_data[num_teams-1][1]
 
-    let winner_logo = team_logos[winner_id]
-    let loser_logo = team_logos[loser_id]
+    let winner_logo = team_logos[teams_rev[winner_name]]
+    let loser_logo = team_logos[teams_rev[loser_name]]
 
     $("#current-winner").text(winner_name);
     $("#current-loser").text(loser_name);
