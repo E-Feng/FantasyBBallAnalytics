@@ -42,7 +42,7 @@ const app = {
 document.addEventListener("DOMContentLoaded", app.init);
 
 
-let weeks_filter = document.querySelector(".matchup-weeks-filter");
+let weeks_filter = document.querySelector("#matchup-weeks-filter");
 weeks_filter.addEventListener("change", filter_weeks)
 
 function filter_weeks() {
@@ -56,7 +56,7 @@ function filter_weeks() {
     }    
 }
 
-let teams_filter = document.querySelector(".matchup-teams-filter");
+let teams_filter = document.querySelector("#matchup-teams-filter");
 teams_filter.addEventListener("change", filter_teams)
 
 function filter_teams() {

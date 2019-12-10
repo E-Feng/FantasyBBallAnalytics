@@ -55,13 +55,13 @@ class DataScraper(object):
         Returns:
         Table "teams" in MySQL with columns
             id            INT            PK
-            id_key        VARCHAR(255)
             abbrev        VARCHAR(4)
             team_name     VARCHAR(255)
             first_name    VARCHAR(255)
             last_name     VARCHAR(255)
             wins          INT
             losses        INT
+            logo_url      VARCHAR(255)
 
         Table "scoreboard" in MySQL with columns
             scores_id     INT            PK AI
@@ -120,13 +120,13 @@ class DataScraper(object):
         if (tables is None) or ("teams",) not in tables:
             self.mycursor.execute("CREATE TABLE teams ("
                                   "id INT PRIMARY KEY,"
-                                  "id_key VARCHAR(255),"
                                   "abbrev VARCHAR(4),"
                                   "team_name VARCHAR(255),"
                                   "first_name VARCHAR(255),"
                                   "last_name VARCHAR(255),"
                                   "wins INT,"
-                                  "losses INT)")  
+                                  "losses INT,"
+                                  "logo_url VARCHAR(255))")  
 
         if (tables is None) or ("scoreboard",) not in tables:
             self.mycursor.execute("CREATE TABLE scoreboard ("
@@ -187,6 +187,8 @@ class DataScraper(object):
         """ 
         Gets team data for league from ESPN
         """
+        self.mycursor.execute("TRUNCATE TABLE teams")
+
         r = requests.get(self.base_url,
                         params={"view" : "mTeam"},
                         cookies={"swid" : self.swid_cookie,
@@ -196,7 +198,7 @@ class DataScraper(object):
 
         self.num_teams = len(d["teams"])
 
-        sql = ("INSERT INTO teams (id, id_key, abbrev, team_name, first_name, last_name, wins, losses)"
+        sql = ("INSERT INTO teams (id, abbrev, team_name, first_name, last_name, wins, losses, logo_url)"
                 " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
                 " ON DUPLICATE KEY UPDATE id=id")
         vals = []
@@ -206,6 +208,7 @@ class DataScraper(object):
             id_key = team["primaryOwner"]
             abbrev = team["abbrev"]
             team_name = team["location"] + " " + team["nickname"]
+            logo_url = team["logo"]
             wins = team["record"]["overall"]["wins"]
             losses = team["record"]["overall"]["losses"]
 
@@ -214,7 +217,7 @@ class DataScraper(object):
                     first_name = member["firstName"]
                     last_name = member["lastName"]
 
-            vals.append((id, id_key, abbrev, team_name, first_name, last_name, wins, losses))
+            vals.append((id, abbrev, team_name, first_name, last_name, wins, losses, logo_url))
 
         self.mycursor.executemany(sql, vals)
         self.mydb.commit()

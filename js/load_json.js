@@ -1,6 +1,7 @@
 let matchup_data = {};
 let standings_data = [];
 let teams = {};
+let team_logos = {};
 
 let num_teams;
 let num_weeks;
@@ -43,6 +44,7 @@ $.getJSON("json/team_data.json", function (team_json) {
 
   for (let team of data["data"]) {
     teams[team["id"]] = team["team_name"];
+    team_logos[team["id"]] = team["logo_url"];
   }
 })
 
@@ -91,3 +93,4 @@ $.getJSON("json/matchup_data.json", function (matchup_json) {
 google.charts.load('current', {packages: ['table']});
 google.charts.setOnLoadCallback(drawAllMatchupTables);
 google.charts.setOnLoadCallback(drawStandingsTable);
+setTimeout(initHomePage, 2000);

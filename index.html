@@ -40,45 +40,47 @@
     </div>
   </header>
 
-  <section id="tabs">
-    <div class="container">
-      <div class="button">
-        <a href="#" data-target="standings" class="nav-link">Standings</a>
-        <a href="#" data-target="matchups" class="nav-link">Schedule Matchups</a>
-      </div>
-    </div>
+  <section class="container" id="tabs">
+    <a href="#" data-target="standings" class="nav-link button">Standings</a>
+    <a href="#" data-target="matchups" class="nav-link button">Schedule Matchups</a>
   </section>
 
-  <section class="container active">
-    <div class="page" id="home">
-      <h1>Home to Interesting Fantasy Basketball Stats</h1>
+  <section class="container" id="main-content">
+    <div class="page active" id="home">
+      <h1>LABron MVP - ESPN Fantasy Basketball League</h1>
+      <h3>Current Winner</h3>
+      <p id="current-winner"></p>
+      <img src="" alt="" id="img-winner">
+      <h3>Current Loser</h3>
+      <p id="current-loser"></p>
+      <img src="" alt="" id="img-loser">
     </div>
 
     <div class="page" id="standings">
-      <div class="flex-container">
-        <h1>League Standings</h1>
-        <p>Current league standings and win-loss record for each category</p>
-        <div id="standings-table"></div>
-      </div>
+      <h1>League Standings</h1>
+      <p>Current league standings and win-loss-tie record for each category</p>
+      <div id="standings-table"></div>
     </div>
 
     <div class="page" id="matchups">
-      <h2>Schedule Matchups</h2>
+      <h1>Schedule Matchups</h1>
       <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
       <form>
-        <select class="matchup-teams-filter">
+        <select id="matchup-teams-filter">
           <option value="all">All Teams</option>
         </select>
       </form>
       <form>
-        <select class="matchup-weeks-filter">
+        <select id="matchup-weeks-filter">
           <option value="all">All Weeks</option>
         </select>
       </form>
+      <div class="clear"></div>
       <div class="flex-container" id="matchup-tables"></div>
+
       <template id="matchup-tables-template">
         <div class="flex-item" data-week="%dw" data-team-id="%dt">
-          <h1>%t - Week %w</h1>
+          <h2>%t - Week %w</h2>
           <div class="box" id="google-charts-table"></div>
         </div>
       </template>
@@ -94,13 +96,14 @@
     <p>Fantasy Basketball Analytics - Elvin Feng</p>
   </footer> -->
 
-  <!-- Scripts  -->  
+  <!-- Scripts  -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script>
     window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
   </script>
   <script src="js/main.js"></script>
+  <script src="js/home_page.js"></script>
   <script src="js/matchup_data.js"></script>
   <script src="js/standings_data.js"></script>
   <script src="js/vendor/modernizr-3.7.1.min.js"></script>

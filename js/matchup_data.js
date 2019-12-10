@@ -26,7 +26,7 @@ function drawAllMatchupTables() {
         item = document.createElement("option");
         item.innerHTML = week;
         item.value = week;
-        $(".matchup-weeks-filter").append(item);
+        $("#matchup-weeks-filter").append(item);
       }
     }
     weeks_filter.selectedIndex = String(cur_week);
@@ -36,7 +36,7 @@ function drawAllMatchupTables() {
     item = document.createElement("option");
     item.innerHTML = teams[team_id];
     item.value = team_id;
-    $(".matchup-teams-filter").append(item);
+    $("#matchup-teams-filter").append(item);
   }
   $("#matchup-tables").append(fragment);
 
