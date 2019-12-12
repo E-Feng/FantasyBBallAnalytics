@@ -134,6 +134,10 @@ header nav {
 
 
 /* Home */
+#win-per-line-graph {
+  float: left;
+}
+
 #side-rankings {
   float: right;
 }

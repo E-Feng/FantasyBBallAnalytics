@@ -48,12 +48,13 @@
   <section class="container" id="main-content">
     <div class="page active" id="home">
       <h1>LABron MVP - ESPN Fantasy Basketball League</h1>
+      <div id="win-per-line-graph"></div>
       
       <aside id="side-rankings"></aside>
       <template id="side-rankings-template">
         <div class="box">
-          <p id="side-rankings-name"></p>
-          <img src="" alt="" id="side-rankings-logo">
+          <p>%p</p>
+          <img src="%src" alt="%alt">
         </div>
       </template>
     </div>
@@ -107,7 +108,7 @@
   </script>
   <script src="js/main.js"></script>
   <script src="js/util.js"></script>
-  <script src="js/home_page.js"></script>
+  <script src="js/homepage_data.js"></script>
   <script src="js/matchup_data.js"></script>
   <script src="js/standings_data.js"></script>
   <script src="js/vendor/modernizr-3.7.1.min.js"></script>

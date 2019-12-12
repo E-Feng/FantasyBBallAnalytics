@@ -145,6 +145,7 @@ homepage_json = {}
 
 per_timeline = wins_timeline / (wins_timeline + losses_timeline)
 per_timeline[per_timeline == np.inf] = 0
+per_timeline = per_timeline.transpose()
 homepage_json["per_timeline"] = per_timeline.tolist()
 
 

@@ -1,5 +1,6 @@
 let matchup_data = {};
 let standings_data = [];
+let homepage_data = {};
 let teams = {};
 let teams_rev = {};
 let team_logos = {};
@@ -51,6 +52,10 @@ $.getJSON("json/team_data.json", function (team_json) {
   }
 })
 
+$.getJSON("json/homepage_data.json", function (homepage_json) {
+  homepage_data["per_timeline"] = homepage_json["per_timeline"];
+})
+
 $.getJSON("json/standings_data.json", function (standings_json) {
   let data = JSON.parse(standings_json);
 
@@ -93,7 +98,8 @@ $.getJSON("json/matchup_data.json", function (matchup_json) {
   }
 });
 
-google.charts.load('current', {packages: ['table']});
+google.charts.load('current', {packages: ['table', 'corechart']});
 google.charts.setOnLoadCallback(drawAllMatchupTables);
 google.charts.setOnLoadCallback(drawStandingsTable);
+google.charts.setOnLoadCallback(drawWinPerLineGraph);
 setTimeout(initHomePage, 2000);
