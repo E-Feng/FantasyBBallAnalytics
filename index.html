@@ -48,17 +48,20 @@
   <section class="container" id="main-content">
     <div class="page active" id="home">
       <h1>LABron MVP - ESPN Fantasy Basketball League</h1>
-      <h3>Current Winner</h3>
-      <p id="current-winner"></p>
-      <img src="" alt="placeholder" id="img-winner">
-      <h3>Current Loser</h3>
-      <p id="current-loser"></p>
-      <img src="" alt="placeholder" id="img-loser">
+      
+      <aside id="side-rankings"></aside>
+      <template id="side-rankings-template">
+        <div class="box">
+          <p id="side-rankings-name"></p>
+          <img src="" alt="" id="side-rankings-logo">
+        </div>
+      </template>
     </div>
 
     <div class="page" id="standings">
       <h1>League Standings</h1>
       <p>Current league standings and win-loss-tie record for each category</p>
+      <p>Top 7 make playoffs, #1 overall gets first round bye</p>
       <div id="standings-table"></div>
     </div>
 
@@ -76,8 +79,8 @@
         </select>
       </form>
       <div class="clear"></div>
-      <div class="flex-container" id="matchup-tables"></div>
 
+      <div class="flex-container" id="matchup-tables"></div>
       <template id="matchup-tables-template">
         <div class="flex-item" data-week="%dw" data-team-id="%dt">
           <h2>%t - Week %w</h2>
@@ -103,6 +106,7 @@
     window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
   </script>
   <script src="js/main.js"></script>
+  <script src="js/util.js"></script>
   <script src="js/home_page.js"></script>
   <script src="js/matchup_data.js"></script>
   <script src="js/standings_data.js"></script>

@@ -8,7 +8,7 @@ function drawAllMatchupTables() {
       // Create HTML div from template
       let table_id = "google-charts-table" + week + "-" + team_id;
 
-      let html = $("template")[0].innerHTML;
+      let html = getTemplateByID("matchup-tables-template").innerHTML;
       html = html.replace("%w", week);
       html = html.replace("%t", teams[team_id]);
       html = html.replace("%dw", week);
@@ -127,23 +127,4 @@ function drawMatchupTable(week, team_id, counter) {
   formatter.format(data, 3);
 
   table.draw(data, options);
-}
-
-function addNewProperty(data, row, col, prop){
-  old_prop = data.getProperties(row, col);
-  if (old_prop["className"]) {
-    new_prop = old_prop["className"] + " " + prop;
-  } else {
-    new_prop = prop;
-  }
-  data.setProperty(row, col, "className", new_prop);
-}
-
-function getColumnIndex(str) {
-  header_keys = Object.keys(matchup_headers);
-  for (let i=0; i< header_keys.length; i++) {
-    if (str == header_keys[i]) {
-      return i;
-    }
-  }
 }

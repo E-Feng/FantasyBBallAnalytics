@@ -2,6 +2,7 @@ import json
 import mysql.connector
 import sqlalchemy 
 import pandas as pd
+import numpy as np
 from operator import add
 from dataScraper import DataScraper
 
@@ -37,10 +38,14 @@ sch_home_raw = pd.read_sql_table("schedules", engine)
 sb_raw = pd.read_sql_table("scoreboard", engine)
 
 num_teams = teams_raw.shape[0]
+num_weeks = sch_home_raw["week"].iloc[-1]
 
 # Creating dataframe for home teams and concatenating
 sch_away_raw = sch_home_raw.copy()
 sch_away_raw = sch_away_raw.rename(columns={"away_id":"home_id", "home_id":"away_id", "away_team":"home_team", "home_team":"away_team"})
+sch_away_raw.loc[(sch_away_raw["won"] == 1), "won"] = 3
+sch_away_raw.loc[(sch_away_raw["won"] == 0), "won"] = 1
+sch_away_raw.loc[(sch_away_raw["won"] == 3), "won"] = 0
 
 schedule = sch_home_raw.append(sch_away_raw, sort=False).sort_values("id")
 schedule = schedule.reset_index()
@@ -53,6 +58,10 @@ matchup_res = {}
 standings_res = teams_raw[["id", "team_name", "wins", "losses"]].sort_values("wins", ascending=False)
 for col in list(sb_raw)[1:]:
     standings_res[col] = "0-0-0"
+
+# Creating array for win/loss timeline
+wins_timeline = np.zeros((num_teams, num_weeks))
+losses_timeline = np.zeros((num_teams, num_weeks))
 
 for index, row in schedule.iterrows():
     home_id = row["home_id"]
@@ -70,6 +79,7 @@ for index, row in schedule.iterrows():
         # Obtaining stats for the home team and matchups
         home_stats = sb_raw.loc[sb_raw["scores_id"] == home_id].drop(columns="scores_id")
         weekly_matchups = schedule.loc[(schedule["week"] == week) & (schedule["away_id"] != row["home_id"])]
+        weekly_matchups = weekly_matchups.drop(columns="won")
 
         # Obtaining stats for all other matchups and calculating difference
         away_stats_raw = pd.merge(weekly_matchups["away_id"], sb_raw, left_on="away_id", right_on="scores_id")
@@ -101,6 +111,12 @@ for index, row in schedule.iterrows():
         away_stats_sub["wins"] = total_wins
         away_stats_sub["losses"] = total_losses
 
+        # Adding to win/loss timeline
+        if row["won"]:
+            wins_timeline[home_team-1][week-1:] += 1
+        else:
+            losses_timeline[home_team-1][week-1:] += 1
+
         # Cleaning up before joining df
         weekly_matchups = weekly_matchups.reset_index(drop=True)
         weekly_matchups = weekly_matchups.drop(columns=["week", "home_id", "away_id", "home_team", "away_team"])
@@ -113,14 +129,23 @@ for index, row in schedule.iterrows():
         matchup_res[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
         matchup_res[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
 
+# Teams data to json file
 teams_json = {}
 teams_json["teams"] = teams_raw.to_json(orient="table", index=False)
 
+# Standings data to json file
 standings_res = standings_res.drop(columns="id")
 standings_res.reset_index(inplace=True, drop=True)
 standings_res.index += 1
 
 standings_json = standings_res.to_json(orient="table")
+
+# Timeline data to json file
+homepage_json = {}
+
+per_timeline = wins_timeline / (wins_timeline + losses_timeline)
+per_timeline[per_timeline == np.inf] = 0
+homepage_json["per_timeline"] = per_timeline.tolist()
 
 
 # Saving final dict to json file
@@ -138,3 +163,8 @@ file_name = "json/standings_data.json"
 
 with open(file_name, "w") as fp:
     json.dump(standings_json, fp)
+
+file_name = "json/homepage_data.json"
+
+with open(file_name, "w") as fp:
+    json.dump(homepage_json, fp)

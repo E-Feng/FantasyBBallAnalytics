@@ -82,7 +82,8 @@ class DataScraper(object):
             home_id       INT            FK to scoreboard.stat_id
             away_id       INT            FK to scoreboard.stat_id
             home_team     INT            FK to teams.id
-            away_team     INT            FK to teams.id  
+            away_team     INT            FK to teams.id 
+            won           BOOLEAN 
 
         Table "player_info" in MySQL with columns
             player_id     INT            PK
@@ -149,7 +150,8 @@ class DataScraper(object):
                                   "home_id INT,"
                                   "away_id INT,"                                  
                                   "home_team INT,"
-                                  "away_team INT)")  
+                                  "away_team INT,"
+                                  "won BOOLEAN)")  
 
         if (tables is None) or ("player_info",) not in tables:
             self.mycursor.execute("CREATE TABLE player_info ("
@@ -237,8 +239,8 @@ class DataScraper(object):
                         
         d = json.loads(r.text)
 
-        sql_sch = ("INSERT INTO schedules (id, week, home_id, away_id, home_team, away_team)"
-                " VALUES (%s, %s, %s, %s, %s, %s)")
+        sql_sch = ("INSERT INTO schedules (id, week, home_id, away_id, home_team, away_team, won)"
+                " VALUES (%s, %s, %s, %s, %s, %s, %s)")
 
         sql_sco = ("INSERT INTO scoreboard (fg_per, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts)"
                 " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
@@ -247,6 +249,8 @@ class DataScraper(object):
         for match in d["schedule"]:
             sch_id = match["id"]
             week = math.ceil(sch_id/(self.num_teams/2))
+            winner = match["winner"]
+            won = True if (winner == "HOME") else False
 
             # Grabbing data for both home and away teams
             scores_id = {}
@@ -276,7 +280,7 @@ class DataScraper(object):
             team_id = match["home"]["teamId"]
             opp_id = match["away"]["teamId"]
 
-            val_sch = (sch_id, week, scores_id["home"], scores_id["away"], team_id, opp_id)
+            val_sch = (sch_id, week, scores_id["home"], scores_id["away"], team_id, opp_id, won)
             
             self.mycursor.execute(sql_sch, val_sch)
             self.mydb.commit()
@@ -325,8 +329,8 @@ class DataScraper(object):
                             fgm = stat["averageStats"][self.CONST_FGM]
                             fga = stat["averageStats"][self.CONST_FGA]
                             fg_per = stat["averageStats"][self.CONST_FG_PER]
-                            ftm = stat["averageStats"][self.CONST_FTA]
-                            fta = stat["averageStats"][self.CONST_FTM]
+                            ftm = stat["averageStats"][self.CONST_FTM]
+                            fta = stat["averageStats"][self.CONST_FTA]
                             ft_per = stat["averageStats"][self.CONST_FT_PER]
                             three_pm = stat["averageStats"][self.CONST_3PM]
                             rebs = stat["averageStats"][self.CONST_REB]

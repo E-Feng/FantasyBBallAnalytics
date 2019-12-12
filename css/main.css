@@ -132,6 +132,22 @@ header nav {
   overflow: auto;
 }
 
+
+/* Home */
+#side-rankings {
+  float: right;
+}
+
+.box {
+  display: block;
+}
+
+.box img {
+  width: 100px;
+  height: 100px;
+}
+
+
 /* Standings */
 #standings-table {
   font-size: 20px;
@@ -202,6 +218,11 @@ header nav {
 .right-border {
   border-color: black !important;
   border-width: 3px 3px 3px 0 !important; 
+}
+
+.bottom-border {
+  border-color: black !important;
+  border-width: 0 0 3px 0 !important;
 }
 
 
