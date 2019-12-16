@@ -42,15 +42,17 @@ function drawWinPerLineGraph() {
     for (let i=0; i<cur_week; i++) {
         let team_data = homepage_data["per_timeline"][i];
         team_data = [i+1].concat(team_data);
-        console.log(team_data);
         data.addRows([team_data]);
     }
 
     let options = {
         title: "Win Percentages",
-        curveType: "function",
         height: 500,
         width: 1000,
+        lineWidth: 5,
+        hAxis: {
+            minValue: 1,
+        }
     }
 
     let chart = new google.visualization.LineChart(document.getElementById("win-per-line-graph"));

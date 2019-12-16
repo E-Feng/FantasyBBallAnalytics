@@ -134,12 +134,24 @@ header nav {
 
 
 /* Home */
-#win-per-line-graph {
+#home {
+  position: relative;
+}
+
+#home .wrapper {
   float: left;
+}
+
+#win-per-line-graph {
+  border: black 3px solid;
 }
 
 #side-rankings {
   float: right;
+}
+
+#injury-list {
+  border: black 3px solid;
 }
 
 .box {

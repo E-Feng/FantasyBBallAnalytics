@@ -1,15 +1,4 @@
-let matchup_data = {};
-let standings_data = [];
-let homepage_data = {};
-let teams = {};
-let teams_rev = {};
-let team_logos = {};
-
-let num_teams;
-let num_weeks;
-let cur_week;
-
-let standings_headers = {
+const standings_headers = {
   "Rank": "number",
   "Team Name": "string",
   "W": "number",
@@ -25,7 +14,7 @@ let standings_headers = {
   "EJ": "string",
   "PTS": "string",
 };
-let matchup_headers = {
+const matchup_headers = {
   "Team Name": "string",
   "Owner": "string",
   "FG%": "number",
@@ -40,6 +29,47 @@ let matchup_headers = {
   "PTS": "number",
 };
 
+let matchup_data = {};
+let standings_data = [];
+let homepage_data = {};
+let teams = {};
+let teams_rev = {};
+let team_logos = {};
+
+let num_teams;
+let num_weeks;
+let cur_week;
+
+let json_data = {};
+
+const json_files = ["homepage_data",
+  "injury_list",
+  "matchup_data",
+  "standings_data",
+  "team_data"
+];
+
+async function load_json_files() {
+  const url = "https://raw.githubusercontent.com/E-Feng/JSONStorage/master/"
+  for (let i=0; i<json_files.length; i++) {
+    let json_name = json_files[i];
+    let res = await fetch(url + json_name + ".json");
+    let data = await res.json();
+    json_data[json_name] = data;
+    console.log(json_name, "running")
+  }
+  console.log("Finished")
+}
+
+load_json_files().
+then(() => {
+  google.charts.load('current', {packages: ['table', 'corechart']});
+  google.charts.setOnLoadCallback(drawAllMatchupTables);
+  google.charts.setOnLoadCallback(drawStandingsTable);
+  google.charts.setOnLoadCallback(drawWinPerLineGraph);
+  initHomePage();
+}).
+catch (err => console.log(err));
 
 $.getJSON("json/team_data.json", function (team_json) {
   let data = JSON.parse(team_json["teams"]);
@@ -97,9 +127,3 @@ $.getJSON("json/matchup_data.json", function (matchup_json) {
     num_weeks = week;
   }
 });
-
-google.charts.load('current', {packages: ['table', 'corechart']});
-google.charts.setOnLoadCallback(drawAllMatchupTables);
-google.charts.setOnLoadCallback(drawStandingsTable);
-google.charts.setOnLoadCallback(drawWinPerLineGraph);
-setTimeout(initHomePage, 2000);

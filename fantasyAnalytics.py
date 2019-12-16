@@ -63,6 +63,7 @@ for col in list(sb_raw)[1:]:
 wins_timeline = np.zeros((num_teams, num_weeks))
 losses_timeline = np.zeros((num_teams, num_weeks))
 
+# Looking through schedule and matchups
 for index, row in schedule.iterrows():
     home_id = row["home_id"]
     home_team = row["home_team"]
