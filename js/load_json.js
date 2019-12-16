@@ -42,7 +42,7 @@ let cur_week;
 
 let json_data = {};
 
-const json_files = ["homepage_data",
+const json_files = ["wins_timeline",
   "injury_list",
   "matchup_data",
   "standings_data",
@@ -55,10 +55,13 @@ async function load_json_files() {
     let json_name = json_files[i];
     let res = await fetch(url + json_name + ".json");
     let data = await res.json();
-    json_data[json_name] = data;
-    console.log(json_name, "running")
+    try {
+      json_data[json_name] = JSON.parse(data);
+    } catch(e) {
+      json_data[json_name] = data;
+      console.log(e);
+    }
   }
-  console.log("Finished")
 }
 
 load_json_files().

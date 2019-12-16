@@ -1,3 +1,4 @@
+import os
 import json
 import mysql.connector
 import sqlalchemy 
@@ -36,6 +37,7 @@ print("All tables initialized and loaded with data")
 teams_raw = pd.read_sql_table("teams", engine)
 sch_home_raw = pd.read_sql_table("schedules", engine)
 sb_raw = pd.read_sql_table("scoreboard", engine)
+players_info_raw = pd.read_sql_table("player_info", engine)
 
 num_teams = teams_raw.shape[0]
 num_weeks = sch_home_raw["week"].iloc[-1]
@@ -130,6 +132,19 @@ for index, row in schedule.iterrows():
         matchup_res[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
         matchup_res[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
 
+# Looking through players
+injury_list = []
+for index, row in players_info_raw.iterrows():
+    # Check if player is currently rostered and not active
+    if not np.isnan(row["team_id"]):
+        if not row["state"] == "ACTIVE":
+            player = {
+                "name": row["first_name"] + " " + row["last_name"],
+                "state": row["state"],
+                "team": row["team_id"],
+            }
+            injury_list.append(player)
+
 # Teams data to json file
 teams_json = {}
 teams_json["teams"] = teams_raw.to_json(orient="table", index=False)
@@ -150,23 +165,19 @@ per_timeline = per_timeline.transpose()
 homepage_json["per_timeline"] = per_timeline.tolist()
 
 
-# Saving final dict to json file
-file_name = "json/matchup_data.json"
+# Saving all results to json files
+json_files = {"homepage_data": homepage_json,
+              "injury_list": injury_list,
+              "matchup_data": matchup_res,
+              "standings_data": standings_json,
+              "team_data": teams_json}
 
-with open(file_name, "w") as fp:
-    json.dump(matchup_res, fp)
+for file_name, data in json_files.items():
+    path = "C:\\Users\\Elvin\\Desktop\\JSONStorage\\"
+    file_name = path + file_name + ".json"
 
-file_name = "json/team_data.json"
+    with open(file_name, "w") as fp:
+        json.dump(data, fp)
 
-with open(file_name, "w") as fp:
-    json.dump(teams_json, fp)
-
-file_name = "json/standings_data.json"
-
-with open(file_name, "w") as fp:
-    json.dump(standings_json, fp)
-
-file_name = "json/homepage_data.json"
-
-with open(file_name, "w") as fp:
-    json.dump(homepage_json, fp)
+# Run commit and push shell script to update
+os.system(path + "commitAndPush.sh")
