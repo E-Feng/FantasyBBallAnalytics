@@ -30,12 +30,6 @@ const matchup_headers = {
 };
 
 let matchup_data = {};
-let standings_data = [];
-let homepage_data = {};
-let teams = {};
-let teams_rev = {};
-let team_logos = {};
-
 let num_teams;
 let num_weeks;
 let cur_week;
@@ -59,13 +53,13 @@ async function load_json_files() {
       json_data[json_name] = JSON.parse(data);
     } catch(e) {
       json_data[json_name] = data;
-      console.log(e);
     }
   }
 }
 
 load_json_files().
 then(() => {
+  formatMatchupData();
   google.charts.load('current', {packages: ['table', 'corechart']});
   google.charts.setOnLoadCallback(drawAllMatchupTables);
   google.charts.setOnLoadCallback(drawStandingsTable);
@@ -74,36 +68,15 @@ then(() => {
 }).
 catch (err => console.log(err));
 
-$.getJSON("json/team_data.json", function (team_json) {
-  let data = JSON.parse(team_json["teams"]);
 
-  for (let team of data["data"]) {
-    teams[team["id"]] = team["team_name"];
-    team_logos[team["id"]] = team["logo_url"];
-
-    teams_rev[team["team_name"]] = team["id"];
-  }
-})
-
-$.getJSON("json/homepage_data.json", function (homepage_json) {
-  homepage_data["per_timeline"] = homepage_json["per_timeline"];
-})
-
-$.getJSON("json/standings_data.json", function (standings_json) {
-  let data = JSON.parse(standings_json);
-
-  for (let team of data["data"]) {
-    standings_data.push(Object.values(team));
-  }
-})
-
-$.getJSON("json/matchup_data.json", function (matchup_json) {
-  for (let week in matchup_json) {
+function formatMatchupData() {
+  let data = json_data["matchup_data"]
+  for (let week in data) {
     matchup_data[week] = {};
-    for (let team_id in matchup_json[week]) {
+    for (let team_id in data[week]) {
       matchup_data[week][team_id] = {};
 
-      matchup = matchup_json[week][team_id];
+      matchup = data[week][team_id];
       opp_name = matchup["away_name"];
       home_stats = JSON.parse(matchup["home_stats"]);
       away_raw = JSON.parse(matchup["away_raw"]);
@@ -129,4 +102,4 @@ $.getJSON("json/matchup_data.json", function (matchup_json) {
     }
     num_weeks = week;
   }
-});
+}

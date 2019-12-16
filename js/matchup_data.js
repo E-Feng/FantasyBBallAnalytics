@@ -4,13 +4,14 @@ function drawAllMatchupTables() {
   let weeks_added = false;
   let fragment = document.createDocumentFragment();  
   for (let team_id = 1; team_id <= num_teams; team_id++) {
+    let team_name = json_data["team_data"].find(o => o.id == team_id)["team_name"]
     for (let week = 1; week <= cur_week; week++) {
       // Create HTML div from template
       let table_id = "google-charts-table" + week + "-" + team_id;
 
       let html = getTemplateByID("matchup-tables-template").innerHTML;
       html = html.replace("%w", week);
-      html = html.replace("%t", teams[team_id]);
+      html = html.replace("%t", team_name);
       html = html.replace("%dw", week);
       html = html.replace("%dt", team_id);      
       html = html.replace("google-charts-table", table_id)
@@ -34,7 +35,7 @@ function drawAllMatchupTables() {
 
     // Add team name to filter drop down menu
     item = document.createElement("option");
-    item.innerHTML = teams[team_id];
+    item.innerHTML = team_name;
     item.value = team_id;
     $("#matchup-teams-filter").append(item);
   }

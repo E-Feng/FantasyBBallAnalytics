@@ -62,8 +62,7 @@ for col in list(sb_raw)[1:]:
     standings_res[col] = "0-0-0"
 
 # Creating array for win/loss timeline
-wins_timeline = np.zeros((num_teams, num_weeks))
-losses_timeline = np.zeros((num_teams, num_weeks))
+wins_timeline = np.zeros((num_teams, num_weeks+1))
 
 # Looking through schedule and matchups
 for index, row in schedule.iterrows():
@@ -116,9 +115,7 @@ for index, row in schedule.iterrows():
 
         # Adding to win/loss timeline
         if row["won"]:
-            wins_timeline[home_team-1][week-1:] += 1
-        else:
-            losses_timeline[home_team-1][week-1:] += 1
+            wins_timeline[home_team-1][week:] += 1
 
         # Cleaning up before joining df
         weekly_matchups = weekly_matchups.reset_index(drop=True)
@@ -146,27 +143,21 @@ for index, row in players_info_raw.iterrows():
             injury_list.append(player)
 
 # Teams data to json file
-teams_json = {}
-teams_json["teams"] = teams_raw.to_json(orient="table", index=False)
+teams_json = teams_raw.to_json(orient="records")
 
 # Standings data to json file
 standings_res = standings_res.drop(columns="id")
-standings_res.reset_index(inplace=True, drop=True)
+standings_res.reset_index(inplace=True)
 standings_res.index += 1
 
-standings_json = standings_res.to_json(orient="table")
+standings_json = standings_res.to_json(orient="records")
 
 # Timeline data to json file
-homepage_json = {}
-
-per_timeline = wins_timeline / (wins_timeline + losses_timeline)
-per_timeline[per_timeline == np.inf] = 0
-per_timeline = per_timeline.transpose()
-homepage_json["per_timeline"] = per_timeline.tolist()
+wins_timeline = wins_timeline.transpose().tolist()
 
 
 # Saving all results to json files
-json_files = {"homepage_data": homepage_json,
+json_files = {"wins_timeline": wins_timeline,
               "injury_list": injury_list,
               "matchup_data": matchup_res,
               "standings_data": standings_json,

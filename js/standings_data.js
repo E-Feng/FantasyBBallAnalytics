@@ -22,13 +22,15 @@ function drawStandingsTable() {
   for (let key in standings_headers) {
     data.addColumn(standings_headers[key], key);
   }
+  let standings = json_data["standings_data"];
 
   let num_cols = data.getNumberOfColumns();
-  let num_rows = standings_data.length;
+  let num_rows = standings.length;
   data.addRows(num_rows);
   for (let i = 0; i < num_rows; i++) {
     for (let j = 0; j < num_cols; j++) {
-      let val = standings_data[i][j];
+      let team = Object.values(standings[i]);
+      let val = team[j];
 
       data.setCell(i, j, val);
       if ((typeof(val) == "string") & (data.getColumnLabel(j) != "Team Name")) {

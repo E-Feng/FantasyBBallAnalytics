@@ -4,5 +4,13 @@
 
 __pycache__/
 .vscode/
+.editorconfig
+.gitattributes
+.htaccess
+browserconfig.xml
+favicon.ico
+humans.txt
+robots.txt
+site.webmanifest
 
 doc/
