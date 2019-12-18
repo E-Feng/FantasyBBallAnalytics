@@ -154,6 +154,19 @@ header nav {
   width: 50%;
 }
 
+.legend-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: auto;
+}
+
+.injury-legend {
+  font-size: 20px;
+  padding: 0 5px;
+  margin: 0 5px;
+}
+
 .box {
   display: block;
 }
