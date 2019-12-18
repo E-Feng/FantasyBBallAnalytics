@@ -28,6 +28,10 @@ const matchup_headers = {
   "EJ": "number",
   "PTS": "number",
 };
+const injury_headers = {
+  "Team Name": "string",
+  "Player": "string",
+}
 
 let matchup_data = {};
 let num_teams;
@@ -61,12 +65,17 @@ load_json_files().
 then(() => {
   formatMatchupData();
   google.charts.load('current', {packages: ['table', 'corechart']});
-  google.charts.setOnLoadCallback(drawAllMatchupTables);
-  google.charts.setOnLoadCallback(drawStandingsTable);
-  google.charts.setOnLoadCallback(drawWinPerLineGraph);
+  google.charts.setOnLoadCallback(drawAllGoogleCharts);
   initHomePage();
 }).
 catch (err => console.log(err));
+
+function drawAllGoogleCharts() {
+  drawAllMatchupTables();
+  drawStandingsTable();
+  drawWinPerLineGraph();
+  drawInjuryListTable();
+}
 
 
 function formatMatchupData() {

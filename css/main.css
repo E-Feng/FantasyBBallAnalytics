@@ -151,7 +151,7 @@ header nav {
 }
 
 #injury-list {
-  border: black 3px solid;
+  width: 50%;
 }
 
 .box {
@@ -214,11 +214,15 @@ header nav {
 }
 
 .red-background {
-  background-color: salmon;
+  background-color: #F48787;
 }
 
 .yellow-background {
   background-color: yellow;
+}
+
+.blue-background {
+  background-color: #47C3F5;
 }
 
 .left-border {

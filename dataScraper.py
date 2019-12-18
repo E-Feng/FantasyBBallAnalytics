@@ -61,6 +61,7 @@ class DataScraper(object):
             last_name     VARCHAR(255)
             wins          INT
             losses        INT
+            seed          INT
             logo_url      VARCHAR(255)
 
         Table "scoreboard" in MySQL with columns
@@ -127,6 +128,7 @@ class DataScraper(object):
                                   "last_name VARCHAR(255),"
                                   "wins INT,"
                                   "losses INT,"
+                                  "seed INT,"
                                   "logo_url VARCHAR(255))")  
 
         if (tables is None) or ("scoreboard",) not in tables:
@@ -200,8 +202,8 @@ class DataScraper(object):
 
         self.num_teams = len(d["teams"])
 
-        sql = ("INSERT INTO teams (id, abbrev, team_name, first_name, last_name, wins, losses, logo_url)"
-                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        sql = ("INSERT INTO teams (id, abbrev, team_name, first_name, last_name, wins, losses, seed, logo_url)"
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
                 " ON DUPLICATE KEY UPDATE id=id")
         vals = []
 
@@ -210,6 +212,7 @@ class DataScraper(object):
             id_key = team["primaryOwner"]
             abbrev = team["abbrev"]
             team_name = team["location"] + " " + team["nickname"]
+            seed = team["playoffSeed"]
             logo_url = team["logo"]
             wins = team["record"]["overall"]["wins"]
             losses = team["record"]["overall"]["losses"]
@@ -219,7 +222,7 @@ class DataScraper(object):
                     first_name = member["firstName"]
                     last_name = member["lastName"]
 
-            vals.append((id, abbrev, team_name, first_name, last_name, wins, losses, logo_url))
+            vals.append((id, abbrev, team_name, first_name, last_name, wins, losses, seed, logo_url))
 
         self.mycursor.executemany(sql, vals)
         self.mydb.commit()

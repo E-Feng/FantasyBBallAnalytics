@@ -4,6 +4,7 @@ import mysql.connector
 import sqlalchemy 
 import pandas as pd
 import numpy as np
+import numpy.matlib
 from operator import add
 from dataScraper import DataScraper
 
@@ -57,7 +58,7 @@ schedule = schedule.drop(columns=["index", "id_x", "id_y"])
 
 matchup_res = {}
 
-standings_res = teams_raw[["id", "team_name", "wins", "losses"]].sort_values("wins", ascending=False)
+standings_res = teams_raw[["id", "seed", "team_name", "wins", "losses"]].sort_values("seed", ascending=True)
 for col in list(sb_raw)[1:]:
     standings_res[col] = "0-0-0"
 
@@ -147,12 +148,13 @@ teams_json = teams_raw.to_json(orient="records")
 
 # Standings data to json file
 standings_res = standings_res.drop(columns="id")
-standings_res.reset_index(inplace=True)
-standings_res.index += 1
 
 standings_json = standings_res.to_json(orient="records")
 
 # Timeline data to json file
+r = 0.15
+wins_add = np.matlib.repmat(np.linspace(0, r, num_teams).transpose(), num_weeks+1, 1)
+wins_timeline = wins_timeline + wins_add.transpose()
 wins_timeline = wins_timeline.transpose().tolist()
 
 

@@ -7,6 +7,10 @@ function getTemplateByID(str) {
   }
 }
 
+function getTeamNameByID(id) {
+  return json_data["team_data"].find(o => o.id==id)["team_name"];
+}
+
 function addNewProperty(data, row, col, prop) {
   // Function to add new css property to google charts data
   old_prop = data.getProperties(row, col);
