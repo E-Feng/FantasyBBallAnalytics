@@ -18,7 +18,7 @@ MYSQL_DB = "fantasybball"
 league_id = 48375511
 league_year = 2020
 
-mydb = mysql.connector.connect(
+mysqldb = mysql.connector.connect(
     host = MYSQL_HOST,
     user = MYSQL_USER,
     passwd = MYSQL_PASS,
@@ -27,7 +27,7 @@ mydb = mysql.connector.connect(
 
 engine = sqlalchemy.create_engine("mysql+mysqlconnector://"+MYSQL_USER+":"+MYSQL_PASS+"@"+MYSQL_HOST+"/"+MYSQL_DB)
 
-data_scraper = DataScraper(mydb, league_id, league_year)
+data_scraper = DataScraper(mysqldb, league_id, league_year)
 data_scraper.init_tables()
 data_scraper.get_team_data()
 data_scraper.get_scoreboard_data()
@@ -132,7 +132,7 @@ for index, row in schedule.iterrows():
 
 # Looking through players
 injury_list = []
-for index, row in players_info_raw.iterrows():
+for index, row in players_info_raw.sort_values("team_id").iterrows():
     # Check if player is currently rostered and not active
     if not np.isnan(row["team_id"]):
         if not row["state"] == "ACTIVE":

@@ -26,85 +26,89 @@
   <![endif]-->
 
   <!-- Add your site or application content here -->
-  <header>
-    <div class="container">
-      <div>
+  <div class="wrapper">
+    <header>
+      <div class="container">
         <h1>Fantasy Basketball Analytics</h1>
       </div>
-      <nav>
-        <ul>
-          <li><a href="#" data-target="home" class="nav-link">Home</a></li>
-          <li><a href="#" data-target="about" class="nav-link">About</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    </header>
 
-  <section class="container" id="tabs">
-    <a href="#" data-target="standings" class="nav-link button">Standings</a>
-    <a href="#" data-target="matchups" class="nav-link button">Schedule Matchups</a>
-  </section>
+    <nav class="flex-nav container" id="tabs">
+      <a class="toggle-nav">☰ Menu</a>
+      <ul>
+        <li><a href="#" data-target="home" class="nav-link button">Home</a></li>
+        <li><a href="#" data-target="standings" class="nav-link button">Standings</a></li>
+        <li><a href="#" data-target="matchups" class="nav-link button">Schedule Matchups</a></li>
+        <li class="filler"></li>
+        <li><a href="#" data-target="about" class="nav-link button about">About</a></li>
+      </ul>
+    </nav>
 
-  <section class="container" id="main-content">
-    <div class="page active" id="home">
-      <h1>LABron MVP - ESPN Fantasy Basketball League</h1>
-      <div class="wrapper">
-        <div id="win-per-line-graph"></div>
-        <div id="injury-list" class="box">
-          <h1>Injury List</h1>
-          <div class=legend-wrapper>
-            <a class="red-background injury-legend">OUT</a>
-            <a class="yellow-background injury-legend">DAY-TO-DAY</a>
-            <a class="blue-background injury-legend">SUSPENSION</a>
+    <section class="container" id="main-content">
+      <div class="page active" id="home">
+        <h1>LABron MVP - ESPN Fantasy Basketball League</h1>
+        <div class="wrapper">
+          <div class="overflow-wrap">
+            <div id="win-line-graph"></div>
           </div>
-          <div id="injury-list-table"></div>
+          <div id="injury-list">
+            <h1>Injury List</h1>
+            <div class=legend-wrapper>
+              <a class="red-background injury-legend">OUT</a>
+              <a class="yellow-background injury-legend">DAY-TO-DAY</a>
+              <a class="blue-background injury-legend">SUSPENSION</a>
+            </div>
+            <div class="overflow-wrap">
+              <div id="injury-list-table"></div>
+            </div>
+          </div>
         </div>
+
+        <aside id="side-rankings"></aside>
+        <template id="side-rankings-template">
+          <div class="box">
+            <p>%p</p>
+            <img src="%src" alt="%alt">
+          </div>
+        </template>
       </div>
 
-      <aside id="side-rankings"></aside>
-      <template id="side-rankings-template">
-        <div class="box">
-          <p>%p</p>
-          <img src="%src" alt="%alt">
-        </div>
-      </template>
-    </div>
+      <div class="page" id="standings">
+        <h1>League Standings</h1>
+        <p>Current league standings and win-loss-tie record for each category</p>
+        <p>Top 7 make playoffs, #1 overall gets first round bye</p>
+        <div id="standings-table"></div>
+      </div>
 
-    <div class="page" id="standings">
-      <h1>League Standings</h1>
-      <p>Current league standings and win-loss-tie record for each category</p>
-      <p>Top 7 make playoffs, #1 overall gets first round bye</p>
-      <div id="standings-table"></div>
-    </div>
+      <div class="page" id="matchups">
+        <h1>Schedule Matchups</h1>
+        <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
+        <form>
+          <select id="matchup-teams-filter">
+            <option value="all">All Teams</option>
+          </select>
+        </form>
+        <form>
+          <select id="matchup-weeks-filter">
+            <option value="all">All Weeks</option>
+          </select>
+        </form>
+        <div class="clear"></div>
 
-    <div class="page" id="matchups">
-      <h1>Schedule Matchups</h1>
-      <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
-      <form>
-        <select id="matchup-teams-filter">
-          <option value="all">All Teams</option>
-        </select>
-      </form>
-      <form>
-        <select id="matchup-weeks-filter">
-          <option value="all">All Weeks</option>
-        </select>
-      </form>
-      <div class="clear"></div>
+        <div class="flex-container" id="matchup-tables"></div>
+        <template id="matchup-tables-template">
+          <div class="flex-item" data-week="%dw" data-team-id="%dt">
+            <h2>%t - Week %w</h2>
+            <div id="google-charts-table"></div>
+          </div>
+        </template>
+      </div>
 
-      <div class="flex-container" id="matchup-tables"></div>
-      <template id="matchup-tables-template">
-        <div class="flex-item" data-week="%dw" data-team-id="%dt">
-          <h2>%t - Week %w</h2>
-          <div id="google-charts-table"></div>
-        </div>
-      </template>
-    </div>
-
-    <div class="page" id="about">
-      <h1>About Page</h1>
-    </div>
-  </section>
+      <div class="page" id="about">
+        <h1>About Page</h1>
+      </div>
+    </section>
+  </div>
 
   <!--
   <footer class="footer">

@@ -69,3 +69,7 @@ function filter_teams() {
         weeks_filter.selectedIndex = "all";
     }    
 }
+
+$('.toggle-nav').on('click', () => {
+    $('.flex-nav ul').toggleClass('open');
+})

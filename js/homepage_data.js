@@ -22,6 +22,7 @@ function initHomePage() {
   $("#side-rankings").append(fragment);
 }
 
+
 function drawInjuryListTable() {
   let cssClassNames = {
     headerRow: '',
@@ -30,7 +31,7 @@ function drawInjuryListTable() {
     selectedTableRow: '',
     hoverTableRow: '',
     headerCell: '',
-    tableCell: 'standings-table-text',
+    tableCell: 'injury-table-text',
     rowNumberCell: ''
   };
 
@@ -53,11 +54,10 @@ function drawInjuryListTable() {
   data.addRows(num_players);
   for (let i = 0; i < num_players; i++) {
     let team_name = getTeamNameByID(injured[i].team)
-    let player = injured[i].name
-    let state = injured[i].state
+    let {name, state} = injured[i]
 
     data.setCell(i, 0, team_name)
-    data.setCell(i, 1, player)
+    data.setCell(i, 1, name)
 
     if (state == "OUT") {
       addNewProperty(data, i, 1, 'red-background');
@@ -72,6 +72,7 @@ function drawInjuryListTable() {
   table.draw(data, options)
 }
 
+
 function drawWinPerLineGraph() {
   let data = new google.visualization.DataTable();
   data.addColumn('number', 'Week');
@@ -81,7 +82,7 @@ function drawWinPerLineGraph() {
   }
 
   for (let i = 0; i < cur_week; i++) {
-    //let team_data = homepage_data["per_timeline"][i];
+
     let team_data = json_data["wins_timeline"][i]
     team_data = [i].concat(team_data);
     data.addRows([team_data]);
@@ -89,13 +90,20 @@ function drawWinPerLineGraph() {
 
   let options = {
     title: "Total Wins",
-    height: 500,
-    width: 1000,
+    height: '500',
+    width: '1000',
     lineWidth: 3,
+    focusTarget: 'category',
     chartArea: {
       left: 50,
+      right: 50,
+    },
+    legend: {
+      position: 'top',
+      maxLines: 4,
     },
     hAxis: {
+      title: 'Week',
       minValue: 0,
     },
     vAxis: {
@@ -106,6 +114,6 @@ function drawWinPerLineGraph() {
     }
   }
 
-  let chart = new google.visualization.LineChart(document.getElementById("win-per-line-graph"));
+  let chart = new google.visualization.LineChart(document.getElementById("win-line-graph"));
   chart.draw(data, options);
 }
