@@ -467,6 +467,15 @@ textarea {
     flex-direction: column;
   }
 
+  header {
+    border-top: #ffffff 2px solid;
+  }
+
+  header h1 {
+    padding-top: 0;
+    margin-top: 0;
+  }
+
   .button {
     width: 100vw;
     padding: 0 0;
@@ -475,8 +484,8 @@ textarea {
   }
 
   .flex-nav {
+    margin-bottom: 10px;
     width: 100%;
-    margin-bottom: 20px;
     order: -1;
   }
 
@@ -493,6 +502,11 @@ textarea {
 
   .flex-nav ul.open {
     display: flex;
+  }
+
+  /* Standings table text made smaller */
+  .standings-table-text {
+    font-size: 12px;
   }
 }
 
