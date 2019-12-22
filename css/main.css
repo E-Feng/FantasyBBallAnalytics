@@ -19,7 +19,6 @@ html {
 
 body {
   font-family: Arial;
-  font-size: 15px;
   background: #FDB927;
 }
 
@@ -64,26 +63,29 @@ header {
   border-bottom: #ffffff 2px solid;
 }
 
+.flex-header {
+  display: flex;
+  align-items: flex-end;
+}
+
+.flex-header .filler {
+  flex: 1;
+}
+
 header h1 {
-  float: left;
   padding: 20px 0 10px 0;
   margin-bottom: 0;
 }
 
 header a {
   text-decoration: none;
-  text-transform: uppercase;
-  font-size: 16px;
-  color: #ffffff;
-}
-
-header a:visited {
+  font-size: 30px;
   color: #ffffff;
 }
 
 header ul {
-  padding: 40px 0 0 0;
-  margin-bottom: 0;
+  padding: 0;
+  margin: 0;
 }
 
 header li {
@@ -91,9 +93,6 @@ header li {
   padding: 0 10px 0 10px;
 }
 
-header nav {
-  float: right;
-}
 
 /* Nav Buttons */
 .toggle-nav {
@@ -453,6 +452,12 @@ textarea {
 
   .flex-nav .filler {
     flex: 0;
+  }
+
+  .flex-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
