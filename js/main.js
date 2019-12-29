@@ -73,3 +73,7 @@ function filter_teams() {
 $('.toggle-nav').on('click', () => {
     $('.flex-nav ul').toggleClass('open');
 })
+
+$(window).resize(() => {
+    //drawWinPerLineGraph();
+});

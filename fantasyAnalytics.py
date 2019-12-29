@@ -2,6 +2,7 @@ import os
 import json
 import mysql.connector
 import sqlalchemy 
+import pymongo
 import pandas as pd
 import numpy as np
 import numpy.matlib
@@ -9,7 +10,7 @@ from operator import add
 from dataScraper import DataScraper
 
 
-# Initializing parameters and database
+# Initializing parameters and database for MySQL
 MYSQL_USER = "root"
 MYSQL_PASS = "123456"
 MYSQL_HOST = "localhost"
@@ -27,8 +28,16 @@ mysqldb = mysql.connector.connect(
 
 engine = sqlalchemy.create_engine("mysql+mysqlconnector://"+MYSQL_USER+":"+MYSQL_PASS+"@"+MYSQL_HOST+"/"+MYSQL_DB)
 
-data_scraper = DataScraper(mysqldb, league_id, league_year)
-data_scraper.init_tables()
+# Initializing parameters and database for MongoDB
+myclient = pymongo.MongoClient('localhost', 27017)
+
+mymongodb = myclient["fantasybball"]
+
+# Creating dict with both db's
+dbs = {"MySQL": mysqldb, "MongoDB": mymongodb}
+
+data_scraper = DataScraper(dbs, league_id, league_year)
+data_scraper.init_sql_tables()
 data_scraper.get_team_data()
 data_scraper.get_scoreboard_data()
 data_scraper.get_player_data()
@@ -87,6 +96,14 @@ for index, row in schedule.iterrows():
         # Obtaining stats for all other matchups and calculating difference
         away_stats_raw = pd.merge(weekly_matchups["away_id"], sb_raw, left_on="away_id", right_on="scores_id")
         away_stats_raw = away_stats_raw.drop(columns=["away_id", "scores_id"])
+
+        # Adding on mean/mode stats
+        mean = away_stats_raw.mean()
+        mean[2:] = mean[2:].round()
+        away_stats_raw = away_stats_raw.append(mean, ignore_index=True)
+
+        weekly_matchups = weekly_matchups.append({"team_name": "Mean", "first_name": ""}, ignore_index=True)
+
 
         away_stats_sub = away_stats_raw.sub(home_stats.values)
         away_stats_sub["tos"] *= -1
@@ -151,15 +168,17 @@ standings_res = standings_res.drop(columns="id")
 
 standings_json = standings_res.to_json(orient="records")
 
-# Timeline data to json file
-r = 0.15
-wins_add = np.matlib.repmat(np.linspace(0, r, num_teams).transpose(), num_weeks+1, 1)
-wins_timeline = wins_timeline + wins_add.transpose()
-wins_timeline = wins_timeline.transpose().tolist()
+# Timeline data to json file, adding offset to make neater graph
+r = 0.25
+offset = np.matlib.repmat(np.linspace(0, r, num_teams).transpose(), num_weeks+1, 1)
+index = wins_timeline.sum(axis=1).argsort()
+ranks = index.argsort()
+wins_timeline = wins_timeline + offset[:,ranks].transpose()
+wins_timeline_list = wins_timeline.transpose().tolist()
 
 
 # Saving all results to json files
-json_files = {"wins_timeline": wins_timeline,
+json_files = {"wins_timeline": wins_timeline_list,
               "injury_list": injury_list,
               "matchup_data": matchup_res,
               "standings_data": standings_json,

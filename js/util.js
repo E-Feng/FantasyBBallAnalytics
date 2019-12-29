@@ -32,6 +32,15 @@ function getColumnIndex(str) {
   }
 }
 
+function getRandomColor() {
+  var letters = '0123456789ABCDEF'.split('');
+  var color = '#';
+  for (var i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 function getColorValue(val) {
   // Function to get color value for standings table
   val = val > 2 ? 2 : val;

@@ -54,7 +54,10 @@ function drawInjuryListTable() {
   data.addRows(num_players);
   for (let i = 0; i < num_players; i++) {
     let team_name = getTeamNameByID(injured[i].team)
-    let {name, state} = injured[i]
+    let {
+      name,
+      state
+    } = injured[i]
 
     data.setCell(i, 0, team_name)
     data.setCell(i, 1, name)
@@ -75,6 +78,10 @@ function drawInjuryListTable() {
 
 function drawWinPerLineGraph() {
   let data = new google.visualization.DataTable();
+  const formatter = new google.visualization.NumberFormat({
+    fractionDigits: 0,
+  });
+
   data.addColumn('number', 'Week');
   for (let i = 0; i < num_teams; i++) {
     let team_name = getTeamNameByID(i + 1)
@@ -82,21 +89,29 @@ function drawWinPerLineGraph() {
   }
 
   for (let i = 0; i < cur_week; i++) {
-
     let team_data = json_data["wins_timeline"][i]
     team_data = [i].concat(team_data);
     data.addRows([team_data]);
   }
 
+  for (let i = 0; i < num_teams; i++) {
+    formatter.format(data, i + 1);
+  }
+
+  const chart_width = $('.scroll-wrapper').width();
+  console.log(chart_width);
+
   let options = {
     title: "Total Wins",
-    height: '500',
-    width: '1000',
+    height: '600',
+    width: chart_width - 25,
     lineWidth: 3,
     focusTarget: 'category',
     chartArea: {
       left: 50,
       right: 50,
+      top: 100,
+      bottom: 75,
     },
     legend: {
       position: 'top',
@@ -109,11 +124,42 @@ function drawWinPerLineGraph() {
     vAxis: {
       minValue: 0,
       viewWindow: {
-        max: parseInt(cur_week) - 1,
+        max: parseInt(cur_week),
       }
     }
   }
 
   let chart = new google.visualization.LineChart(document.getElementById("win-line-graph"));
   chart.draw(data, options);
+}
+
+function drawWinPerLineGraphChartjs() {
+  let data = {};
+  data['labels'] = [];
+  data['datasets'] = [];
+  const options = {};
+
+  for (let i = 0; i < cur_week; i++) {
+    data['labels'].push(i.toString());
+  }
+
+  const wins_data = json_data["wins_timeline"]
+  for (let i = 0; i < wins_data.length; i++) {
+    let dataset = {
+      data: wins_data[i],
+      label: getTeamNameByID(i + 1),
+      backgroundColor: 'rgba(255, 255, 255, 0)',
+      borderColor: getRandomColor(),
+      lineTension: 0,
+    };
+
+    data['datasets'].push(dataset);
+  }
+
+  const ctx = document.getElementById('win-line-graph').getContext('2d');
+  const my_chart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+  });
 }

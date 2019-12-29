@@ -31,8 +31,10 @@ class DataScraper(object):
     espn_cookie = "{AEANBh%2BD2CyE%2BH%2FBEYL2sJ%2B4nV9%2FOklCUoyYPiegbqwlFqzfE%2BnViiqW87jner2OdiFYVXKnHjjaSSx%2FJDbZWgyrFSCnaU8AxPJtsGXuMpDzFZw7B8YgcpTmCkSasag97Sd%2Fl1r6igCZh%2F1YyquO0H%2FyMVIXq8%2FUAarrXIFzeSx%2BBiB0ywQn6Iz6Smkiv63RWoJeNrzojIXfuoTbFw%2BVzXSnF6TH5MF4X7ooRKw%2FImPagScBbqIMjrq0EfPf6%2Bcm9XE%3D}"
 
     def __init__(self, mydb, league_id, league_year):
-        self.mydb = mydb
-        self.mycursor = mydb.cursor(buffered=True)
+        self.mysqldb = mydb["MySQL"]
+        self.mymongodb = mydb["MongoDB"]
+
+        self.mycursor = self.mysqldb.cursor(buffered=True)
         self.league_id = league_id
         self.league_year = league_year
         self.num_teams = None
@@ -48,7 +50,7 @@ class DataScraper(object):
         self.periods = (per_1, per_2, per_3, per_4)
 
 
-    def init_tables(self):
+    def init_sql_tables(self):
         """ 
         Initializes tables for database
 
@@ -187,6 +189,20 @@ class DataScraper(object):
                                   "zscore FLOAT)")                               
 
 
+    def init_mongo_collections(self):
+        """
+        Initializes collections for MongoDB
+        Same as MySQL tables
+        """
+        col_list = self.mymongodb.list_collection_names()
+        table_names = ["teams", "schedules", "scoreboard", "player_info", "player_stats"]
+
+        for table in table_names:
+            if table not in col_list:
+                self.mymongodb[table]
+        print(self.mymongodb.list_collection_names())
+
+
     def get_team_data(self):
         """ 
         Gets team data for league from ESPN
@@ -207,6 +223,10 @@ class DataScraper(object):
                 " ON DUPLICATE KEY UPDATE id=id")
         vals = []
 
+        if "teams" in self.mymongodb.list_collection_names():
+            self.mymongodb["teams"].drop()
+        col = self.mymongodb["teams"]
+
         for team in d["teams"]:
             id = team["id"]
             id_key = team["primaryOwner"]
@@ -222,10 +242,12 @@ class DataScraper(object):
                     first_name = member["firstName"]
                     last_name = member["lastName"]
 
+            col.insert_one(team)
+
             vals.append((id, abbrev, team_name, first_name, last_name, wins, losses, seed, logo_url))
 
         self.mycursor.executemany(sql, vals)
-        self.mydb.commit()
+        self.mysqldb.commit()
 
 
     def get_scoreboard_data(self):
@@ -247,6 +269,11 @@ class DataScraper(object):
 
         sql_sco = ("INSERT INTO scoreboard (fg_per, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts)"
                 " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+
+        if "full_schedule" in self.mymongodb.list_collection_names():
+            self.mymongodb["full_schedule"].drop()
+        col = self.mymongodb["full_schedule"]   
+
 
         sides = ("home", "away")
         for match in d["schedule"]:
@@ -275,7 +302,7 @@ class DataScraper(object):
 
                     self.mycursor.execute(sql_sco, val_sco)
                     scores_id[side] = self.mycursor.lastrowid
-                    self.mydb.commit()
+                    self.mysqldb.commit()
                 else:
                     scores_id[side] = None
 
@@ -286,7 +313,9 @@ class DataScraper(object):
             val_sch = (sch_id, week, scores_id["home"], scores_id["away"], team_id, opp_id, won)
             
             self.mycursor.execute(sql_sch, val_sch)
-            self.mydb.commit()
+            self.mysqldb.commit()
+
+            col.insert_one(match)
 
                     
     def get_player_data(self):
@@ -309,6 +338,11 @@ class DataScraper(object):
         sql_pstats = ("INSERT INTO player_stats (player_id, period, mins, fgm, fga, fg_per, ftm, fta, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts, zscore)"
                 " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")                
 
+        if "player_stats" in self.mymongodb.list_collection_names():
+            self.mymongodb["player_stats"].drop()
+        col = self.mymongodb["player_stats"]   
+
+
         for player in d["players"]:
             # Check for active player (has rating or rostered)
             if "ratings" in player:
@@ -323,7 +357,9 @@ class DataScraper(object):
                     val_pinfo = (player_id, team_id, first_name, last_name, state, avail_slots)
 
                     self.mycursor.execute(sql_pinfo, val_pinfo)
-                    self.mydb.commit()    
+                    self.mysqldb.commit()    
+
+                    col.insert_one(player)
 
                     for stat in player["player"]["stats"]:
                         if stat["id"] in self.periods and "averageStats" in stat:
@@ -350,4 +386,4 @@ class DataScraper(object):
                             val_pstats = (player_id, period, mins, fgm, fga, fg_per, ftm, fta, ft_per, three_pm, rebs, asts, stls, blks, tos, ejs, pts, zscore)
 
                             self.mycursor.execute(sql_pstats, val_pstats)
-                            self.mydb.commit()               
+                            self.mysqldb.commit()               

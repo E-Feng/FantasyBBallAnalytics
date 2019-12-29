@@ -134,7 +134,7 @@ header li {
 
 /* Body */
 #main-content {
-  width: 90%;
+  width: 80%;
 }
 
 .wrap {
@@ -146,24 +146,34 @@ header li {
 
 
 /* Home */
-#home {
-  position: relative;
-}
-
-#home .wrapper {
-  float: left;
+.flex-home {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #win-line-graph {
-  border: black 3px solid;
+  min-width: 600px;
+  margin: 0 0;
+}
+
+.scroll-wrapper {
+  margin: 0 0;
+}
+
+.sub-container {
+  flex: 1 1 600px;
 }
 
 #side-rankings {
-  float: right;
+  flex: 0 1 150px;
+}
+
+#side-rankings h2 {
+  margin: 0 0;
 }
 
 #injury-list {
-  width: 40%;
+  width: 50%;
 }
 
 .legend-wrapper {
@@ -184,7 +194,8 @@ header li {
 }
 
 .box {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 .box img {
@@ -459,6 +470,11 @@ textarea {
     flex-direction: column;
     align-items: center;
   }
+
+  /* Standings table text made smaller */
+  .standings-table-text {
+    font-size: 12px;
+  }  
 }
 
 @media all and (max-width: 600px) {
@@ -502,6 +518,20 @@ textarea {
 
   .flex-nav ul.open {
     display: flex;
+  }
+
+  #main-content {
+    width: 100%;
+  }
+
+  .scroll-wrapper {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    width: 100vw;
+  }
+
+  #injury-list {
+    width: 100vw;
   }
 
   /* Standings table text made smaller */
