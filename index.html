@@ -72,7 +72,8 @@
           <aside id="side-rankings"><h2>Rankings</h2></aside>
           <template id="side-rankings-template">
             <div class="box">
-              <p>%p</p>
+              <h5>%p</h5>
+              <p>%e<span class="green bold">%w</span>-<span class="red bold">%l</span>%e</p>
               <img src="%src" alt="%alt">
             </div>
           </template>
@@ -112,6 +113,14 @@
 
       <div class="page" id="about">
         <h1>About Page</h1>
+        <h3>Data Source</h3>
+        <p>Data retrieved from ESPN's Fantasy Basketball v3 API various endpoints. JSON data was parsed and formatted for database input.</p>
+        <h3>Database Management</h3>
+        <p>Data was stored in a local MySQL and MongoDB database for learning purposes.</p>
+        <h3>Data Analysis</h3>
+        <p>The databases were queried for data and analysis done in Python using various libraries.</p>
+        <h3>Data Handling</h3>
+        <p></p>
       </div>
     </section>
   </div>

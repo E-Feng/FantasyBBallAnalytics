@@ -55,6 +55,18 @@ a {
   clear: both;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
 /* Header */
 header {
   background: #552583;
@@ -196,11 +208,22 @@ header li {
 .box {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .box img {
-  width: 100px;
-  height: 100px;
+  width: 75px;
+  height: 75px;
+}
+
+.box h5 {
+  margin: 0 0;
+  align-self: flex-start;
+}
+
+.box p {
+  margin: 0 0;
 }
 
 

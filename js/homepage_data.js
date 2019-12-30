@@ -4,15 +4,27 @@ function initHomePage() {
   let fragment = document.createDocumentFragment();
   for (let i = 0; i < num_teams; i++) {
     // Get team id's
-    let teams = json_data["team_data"]
-    let winner_name = json_data["standings_data"][i].team_name;
-    let winner_logo = teams.find(o => o.team_name == winner_name)["logo_url"]
+    const teams = json_data["team_data"];
+    let name = json_data["standings_data"][i].team_name;
+    let logo = teams.find(o => o.team_name == name)["logo_url"];
+    let wins = teams.find(o => o.team_name == name)["wins"];
+    let losses = teams.find(o => o.team_name == name)["losses"];
 
     // Create HTML div from template
     let html = getTemplateByID("side-rankings-template").innerHTML;
-    html = html.replace("%p", (i + 1) + ". " + winner_name);
-    html = html.replace("%src", winner_logo);
-    html = html.replace("%alt", winner_name);
+    html = html.replace("%p", (i + 1) + ". " + name);
+    html = html.replace("%src", logo);
+    html = html.replace("%alt", name);
+    html = html.replace("%w", wins);
+    html = html.replace("%l", losses);
+
+    if (i == 0) {
+      html = html.replace(/%e/g, " &#128525 ");
+    } else if (i == num_teams - 1) {
+      html = html.replace(/%e/g, " &#128169 ");
+    } else {
+      html = html.replace(/%e/g, "");
+    }
 
     ele = document.createElement(null);
     ele.innerHTML = html;
@@ -107,6 +119,7 @@ function drawWinPerLineGraph() {
     width: chart_width - 25,
     lineWidth: 3,
     focusTarget: 'category',
+    dataOpacity: 0,
     chartArea: {
       left: 50,
       right: 50,
