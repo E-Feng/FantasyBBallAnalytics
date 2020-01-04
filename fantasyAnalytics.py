@@ -11,8 +11,8 @@ from dataScraper import DataScraper
 
 
 # Initializing parameters and database for MySQL
-MYSQL_USER = "root"
-MYSQL_PASS = "123456"
+MYSQL_USER = os.environ["MYSQL_USER"]
+MYSQL_PASS = os.environ["MYSQL_PASS"]
 MYSQL_HOST = "localhost"
 MYSQL_DB = "fantasybball"
 
@@ -26,6 +26,11 @@ mysqldb = mysql.connector.connect(
     database = MYSQL_DB
 )
 
+cookie = {
+    "swid_cookie": os.environ["swid_cookie"],
+    "espn_cookie": os.environ["espn_cookie"],
+}
+
 engine = sqlalchemy.create_engine("mysql+mysqlconnector://"+MYSQL_USER+":"+MYSQL_PASS+"@"+MYSQL_HOST+"/"+MYSQL_DB)
 
 # Initializing parameters and database for MongoDB
@@ -36,7 +41,7 @@ mymongodb = myclient["fantasybball"]
 # Creating dict with both db's
 dbs = {"MySQL": mysqldb, "MongoDB": mymongodb}
 
-data_scraper = DataScraper(dbs, league_id, league_year)
+data_scraper = DataScraper(dbs, league_id, league_year, cookie)
 data_scraper.init_sql_tables()
 data_scraper.get_team_data()
 data_scraper.get_scoreboard_data()
@@ -214,3 +219,4 @@ for file_name, data in json_files.items():
 
 # Run commit and push shell script to update
 os.system(path + "commitAndPush.sh")
+print('Updated')

@@ -26,11 +26,8 @@ class DataScraper(object):
     CONST_LAST15 = '02'
     CONST_LAST30 = '03'
 
-    # Establishing league URL and appropriate cookies
-    swid_cookie = "{A746C402-08B1-42F4-86C4-0208B142F42A}"
-    espn_cookie = "{AEANBh%2BD2CyE%2BH%2FBEYL2sJ%2B4nV9%2FOklCUoyYPiegbqwlFqzfE%2BnViiqW87jner2OdiFYVXKnHjjaSSx%2FJDbZWgyrFSCnaU8AxPJtsGXuMpDzFZw7B8YgcpTmCkSasag97Sd%2Fl1r6igCZh%2F1YyquO0H%2FyMVIXq8%2FUAarrXIFzeSx%2BBiB0ywQn6Iz6Smkiv63RWoJeNrzojIXfuoTbFw%2BVzXSnF6TH5MF4X7ooRKw%2FImPagScBbqIMjrq0EfPf6%2Bcm9XE%3D}"
 
-    def __init__(self, mydb, league_id, league_year):
+    def __init__(self, mydb, league_id, league_year, cookie):
         self.mysqldb = mydb["MySQL"]
         self.mymongodb = mydb["MongoDB"]
 
@@ -48,6 +45,10 @@ class DataScraper(object):
         per_4 = self.CONST_LAST30 + str(self.league_year)
 
         self.periods = (per_1, per_2, per_3, per_4)
+
+        # Establishing appropriate cookies
+        self.swid_cookie = cookie["swid_cookie"]
+        self.espn_cookie = cookie["espn_cookie"]
 
 
     def init_sql_tables(self):
