@@ -47,7 +47,8 @@ print("All tables initialized and loaded with data")
 teams_raw = pd.read_sql_table("teams", engine)
 sch_home_raw = pd.read_sql_table("schedules", engine)
 sb_raw = pd.read_sql_table("scoreboard", engine)
-players_info_raw = pd.read_sql_table("player_info", engine)
+player_info_raw = pd.read_sql_table("player_info", engine)
+player_stats_raw = pd.read_sql_table("player_stats", engine)
 
 num_teams = teams_raw.shape[0]
 num_weeks = sch_home_raw["week"].iloc[-1]
@@ -147,9 +148,9 @@ for index, row in schedule.iterrows():
         matchup_res[week][home_team]["away_raw"] = away_final_raw.to_json(orient="table", index=False)
         matchup_res[week][home_team]["away_sub"] = away_final_sub.to_json(orient="table", index=False)
 
-# Looking through players
+# Looking through players for current injuries
 injury_list = []
-for index, row in players_info_raw.sort_values("team_id").iterrows():
+for index, row in player_info_raw.sort_values("team_id").iterrows():
     # Check if player is currently rostered and not active
     if not np.isnan(row["team_id"]):
         if not row["state"] == "ACTIVE":
@@ -159,6 +160,26 @@ for index, row in players_info_raw.sort_values("team_id").iterrows():
                 "team": row["team_id"],
             }
             injury_list.append(player)
+
+# Getting best/worse ranked players for each
+player_stats_merge = player_stats_raw[["player_id", "period", "zscore"]]
+player_info_merge = player_info_raw[["player_id", "team_id", "first_name", "last_name"]]
+zscores = pd.merge(player_stats_merge, player_info_merge, how="left", on="player_id")
+
+best_players = []
+worst_players = []
+
+periods = ["002020", "012020", "022020", "032020"]
+for team_id in range(1, num_teams+1):
+    for period in periods:
+        subset = zscores.loc[(zscores["team_id"] == team_id) & (zscores["period"] == period)]
+        sorted = subset.sort_values(by=["zscore"], ascending=False)
+        
+        best_player = sorted.head(1)
+        worst_player = sorted.tail(1)
+
+        best_players.append(best_player.to_dict(orient="records")[0])
+        worst_players.append(worst_player.to_dict(orient="records")[0])
 
 # Teams data to json file
 teams_json = teams_raw.to_json(orient="records")

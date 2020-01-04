@@ -110,8 +110,12 @@ function drawWinPerLineGraph() {
     formatter.format(data, i + 1);
   }
 
-  const chart_width = $('.scroll-wrapper').width();
+  const wrap_width = $('.scroll-wrapper').width();
+  const chart_width = Math.max(wrap_width, 600);
   console.log(chart_width);
+
+  const past_week = json_data["wins_timeline"][cur_week - 1]
+  const max_val = Math.ceil(Math.max(...past_week))
 
   let options = {
     title: "Total Wins",
@@ -137,7 +141,7 @@ function drawWinPerLineGraph() {
     vAxis: {
       minValue: 0,
       viewWindow: {
-        max: parseInt(cur_week),
+        max: max_val,
       }
     }
   }

@@ -11,6 +11,11 @@ function getTeamNameByID(id) {
   return json_data["team_data"].find(o => o.id==id)["team_name"];
 }
 
+function getHeadshotURLFromID(id) {
+  let url = "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/" + id + ".png";
+  return url;
+}
+
 function addNewProperty(data, row, col, prop) {
   // Function to add new css property to google charts data
   old_prop = data.getProperties(row, col);
