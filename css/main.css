@@ -243,6 +243,38 @@ header li {
   margin-bottom: 5px;
 }
 
+/* Players */
+#players {
+  margin: auto;
+}
+
+#best-table {
+  max-width: 900px;
+  margin: auto;
+}
+
+.player-cell-best {
+  max-width: 100px;
+  height: 73px;
+  background: limegreen;
+}
+
+.player-cell-worse {
+  max-width: 100px;
+  height: 73px;
+  background: #F48787;
+}
+
+.players-table-text {
+  width: 100px !important;
+  height: 73px;
+  padding: 0 0 !important;
+}
+
+.team-padding {
+  padding: 0 5px;
+}
+
 
 /* Footer */
 

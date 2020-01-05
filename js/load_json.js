@@ -34,14 +34,14 @@ const injury_headers = {
 }
 const best_headers = {
   "Team Name": "string",
-  "Best (Season)": "string",
-  "Best (Last 7)": "string",
-  "Best (Last 15)": "string",
-  "Best (Last 30)": "string",
-  "Worst (Season)": "string",
-  "Worst (Last 7)": "string",
-  "Worst (Last 15)": "string",
-  "Worst (Last 30)": "string",
+  "Best <br>(Season)": "string",
+  "Best <br>(Last 7)": "string",
+  "Best <br>(Last 15)": "string",
+  "Best <br>(Last 30)": "string",
+  "Worst <br>(Season)": "string",
+  "Worst <br>(Last 7)": "string",
+  "Worst <br>(Last 15)": "string",
+  "Worst <br>(Last 30)": "string",
 }
 
 let matchup_data = {};
