@@ -1,5 +1,6 @@
 # FantasyBBallAnalytics
 Analytics to optimize fantasy basketball decisions.
+
 Github Pages hosted - https://e-feng.github.io/FantasyBBallAnalytics/
 
 ## Introduction to Fantasy
@@ -13,5 +14,14 @@ Source data retrieved from ESPN using their Fantasy Basketball API various endpo
 
 ## Example Visuals
 ### League Standings
-Current league standings with rankings, win-loss column, and heatmap of overall category stats throughout the weeks.
+Current league standings with rankings, win-loss column, and heatmap of overall category stats throughout the weeks. Good for seeing teams overall strength and weaknesses in specific categories to help prepare. (Black border denotes playoff cutoff)
 ![League Standings](https://i.imgur.com/q82IisH.png)
+
+### Schedule Matchups
+Matchup comparison against every other team and the mean. Colored categories easily shows win or loss and overall color on team name shows an overall win or loss for that week. Good to see teams overall strength for that week as well as specific matchup details against other teams. (Black border denotes scheduled matchup)
+![Schedule Matchup](https://i.imgur.com/Umw74jF.png)
+
+## Future Work
+Future work includes further information such as projections for the current matchup as well throughout the rest of the season. A trade simulator can show future projections and stimulate trades.
+
+Long term work would involve opening this project up to the community by allowing others to put in their league and have this information evaluated and help them. Currently portions of this have been hardcoded to this league specifically and may not work on others that have different settings. 
