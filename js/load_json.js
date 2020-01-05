@@ -32,6 +32,17 @@ const injury_headers = {
   "Team Name": "string",
   "Player": "string",
 }
+const best_headers = {
+  "Team Name": "string",
+  "Best (Season)": "string",
+  "Best (Last 7)": "string",
+  "Best (Last 15)": "string",
+  "Best (Last 30)": "string",
+  "Worst (Season)": "string",
+  "Worst (Last 7)": "string",
+  "Worst (Last 15)": "string",
+  "Worst (Last 30)": "string",
+}
 
 let matchup_data = {};
 let num_teams;
@@ -44,7 +55,8 @@ const json_files = ["wins_timeline",
   "injury_list",
   "matchup_data",
   "standings_data",
-  "team_data"
+  "team_data",
+  "best_players",
 ];
 
 async function load_json_files() {
@@ -75,6 +87,7 @@ function drawAllGoogleCharts() {
   drawStandingsTable();
   drawWinPerLineGraph();
   drawInjuryListTable();
+  drawBestPlayersTable();
 }
 
 

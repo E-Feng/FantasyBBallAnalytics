@@ -172,7 +172,6 @@ player_info_merge = player_info_raw[["player_id", "team_id", "first_name", "last
 zscores = pd.merge(player_stats_merge, player_info_merge, how="left", on="player_id")
 
 best_players = []
-worst_players = []
 
 periods = ["002020", "012020", "022020", "032020"]
 for team_id in range(1, num_teams+1):
@@ -181,10 +180,12 @@ for team_id in range(1, num_teams+1):
         sorted = subset.sort_values(by=["zscore"], ascending=False)
         
         best_player = sorted.head(1)
+        best_player["rank"] = "best"
         worst_player = sorted.tail(1)
+        worst_player["rank"] = "worse"
 
         best_players.append(best_player.to_dict(orient="records")[0])
-        worst_players.append(worst_player.to_dict(orient="records")[0])
+        best_players.append(worst_player.to_dict(orient="records")[0])
 
 # Teams data to json file
 teams_json = teams_raw.to_json(orient="records")
@@ -208,7 +209,8 @@ json_files = {"wins_timeline": wins_timeline_list,
               "injury_list": injury_list,
               "matchup_data": matchup_res,
               "standings_data": standings_json,
-              "team_data": teams_json}
+              "team_data": teams_json,
+              "best_players": best_players}
 
 for file_name, data in json_files.items():
     path = "C:\\Users\\Elvin\\Desktop\\JSONStorage\\"

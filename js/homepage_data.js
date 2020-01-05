@@ -149,34 +149,3 @@ function drawWinPerLineGraph() {
   let chart = new google.visualization.LineChart(document.getElementById("win-line-graph"));
   chart.draw(data, options);
 }
-
-function drawWinPerLineGraphChartjs() {
-  let data = {};
-  data['labels'] = [];
-  data['datasets'] = [];
-  const options = {};
-
-  for (let i = 0; i < cur_week; i++) {
-    data['labels'].push(i.toString());
-  }
-
-  const wins_data = json_data["wins_timeline"]
-  for (let i = 0; i < wins_data.length; i++) {
-    let dataset = {
-      data: wins_data[i],
-      label: getTeamNameByID(i + 1),
-      backgroundColor: 'rgba(255, 255, 255, 0)',
-      borderColor: getRandomColor(),
-      lineTension: 0,
-    };
-
-    data['datasets'].push(dataset);
-  }
-
-  const ctx = document.getElementById('win-line-graph').getContext('2d');
-  const my_chart = new Chart(ctx, {
-    type: 'line',
-    data: data,
-    options: options
-  });
-}
