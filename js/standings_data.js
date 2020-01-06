@@ -22,7 +22,7 @@ function drawStandingsTable() {
   for (let key in standings_headers) {
     data.addColumn(standings_headers[key], key);
   }
-  let standings = json_data["standings_data"];
+  const standings = json_data["standings_data"];
 
   let num_cols = data.getNumberOfColumns();
   let num_rows = standings.length;
