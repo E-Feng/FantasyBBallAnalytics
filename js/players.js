@@ -44,8 +44,8 @@ function drawBestPlayersTable() {
     }
     let url = getHeadshotURLFromID(player.player_id);
     let full_name = player.first_name + " " + player.last_name;
-    let settings = `" title="` + full_name + `" alt="` + full_name + `"`;
-    let val = `<img class='` + class_name + `' src="` + url + settings + `></img>`;
+    let settings = `" title="${full_name}" alt="${full_name}"`
+    let val = `<img class="${class_name}" src="${url}${settings}></img`
     data.setCell(row, col, val);
   })
 
