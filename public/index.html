@@ -1,0 +1,159 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>Fantasy Basketball Analytics - Home</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="img/icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <meta name="theme-color" content="#fafafa">
+
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+
+<body>
+  <!--[if IE]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <div class="wrapper">
+    <header>
+      <div class="flex-header container">
+        <h1>Fantasy Basketball Analytics</h1>
+        <div class="filler"></div>
+        <ul>
+          <li class="social"><a href="https://github.com/E-Feng"><i class="fa fa-github"></i></a></li>
+          <li class="social"><a href="https://www.linkedin.com/in/elvin-feng-527b8b81/"><i class="fa fa-linkedin"></i></a></li>
+        </ul>
+      </div>
+    </header>
+
+    <nav class="flex-nav container" id="tabs">
+      <a class="toggle-nav">☰ Menu</a>
+      <ul>
+        <li><a href="#" data-target="home" class="nav-link button">Home</a></li>
+        <li><a href="#" data-target="standings" class="nav-link button">Standings</a></li>
+        <li><a href="#" data-target="matchups" class="nav-link button">Schedule Matchups</a></li>
+        <li><a href="#" data-target="players" class="nav-link button">Players</a></li>
+        <li class="filler"></li>
+        <li><a href="#" data-target="about" class="nav-link button about">About</a></li>
+      </ul>
+    </nav>
+
+    <section class="container" id="main-content">
+      <div class="page active" id="home">
+        <h1>LABron MVP - ESPN Fantasy Basketball League</h1>
+        <div class="flex-home">
+          <div class="sub-container">
+            <div class="scroll-wrapper">
+              <figure id="win-line-graph"></figure>
+            </div>
+            <div id="injury-list">
+              <h1>Injury List</h1>
+              <div class=legend-wrapper>
+                <a class="red-background injury-legend">OUT</a>
+                <a class="yellow-background injury-legend">DAY-TO-DAY</a>
+                <a class="blue-background injury-legend">SUSPENSION</a>
+              </div>
+              <div id="injury-list-table"></div>
+            </div>
+          </div>
+
+          <aside id="side-rankings"><h2>Rankings</h2></aside>
+          <template id="side-rankings-template">
+            <div class="box">
+              <h5>%p</h5>
+              <p>%e<span class="green bold">%w</span>-<span class="red bold">%l</span>%e</p>
+              <img src="%src" alt="%alt">
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div class="page" id="standings">
+        <h1>League Standings</h1>
+        <p>Current league standings and win-loss-tie record for each category</p>
+        <p>Top 7 make playoffs, #1 overall gets first round bye</p>
+        <div id="standings-table"></div>
+      </div>
+
+      <div class="page" id="matchups">
+        <h1>Schedule Matchups</h1>
+        <p>Weekly comparisions to every other team, bordered team represents actual matchup</p>
+        <form>
+          <select id="matchup-teams-filter">
+            <option value="all">All Teams</option>
+          </select>
+        </form>
+        <form>
+          <select id="matchup-weeks-filter">
+            <option value="all">All Weeks</option>
+          </select>
+        </form>
+        <div class="clear"></div>
+
+        <div class="flex-container" id="matchup-tables"></div>
+        <template id="matchup-tables-template">
+          <div class="flex-item" data-week="%dw" data-team-id="%dt">
+            <h2>%t - Week %w</h2>
+            <div id="google-charts-table"></div>
+          </div>
+        </template>
+      </div>
+
+      <div class="page" id="players">
+        <h1>Player Rankings</h1>
+        <p>Best and worse players for each team calculated from ESPNs Player Rater (zscore). Shown is full season stats and recent number of games.</p>
+        <div id="best-table"></div>
+      </div>
+
+      <div class="page" id="about">
+        <h1>About Page</h1>
+        <h3>Data Source</h3>
+        <p>Data retrieved from ESPN's Fantasy Basketball v3 API various endpoints. JSON data was parsed and formatted for database input.</p>
+        <h3>Database Management</h3>
+        <p>Data was stored in a local MySQL and MongoDB database for learning purposes.</p>
+        <h3>Data Analysis</h3>
+        <p>The databases were queried for data and analysis done in Python using various libraries.</p>
+        <h3>Data Handling</h3>
+        <p>Results were converted to JSON files and pushed to neighboring repository for ease of fetching.</p>
+        <h3>Webpage</h3>
+        <p>Webpage is statically hosted with Github-Pages, graphs and tables created using Google Charts.</p>
+      </div>
+    </section>
+  </div>
+
+  <!--
+  <footer class="footer">
+    <p>Fantasy Basketball Analytics - Elvin Feng</p>
+  </footer> -->
+
+  <!-- Scripts  -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script>
+    window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/homepage_data.js"></script>
+  <script src="js/matchup_data.js"></script>
+  <script src="js/standings_data.js"></script>
+  <script src="js/vendor/modernizr-3.7.1.min.js"></script>
+  <script src="js/plugins.js"></script>
+  <script src="js/load_json.js"></script>
+  <script src="js/players.js"></script>
+</body>
+
+</html>

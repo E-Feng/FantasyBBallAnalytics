@@ -1,0 +1,679 @@
+/*! HTML5 Boilerplate v7.2.0 | MIT License | https://html5boilerplate.com/ */
+
+/* main.css 2.0.0 | MIT License | https://github.com/h5bp/main.css#readme */
+/*
+ * What follows is the result of much research on cross-browser styling.
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ */
+
+/* ==========================================================================
+   Base styles: opinionated defaults
+   ========================================================================== */
+
+html {
+  color: #222;
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+body {
+  font-family: Arial;
+  background: #FDB927;
+}
+
+h1 {
+  text-align: center;
+}
+
+.page {
+  display: none;
+  min-height: 100vh;
+  position: relative;
+  align-content: center;
+}
+
+.active {
+  display: block;
+}
+
+.container {
+  width: 80%;
+  margin: auto;
+  overflow: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+a {
+  display: inline-block;
+}
+
+.clear {
+  clear: both;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+/* Header */
+header {
+  background: #552583;
+  color: #ffffff;
+  min-height: 50px;
+  border-bottom: #ffffff 2px solid;
+}
+
+.flex-header {
+  display: flex;
+  align-items: flex-end;
+}
+
+.flex-header .filler {
+  flex: 1;
+}
+
+header h1 {
+  padding: 20px 0 10px 0;
+  margin-bottom: 0;
+}
+
+header a {
+  text-decoration: none;
+  font-size: 30px;
+  color: #ffffff;
+}
+
+header ul {
+  padding: 0;
+  margin: 0;
+}
+
+header li {
+  display: inline;
+  padding: 0 10px 0 10px;
+}
+
+
+/* Nav Buttons */
+.toggle-nav {
+  display: none;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center; 
+  border-radius: 15px;
+  height: 45px;
+  width: 100px;
+  margin: 10px 4px;
+  padding: 10px 5px;
+  background-color: #552583;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-decoration: none;
+  word-wrap: break-word;
+}
+
+.button a:visited {
+  color: #ffffff;
+}
+
+.flex-nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0 0;
+  padding: 0 0;
+}
+
+.flex-nav .filler {
+  flex: 1;
+}
+
+
+/* Body */
+#main-content {
+  width: 80%;
+}
+
+.wrap {
+  height: auto;
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+
+/* Home */
+.flex-home {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#win-line-graph {
+  min-width: 600px;
+  margin: 0 0;
+}
+
+.scroll-wrapper {
+  margin: 0 0;
+}
+
+.sub-container {
+  flex: 1 1 600px;
+}
+
+#side-rankings {
+  flex: 0 1 150px;
+}
+
+#side-rankings h2 {
+  margin: 0 0;
+}
+
+#injury-list {
+  width: 50%;
+}
+
+.legend-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: auto;
+}
+
+.injury-legend {
+  font-size: 20px;
+  padding: 0 5px;
+  margin: 0 5px;
+}
+
+.injury-table-text {
+  font-size: 14px;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.box img {
+  width: 75px;
+  height: 75px;
+}
+
+.box h5 {
+  margin: 0 0;
+  align-self: flex-start;
+}
+
+.box p {
+  margin: 0 0;
+}
+
+
+/* Standings */
+#standings-table {
+  font-size: 20px;
+}
+
+
+/* Matchups */
+#matchup-weeks-filter, #matchup-teams-filter {
+  display: block;
+  float: left;
+}
+
+.flex-item h1 {
+  margin-bottom: 5px;
+}
+
+/* Players */
+#players {
+  margin: auto;
+}
+
+#best-table {
+  max-width: 900px;
+  margin: auto;
+}
+
+.player-cell-best {
+  max-width: 100px;
+  height: 73px;
+  background: limegreen;
+}
+
+.player-cell-worse {
+  max-width: 100px;
+  height: 73px;
+  background: #F48787;
+}
+
+.players-table-text {
+  width: 100px !important;
+  height: 73px;
+  padding: 0 0 !important;
+}
+
+.team-padding {
+  padding: 0 5px;
+}
+
+
+/* Footer */
+
+
+/* Flex Containers */
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.flex-item {
+  text-align: center;
+  padding: 0 5px;
+  overflow: auto;
+}
+
+
+/* Google Charts */
+.matchup-table-text {
+  font-size: 12px;
+}
+
+.standings-table-text {
+  font-size: 16px;
+}
+
+.green-background {
+  background-color: limegreen;
+}
+
+.red-background {
+  background-color: #F48787;
+}
+
+.yellow-background {
+  background-color: yellow;
+}
+
+.blue-background {
+  background-color: #47C3F5;
+}
+
+.left-border {
+  border-color: black !important;
+  border-width: 3px 0 3px 3px !important;
+}
+
+.middle-border {
+  border-color: black !important;
+  border-width: 3px 0 3px 0 !important;  
+}
+
+.right-border {
+  border-color: black !important;
+  border-width: 3px 3px 3px 0 !important; 
+}
+
+.bottom-border {
+  border-color: black !important;
+  border-width: 0 0 3px 0 !important;
+}
+
+
+/*
+ * Remove text-shadow in selection highlight:
+ * https://twitter.com/miketaylr/status/12228805301
+ *
+ * Vendor-prefixed and regular ::selection selectors cannot be combined:
+ * https://stackoverflow.com/a/16982510/7133471
+ *
+ * Customize the background color to match your design.
+ */
+
+::-moz-selection {
+  background: #b3d4fc;
+  text-shadow: none;
+}
+
+::selection {
+  background: #b3d4fc;
+  text-shadow: none;
+}
+
+/*
+ * A better looking default horizontal rule
+ */
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ * https://github.com/h5bp/html5-boilerplate/issues/440
+ */
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+  vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset styles.
+ */
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * Allow only vertical resizing of textareas.
+ */
+
+textarea {
+  resize: vertical;
+}
+
+/* ==========================================================================
+   Browser Upgrade Prompt
+   ========================================================================== */
+
+.browserupgrade {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+/*
+ * Hide visually and from screen readers
+ */
+
+.hidden {
+  display: none !important;
+}
+
+/*
+* Hide only visually, but have it available for screen readers:
+* https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+*
+* 1. For long content, line feeds are not interpreted as spaces and small width
+*    causes content to wrap 1 word per line:
+*    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
+*/
+
+.sr-only {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+  /* 1 */
+}
+
+/*
+* Extends the .sr-only class to allow the element
+* to be focusable when navigated to via the keyboard:
+* https://www.drupal.org/node/897638
+*/
+
+.sr-only.focusable:active,
+.sr-only.focusable:focus {
+  clip: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  white-space: inherit;
+  width: auto;
+}
+
+/*
+* Hide visually and from screen readers, but maintain layout
+*/
+
+.invisible {
+  visibility: hidden;
+}
+
+/*
+* Clearfix: contain floats
+*
+* For modern browsers
+* 1. The space content is one way to avoid an Opera bug when the
+*    `contenteditable` attribute is included anywhere else in the document.
+*    Otherwise it causes space to appear at the top and bottom of elements
+*    that receive the `clearfix` class.
+* 2. The use of `table` rather than `block` is only necessary if using
+*    `:before` to contain the top-margins of child elements.
+*/
+
+.clearfix:before,
+.clearfix:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media all and (max-width: 800px) {
+  .flex-nav ul {
+    flex-wrap: wrap;
+  }
+
+  .flex-nav .filler {
+    flex: 0;
+  }
+
+  .flex-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Standings table text made smaller */
+  .standings-table-text {
+    font-size: 12px;
+  }  
+}
+
+@media all and (max-width: 600px) {
+  .container {
+    width: 100%;
+    margin: auto;
+    overflow: hidden;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    border-top: #ffffff 2px solid;
+  }
+
+  header h1 {
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .button {
+    width: 100vw;
+    padding: 0 0;
+    margin: 0 0;
+    border-radius: 0;
+  }
+
+  .flex-nav {
+    margin-bottom: 10px;
+    width: 100%;
+    order: -1;
+  }
+
+  .toggle-nav {
+    display: block;
+    text-align: center;
+    font-size: 20px;
+    margin: 20px 0;
+  }
+
+  .flex-nav ul {
+    display: none;
+  }
+
+  .flex-nav ul.open {
+    display: flex;
+  }
+
+  #main-content {
+    width: 100%;
+  }
+
+  .scroll-wrapper {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    width: 100vw;
+  }
+
+  #injury-list {
+    width: 100vw;
+  }
+
+  /* Standings table text made smaller */
+  .standings-table-text {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (min-width: 35em) {
+  /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+  (-webkit-min-device-pixel-ratio: 1.25),
+  (min-resolution: 1.25dppx),
+  (min-resolution: 120dpi) {
+  /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid the additional HTTP request:
+   https://www.phpied.com/delay-loading-your-print-css/
+   ========================================================================== */
+
+@media print {
+  *,
+  *:before,
+  *:after {
+    background: transparent !important;
+    color: #000 !important;
+    /* Black prints faster */
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  /*
+     * Don't show links that are fragment identifiers,
+     * or use the `javascript:` pseudo protocol
+     */
+  a[href^="#"]:after,
+  a[href^="javascript:"]:after {
+    content: "";
+  }
+  pre {
+    white-space: pre-wrap !important;
+  }
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  /*
+     * Printing Tables:
+     * https://web.archive.org/web/20180815150934/http://css-discuss.incutio.com/wiki/Printing_Tables
+     */
+  thead {
+    display: table-header-group;
+  }
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}
+
