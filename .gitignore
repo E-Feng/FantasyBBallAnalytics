@@ -14,3 +14,4 @@ robots.txt
 site.webmanifest
 
 doc/
+node_modules/
