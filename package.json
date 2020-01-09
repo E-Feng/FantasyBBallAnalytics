@@ -1,0 +1,24 @@
+{
+  "name": "fantasybballanalytics",
+  "version": "1.0.0",
+  "description": "Fantasy Basketball Analytics",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/E-Feng/FantasyBBallAnalytics.git"
+  },
+  "author": "Elvin Feng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/E-Feng/FantasyBBallAnalytics/issues"
+  },
+  "homepage": "https://github.com/E-Feng/FantasyBBallAnalytics#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  }
+}
