@@ -55,6 +55,14 @@ a {
   clear: both;
 }
 
+.italics {
+  font-style: italic;
+}
+
+.center {
+  text-align: center;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -167,12 +175,6 @@ header li {
   margin-bottom: 5px;
 }
 
-#main-content p {
-  text-align: center;
-  font-style: italic;
-  margin-top: 0;
-}
-
 #win-line-graph {
   min-width: 600px;
   margin: 0 0;
@@ -196,6 +198,7 @@ header li {
 
 #injury-list {
   width: 50%;
+  min-width: 360px;
 }
 
 .legend-wrapper {
