@@ -2,6 +2,7 @@
 Analytics to optimize fantasy basketball decisions.
 
 Heroku hosted - http://fantasyanalytics.info
+
 Github Pages hosted - https://e-feng.github.io/FantasyBBallAnalytics/
 
 ## Introduction to Fantasy
