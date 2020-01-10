@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import numpy.matlib
 from operator import add
+from datetime import datetime
 from dataScraper import DataScraper
 
 
@@ -203,6 +204,12 @@ ranks = index.argsort()
 wins_timeline = wins_timeline + offset[:,ranks].transpose()
 wins_timeline_list = wins_timeline.transpose().tolist()
 
+# Misc Data
+misc_data = {}
+# Last updated time
+now = datetime.now()
+dt_string = now.strftime("%m/%d/%Y %I:%M:%S %p")
+misc_data["time"] = dt_string
 
 # Saving all results to json files
 json_files = {"wins_timeline": wins_timeline_list,
@@ -210,7 +217,8 @@ json_files = {"wins_timeline": wins_timeline_list,
               "matchup_data": matchup_res,
               "standings_data": standings_json,
               "team_data": teams_json,
-              "best_players": best_players}
+              "best_players": best_players,
+              "misc_data": misc_data}
 
 for file_name, data in json_files.items():
     path = "C:\\Users\\Elvin\\Desktop\\JSONStorage\\"

@@ -1,4 +1,5 @@
 function initHomePage() {
+  // Setting up rankings side bar
   let ele;
   let item;
   let fragment = document.createDocumentFragment();
@@ -32,6 +33,10 @@ function initHomePage() {
     fragment.appendChild(ele);
   }
   $("#side-rankings").append(fragment);
+
+  // Updating last updated time
+  const time = json_data["misc_data"]["time"];
+  document.getElementById("update-time").textContent = time;
 }
 
 

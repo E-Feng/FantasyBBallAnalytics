@@ -57,6 +57,7 @@ const json_files = ["wins_timeline",
   "standings_data",
   "team_data",
   "best_players",
+  "misc_data",
 ];
 
 async function load_json_files() {

@@ -163,6 +163,16 @@ header li {
   flex-wrap: wrap;
 }
 
+#main-content h1 {
+  margin-bottom: 5px;
+}
+
+#main-content p {
+  text-align: center;
+  font-style: italic;
+  margin-top: 0;
+}
+
 #win-line-graph {
   min-width: 600px;
   margin: 0 0;
