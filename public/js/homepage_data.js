@@ -116,8 +116,8 @@ function drawWinPerLineGraph() {
   }
 
   const wrap_width = $('.scroll-wrapper').width();
-  const chart_width = Math.max(wrap_width, 600);
-  console.log(chart_width);
+  let chart_width = Math.max(wrap_width, 600);
+  chart_width = Math.min(chart_width, 1400);
 
   const past_week = json_data["wins_timeline"][cur_week - 1]
   const max_val = Math.ceil(Math.max(...past_week))
