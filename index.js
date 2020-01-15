@@ -3,5 +3,7 @@ console.log("Running index.js")
 const express = require('express');
 const app = express();
 
-app.listen(process.env.PORT || 3000, () => console.log('Running'));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
 app.use(express.static('public'));
