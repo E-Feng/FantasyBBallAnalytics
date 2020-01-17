@@ -23,11 +23,12 @@ Specifics of the technical details as well as history of changes
 ### Data Hosting
 * Data files pushed to neighboring repository for daily updates and ease of fetching
 * Added AWS-S3 buckets and data served using APIs with Express
-### Visualization
+### Frontend and Visualization
+* Responsive designed created with vanilla HTML/CSS/JS
 * Tables and graphs created using Google Charts
 ### Deployment
 * Statically hosted with Github Pages
-* Hosted through Heroku with Node.js (+Express)
+* Hosted through Heroku with Node.js with custom domain
 * Hosted on AWS-EC2 server
 
 ## Example Visuals
