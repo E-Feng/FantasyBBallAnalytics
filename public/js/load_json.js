@@ -61,16 +61,24 @@ const json_files = ["wins_timeline",
 ];
 
 async function load_json_files() {
-  const url = "https://raw.githubusercontent.com/E-Feng/JSONStorage/master/"
+  const git_url = "https://raw.githubusercontent.com/E-Feng/JSONStorage/master/"
   for (let i=0; i<json_files.length; i++) {
     let json_name = json_files[i];
-    let res = await fetch(url + json_name + ".json");
-    let data = await res.json();
-    try {
-      json_data[json_name] = JSON.parse(data);
-    } catch(e) {
-      json_data[json_name] = data;
+
+    // Loading from github repository
+    let res = await fetch(git_url + json_name + ".json");
+    let git_data = await res.json();
+    if (typeof(git_data) == 'string') {
+      git_data = JSON.parse(git_data);
     }
+
+    // Loading from backend API for testing
+    let res2 = await fetch(`/api/${json_name}`)
+    let api_data = await res2.json();
+    api_data = JSON.parse(api_data);
+
+    // Saving either to global variable
+    json_data[json_name] = git_data;
   }
 }
 
