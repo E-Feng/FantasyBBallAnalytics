@@ -30,7 +30,7 @@ async function get_AWS_S3_data() {
       Bucket: 'fantasybballanalytics',
     }).promise();
 
-    // Getting each file 
+    // Getting each file from bucket
     const files = res.Contents.forEach((file) => {
       if (file.Key.endsWith('.json')) {
         let params = {
@@ -42,6 +42,7 @@ async function get_AWS_S3_data() {
             return err;
           }
 
+          // Creating routes for frontend to access json files
           const json_name = path.basename(file.Key, '.json');
           const json_data = data.Body.toString('utf-8');
 

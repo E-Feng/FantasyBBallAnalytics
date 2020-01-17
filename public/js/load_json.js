@@ -78,7 +78,7 @@ async function load_json_files() {
     let api_data = await res2.json();
     api_data = JSON.parse(api_data);
     } catch(err) {
-      console.log('API routes not set (no backend setup)', err);
+      console.log('API routes not set (no backend setup)');
     }
 
     // Saving either to global variable
