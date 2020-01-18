@@ -76,9 +76,7 @@ async function load_json_files() {
     if (!is_static) {
       let res2 = await fetch(`/api/${json_name}`)
       let api_data = await res2.json();
-      console.log(api_data);
       api_data = JSON.parse(api_data);
-      console.log(api_data);
     }
 
     // Saving either to global variable
