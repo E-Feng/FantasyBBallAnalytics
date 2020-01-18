@@ -2,20 +2,33 @@ const path = require('path');
 const aws = require('aws-sdk');
 const express = require('express');
 const router = express.Router();
-require('dotenv').config();
+const connectDB = require('./config/db');
+require('dotenv').config({path: './config/.env'});
+
+// Params
+const useAWS = false;
 
 // Starting server with express
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => console.log(`Running on port ${PORT}`));
 app.use(express.static('public'));
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
 
-get_AWS_S3_data()
+connectDB();
+
+// Getting data from AWS and setting routes, if not return default JSON
+if (useAWS) {
+  getAWSS3data()
+} else {
+  app.get('/api/*', (req, res) => {
+    res.json(JSON.stringify({msg: 'For Testing'}));
+  })
+}
 
 // Connecting to AWS-S3
-async function get_AWS_S3_data() {
+async function getAWSS3data() {
   console.log('Getting AWS S3 data...')
   try {
     aws.config.setPromisesDependency();
@@ -52,7 +65,8 @@ async function get_AWS_S3_data() {
         });
       }
     })
-  } catch (e) {
-    console.log('Error: ', e);
+  } catch (err) {
+    console.log('Error: ', err);
   }
+  console.log('Retreived AWS S3 data...')
 }

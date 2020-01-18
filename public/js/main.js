@@ -1,3 +1,4 @@
+// Creating SPA by hiding/showing content pages
 const app = {
     pages: [],
     show: new Event("show"),
@@ -41,7 +42,11 @@ const app = {
 
 document.addEventListener("DOMContentLoaded", app.init);
 
+// Determining host and what data retrieval to use
+const host_url = document.location.host;
+const is_static = host_url.includes('github') || host_url.includes('127.0.0.1');
 
+// Creating filters for teams/week for matchups
 let weeks_filter = document.querySelector("#matchup-weeks-filter");
 weeks_filter.addEventListener("change", filter_weeks)
 

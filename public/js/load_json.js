@@ -72,13 +72,13 @@ async function load_json_files() {
       git_data = JSON.parse(git_data);
     }
 
-    // Loading from backend API for testing
-    try {
-    let res2 = await fetch(`/api/${json_name}`)
-    let api_data = await res2.json();
-    api_data = JSON.parse(api_data);
-    } catch(err) {
-      console.log('API routes not set (no backend setup)');
+    // Loading from backend API for testing (not run on static pages)
+    if (!is_static) {
+      let res2 = await fetch(`/api/${json_name}`)
+      let api_data = await res2.json();
+      console.log(api_data);
+      api_data = JSON.parse(api_data);
+      console.log(api_data);
     }
 
     // Saving either to global variable
