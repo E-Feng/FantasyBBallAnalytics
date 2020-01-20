@@ -10,11 +10,14 @@ const useAWS = false;
 
 // Starting server with express
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static('public'));
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+
+// Routes
+app.use(express.json());
+app.use('/comments/', require('./routes/comments'));
 
 connectDB();
 
