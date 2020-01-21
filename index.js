@@ -1,24 +1,33 @@
 const path = require('path');
 const aws = require('aws-sdk');
 const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 const router = express.Router();
 const connectDB = require('./config/db');
 require('dotenv').config({path: './config/.env'});
 
 // Params
 const useAWS = false;
-
-// Starting server with express
-const app = express();
 const PORT = process.env.PORT || 3000;
-
-app.use(express.static('public'));
-app.listen(PORT, () => console.log(`Running on port ${PORT}`));
 
 // Routes
 app.use(express.json());
 app.use('/comments/', require('./routes/comments'));
 
+// Socket.io for chatbox
+io.sockets.on('connection', (socket) => {
+  socket.on('username', (username) => {
+    socket.username = username;
+  })
+
+  socket.on('chat_message', (message) => {
+    io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
+  })
+})
+
+// Connecting to db
 connectDB();
 
 // Getting data from AWS and setting routes, if not return default JSON
@@ -29,6 +38,10 @@ if (useAWS) {
     res.json(JSON.stringify({msg: 'For Testing'}));
   })
 }
+
+// Starting server with express
+app.use(express.static('public'));
+http.listen(PORT, () => console.log(`Running on port ${PORT}`));
 
 // Connecting to AWS-S3
 async function getAWSS3data() {

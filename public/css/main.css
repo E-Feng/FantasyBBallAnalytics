@@ -169,10 +169,70 @@ header li {
 .flex-home {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 #main-content h1 {
   margin-bottom: 5px;
+}
+
+/* Chatbox */
+.chat-container {
+  position: relative;
+}
+
+#chat-overlay {
+  color: #ffffff;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0, 0.7);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#warning {
+  color: red;
+}
+
+#chat-form {
+  display: flex;
+  margin: 0 0 10px 0;
+}
+
+#message-box {
+  list-style-type: none;
+  background-color: #ffffff;
+  border: solid black 1px;
+  height: 500px;
+  margin: 0;
+  padding: 0;
+}
+
+#message-box li {
+  padding: 3px 5px;
+}
+
+#message-box li:nth-child(odd) {
+  background: #eeeeee;
+}
+
+#message {
+  flex: 1;
+}
+
+#username {
+  width: 200px;
+}
+
+#user-label {
+  background: #eeeeee;
+  padding: 0 5px;
 }
 
 #win-line-graph {
@@ -185,10 +245,12 @@ header li {
 }
 
 .sub-container {
+  max-width: 1400px;
   flex: 1 1 600px;
 }
 
 #side-rankings {
+  margin-left: 25px;
   flex: 0 1 150px;
 }
 

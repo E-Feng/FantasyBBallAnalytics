@@ -12,7 +12,7 @@ const app = {
             link.addEventListener("click", app.nav);
         })
 
-        history.replaceState({}, "Home", "#home")
+        history.replaceState({}, "Home", "?#home")
         window.addEventListener("hashchange", app.poppin)
     },
 
