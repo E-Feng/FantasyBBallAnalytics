@@ -13,11 +13,6 @@ exports.getComments = async (req, res, next) => {
       comments = comments.sort((a,b) => (a.createdAt > b.createdAt ? 1 : -1));
     }
 
-    // Remove collections after >400 (free mongodb limintations)
-    if (comments.length > 400) {
-      const to_delete = comments.length - 400;
-    }
-
     return res.status(200).json({
       success: true,
       count: comments.length,

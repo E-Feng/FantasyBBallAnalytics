@@ -218,6 +218,7 @@ header li {
 }
 
 #message-box li {
+  word-wrap: break-word;
   padding: 3px 5px;
 }
 
