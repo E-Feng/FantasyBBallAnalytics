@@ -27,7 +27,7 @@ exports.addComments = async (req, res, next) => {
   try {
     if (req.body.comment) {
       const comment = await Comment.create(req.body);
-
+      
       return res.status(201).json({
         success: true,
         data: comment

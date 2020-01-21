@@ -2,7 +2,7 @@
 const app = {
     pages: [],
     show: new Event("show"),
-    init: function(){
+    init: function () {
         app.pages = document.querySelectorAll(".page");
         app.pages.forEach((pg) => {
             pg.addEventListener("show", app.pageShown);
@@ -16,7 +16,7 @@ const app = {
         window.addEventListener("hashchange", app.poppin)
     },
 
-    nav: function(ev){
+    nav: function (ev) {
         ev.preventDefault();
         let current_page = ev.target.getAttribute("data-target");
         document.querySelector(".active").classList.remove("active");
@@ -26,17 +26,17 @@ const app = {
         document.getElementById(current_page).dispatchEvent(app.show);
     },
 
-    pageShown: function(ev) {
+    pageShown: function (ev) {
         console.log("Page", ev.target.id, "shown");
     },
 
-    poppin: function(ev){
+    poppin: function (ev) {
         console.log(location.hash, "popstate event");
         let hash = location.hash.replace("#", "");
         document.querySelector(".active").classList.remove("active");
         document.getElementById(hash).classList.add("active");
 
-        document.getElementById(hash).dispatchEvent(app.show);        
+        document.getElementById(hash).dispatchEvent(app.show);
     }
 }
 
@@ -45,6 +45,15 @@ document.addEventListener("DOMContentLoaded", app.init);
 // Determining host and what data retrieval to use
 const host_url = document.location.host;
 const is_static = host_url.includes('github') || host_url.includes('127.0.0.1');
+
+if (is_static) {
+    const warning = document.getElementById('warning');
+    warning.textContent = 'Only available on fantasyanalytics.info'
+} else {
+    loadScript("/socket.io/socket.io.js", () => {
+        loadScript("js/chatbox.js");
+    });
+}
 
 // Creating filters for teams/week for matchups
 let weeks_filter = document.querySelector("#matchup-weeks-filter");
@@ -58,7 +67,7 @@ function filter_weeks() {
         $("#matchup-tables div[data-week]").addClass("hidden");
         $('#matchup-tables div[data-week="' + selected_event + '"]').removeClass("hidden");
         teams_filter.selectedIndex = "all";
-    }    
+    }
 }
 
 let teams_filter = document.querySelector("#matchup-teams-filter");
@@ -72,7 +81,7 @@ function filter_teams() {
         $("#matchup-tables div[data-team-id]").addClass("hidden");
         $('#matchup-tables div[data-team-id="' + selected_event + '"]').removeClass("hidden");
         weeks_filter.selectedIndex = "all";
-    }    
+    }
 }
 
 $('.toggle-nav').on('click', () => {
