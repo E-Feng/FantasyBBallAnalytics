@@ -206,12 +206,15 @@ header li {
 }
 
 #message-box {
+  position: relative;
   list-style-type: none;
   background-color: #ffffff;
   border: solid black 1px;
   height: 500px;
+  max-height: 500px;
   margin: 0;
   padding: 0;
+  overflow-y: scroll;
 }
 
 #message-box li {

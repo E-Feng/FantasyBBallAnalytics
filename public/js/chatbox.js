@@ -8,31 +8,41 @@ const message_box = document.getElementById('message-box')
 const message = document.getElementById('message');
 const warning = document.getElementById('warning');
 
+getChatLog();
+
+// Grabbing contents from db and appending items
+async function getChatLog() {
+  const res = await fetch('/comments/');
+  const comments = await res.json();
+  comments.data.forEach(comment => {
+    const msg = `<strong>${comment.user}:</strong> ${comment.comment}`;
+    message_box.append($('<li>').html(msg)[0]);
+  })
+  
+  // Adjusting scroll to bottom
+  message_box.scrollTop = message_box.scrollHeight;
+}
+
 // Init chat after submitting, grabbing username
 async function initChat(e) {
+  e.preventDefault();
   if (username.value != '') {
     overlay.style.zIndex = -1;
     user_label.textContent = username.value;
     socket.emit('username', username.value);
-
-    // Grabbing contents from db and appending items
-    const res = await fetch('/comments/');
-    const comments = await res.json();
-    comments.data.forEach(comment => {
-      const msg = `<strong>${comment.user}:</strong> ${comment.comment}`;
-      message_box.append($('<li>').html(msg)[0]);
-    })
   } else {
     warning.textContent = 'Enter a username';
   }
 }
 
-chatbox_init.addEventListener('submit', initChat, {passive: true});
+chatbox_init.addEventListener('submit', initChat);
 
 // Add message to messages and to db/API
-async function addMessage(e) {
+async function sendMessage(e) {
+  e.preventDefault();
   if (message.value != '') {
     socket.emit('chat_message', message.value);
+    message_box.scrollTop = message_box.scrollHeight; 
 
     // Sending data to db/API
     const send_body = {
@@ -54,10 +64,11 @@ async function addMessage(e) {
     }
   }
   message.value = '';
+  message.focus();
 }
 
 socket.on('chat_message', (msg) => {
   message_box.append($('<li>').html(msg)[0]);
 })
 
-message_form.addEventListener('submit', addMessage, {passive: true});
+message_form.addEventListener('submit', sendMessage);
