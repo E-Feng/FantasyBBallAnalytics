@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const PostSchema = new mongoose.Schema({
-  post: {
+const CommentSchema = new mongoose.Schema({
+  comment: {
     type: String,
-    required: [true, 'Please add a post'],
+    required: [true, 'Please add a comment'],
   },
   user: {
     type: String,
@@ -15,4 +15,4 @@ const PostSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model('Comment', CommentSchema);

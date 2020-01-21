@@ -34,7 +34,8 @@
         <div class="filler"></div>
         <ul>
           <li class="social"><a href="https://github.com/E-Feng"><i class="fa fa-github"></i></a></li>
-          <li class="social"><a href="https://www.linkedin.com/in/elvin-feng-527b8b81/"><i class="fa fa-linkedin"></i></a></li>
+          <li class="social"><a href="https://www.linkedin.com/in/elvin-feng-527b8b81/"><i
+                class="fa fa-linkedin"></i></a></li>
         </ul>
       </div>
     </header>
@@ -57,6 +58,25 @@
         <p class="center italics">Last Updated: <span id="update-time"></span></p>
         <div class="flex-home">
           <div class="sub-container">
+            <div class="chat-container">
+              <div id="chat-overlay">
+                <form id="chat-init">
+                  <h2>Join Live League Chat</h2>
+                  <p>(Please limit impersonations and profanities)</p>
+                  <input type="text" id="username" placeholder="User">
+                  <button type="submit">Join</button>
+                  <p id="warning">&nbsp;</p>
+                </form>
+              </div>
+              <div id="chat-box">
+                <ul id="message-box"></ul>
+                <form id="chat-form">
+                  <label id='user-label'></label>
+                  <input type="text" id="message" placeholder="Type your message here...">
+                  <button type="submit">SEND</button>
+                </form>
+              </div>
+            </div>
             <div class="scroll-wrapper">
               <figure id="win-line-graph"></figure>
             </div>
@@ -71,7 +91,9 @@
             </div>
           </div>
 
-          <aside id="side-rankings"><h2>Rankings</h2></aside>
+          <aside id="side-rankings">
+            <h2>Rankings</h2>
+          </aside>
           <template id="side-rankings-template">
             <div class="box">
               <h5>%p</h5>
@@ -115,16 +137,18 @@
 
       <div class="page" id="players">
         <h1>Player Rankings</h1>
-        <p>Best and worse players for each team calculated from ESPNs Player Rater (zscore). Shown is full season stats and recent number of games.</p>
+        <p>Best and worse players for each team calculated from ESPNs Player Rater (zscore). Shown is full season stats
+          and recent number of games.</p>
         <div id="best-table"></div>
       </div>
 
       <div class="page" id="about">
         <h1>About</h1>
         <h3>Technical Details</h3>
-        <span>Details can be found on Github <span><a href='https://github.com/E-Feng/FantasyBBallAnalytics'>README</a></span>
-        <h3>Contact</h3>
-        <p>efeng92@gmail.com</p>
+        <span>Details can be found on Github <span><a
+              href='https://github.com/E-Feng/FantasyBBallAnalytics'>README</a></span>
+          <h3>Contact</h3>
+          <p>efeng92@gmail.com</p>
       </div>
     </section>
   </div>
@@ -140,8 +164,8 @@
   <script>
     window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')
   </script>
-  <script src="js/main.js"></script>
   <script src="js/util.js"></script>
+  <script src="js/main.js"></script>
   <script src="js/homepage_data.js"></script>
   <script src="js/matchup_data.js"></script>
   <script src="js/standings_data.js"></script>

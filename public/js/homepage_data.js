@@ -125,7 +125,7 @@ function drawWinPerLineGraph() {
   let options = {
     title: "Total Wins",
     height: '600',
-    width: chart_width - 25,
+    width: chart_width,
     lineWidth: 3,
     focusTarget: 'category',
     dataOpacity: 0,
