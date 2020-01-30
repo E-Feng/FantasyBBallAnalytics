@@ -188,6 +188,10 @@ for team_id in range(1, num_teams+1):
         best_players.append(best_player.to_dict(orient="records")[0])
         best_players.append(worst_player.to_dict(orient="records")[0])
 
+# All raw stats
+all_stats = pd.merge(player_stats_raw, player_info_raw, how="left", on="player_id")
+all_stats_json = all_stats.to_json(orient="records")
+
 # Teams data to json file
 teams_json = teams_raw.to_json(orient="records")
 
@@ -218,7 +222,8 @@ json_files = {"wins_timeline": wins_timeline_list,
               "standings_data": standings_json,
               "team_data": teams_json,
               "best_players": best_players,
-              "misc_data": misc_data}
+              "misc_data": misc_data,
+              "all_stats": all_stats_json}
 
 for file_name, data in json_files.items():
     path = "C:\\Users\\Elvin\\Desktop\\JSONStorage\\"
