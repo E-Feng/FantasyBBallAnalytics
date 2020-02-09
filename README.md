@@ -26,6 +26,7 @@ Specifics of the technical details as well as history of changes
 ### Frontend and Visualization
 * Responsive designed created with vanilla HTML/CSS/JS
 * Tables and graphs created using Google Charts
+* Stats page built using React components and hooks
 ### Deployment
 * Statically hosted with Github Pages
 * Hosted through Heroku with Node.js with custom domain
