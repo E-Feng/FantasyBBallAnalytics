@@ -12,6 +12,24 @@ Fantasy basketball is a popular fantasy game where players act as general manage
 Information on current standings, player injury list, category standings and ranks, matchups with opposing teams, and player rankings is provided. Colorful visual displays are shown to provide information and help guide a decision for setting player lineups.
 
 ## Technical Details
+
+### Frontend
+HTML5
+CSS3
+JavaScript
+React (stats only)
+
+### Backend
+Node.js/Express
+Python (data)
+MySQL
+MongoDB
+
+### Deployment
+GitHub-Pages 
+AWS-EC2
+Heroku (current)
+
 Specifics of the technical details as well as history of changes
 ### Source Data
 * JSON data retrieved from ESPN v3 API various endpoints
