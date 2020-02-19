@@ -14,20 +14,20 @@ Information on current standings, player injury list, category standings and ran
 ## Technical Details
 
 ### Frontend
-HTML5
-CSS3
-JavaScript
+HTML5\
+CSS3\
+JavaScript\
 React (stats only)
 
 ### Backend
-Node.js/Express
-Python (data)
-MySQL
+Node.js/Express\
+Python (data)\
+MySQL\
 MongoDB
 
 ### Deployment
-GitHub-Pages 
-AWS-EC2
+GitHub-Pages\
+AWS-EC2\
 Heroku (current)
 
 Specifics of the technical details as well as history of changes
