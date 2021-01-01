@@ -1,0 +1,17 @@
+# Include your project-specific ignores in this file
+# Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
+# Useful .gitignore templates: https://github.com/github/gitignore
+
+__pycache__/
+.vscode/
+.editorconfig
+.gitattributes
+.htaccess
+.env
+config/.env
+browserconfig.xml
+humans.txt
+robots.txt
+
+doc/
+node_modules/
