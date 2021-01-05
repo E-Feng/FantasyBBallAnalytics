@@ -16,5 +16,6 @@
   "bugs": {
     "url": "https://github.com/E-Feng/FantasyBBallAnalytics/issues"
   },
-  "homepage": "https://github.com/E-Feng/FantasyBBallAnalytics#readme"
+  "homepage": "https://github.com/E-Feng/FantasyBBallAnalytics#readme",
+  "dependencies": {}
 }
