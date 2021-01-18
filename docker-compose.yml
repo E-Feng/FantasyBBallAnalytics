@@ -14,8 +14,8 @@ services:
     - traefik.http.routers.fantasy.tls.certresolver=lets-encrypt
     - traefik.port=80
     networks:
-    - traefik_public
+    - web
 
 networks:
-  traefik_public:
+  web:
     external: true
