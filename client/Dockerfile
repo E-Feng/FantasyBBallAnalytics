@@ -11,3 +11,4 @@ RUN npm run build
 # Moving files over to second container
 FROM nginx:1.19.6-alpine
 COPY --from=builder /app/build /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]

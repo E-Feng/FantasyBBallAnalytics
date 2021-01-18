@@ -1,22 +1,21 @@
 version: '3.7'
 
 services:
-  client:
+  fantasy:
     container_name: fantasy-client
+    image: elvinfeng/fantasy:client
     restart: always
     build:
       context: ./client
     labels:
-    - "traefik.enable=true"
-    - "traefik.docker.network=traefik_public"
-    - "traefik.backend=client"
-    - "traefik.frontend.rule=Host:fantasy.elvinfeng.com"
-    - "traefik.port=8080"
+    - traefik.enable=true
+    - traefik.http.routers.fantasy.rule=Host(`fantasy.elvinfeng.com`)
+    - traefik.http.routers.fantasy.tls=true
+    - traefik.http.routers.fantasy.tls.certresolver=lets-encrypt
+    - traefik.port=80
     networks:
     - traefik_public
-    - private
 
 networks:
   traefik_public:
     external: true
-  private:

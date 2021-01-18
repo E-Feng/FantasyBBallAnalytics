@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  client:
+  fantasy:
     container_name: fantasy-client
     image: elvinfeng/fantasy:client
     restart: always
