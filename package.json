@@ -19,14 +19,14 @@
   },
   "homepage": "https://github.com/E-Feng/FantasyBBallAnalytics#readme",
   "dependencies": {
-    "aws-sdk": "^2.819.0",
+    "aws-sdk": "^2.828.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.11.9",
+    "mongoose": "^5.11.12",
     "pm2": "^4.5.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.7"
   }
 }
