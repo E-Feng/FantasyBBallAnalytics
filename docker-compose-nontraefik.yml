@@ -3,6 +3,9 @@ version: '3.7'
 services:
   client:
     container_name: fantasy-client
+    image: elvinfeng/fantasy:client
     restart: always
     build:
       context: ./client
+    ports:
+      - '80:80'
