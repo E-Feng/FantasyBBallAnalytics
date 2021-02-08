@@ -9,6 +9,7 @@ __pycache__/
 .htaccess
 .env
 config/.env
+dags/keys/.env
 browserconfig.xml
 humans.txt
 robots.txt

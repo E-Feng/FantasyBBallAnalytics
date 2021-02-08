@@ -16,7 +16,7 @@ cookie_swid = os.environ['COOKIE_SWID']
 cookies = {"swid": cookie_swid, "espn_s2": cookie_espn}
 
 
-def extract_team_info():
+def extract_team_info(**context):
   """
   Extracts team data from ESPN API
   """
@@ -25,6 +25,29 @@ def extract_team_info():
                    params = {"view": "mTeam"},
                    cookies = cookies)
 
-  return r
+  if r.status_code == 200:
+    data = r.json()
 
-extract_team_info()
+    context['ti'].xcom_push(key='team_data', value=data)
+    print("Successfully fetched data from ESPN and pushed to xcom")
+  else:
+    print("Failed fetching data from ESPN")
+    raise ValueError("Error obtaining team data from ESPN API")
+
+def extract_scoreboard_info(**context):
+  """
+  Extracts scoreboard_info from ESPN API
+  """
+
+  r = requests.get(league_url,
+                    params = {"view": "mScoreboard"},
+                    cookies = cookies)
+
+  if r.status_code == 200:
+    data = r.json()
+
+    context['ti'].xcom_push(key='scoreboard_data', value=data)
+    print("Successfully fetched data from ESPN and pushed to xcom")
+  else:
+    print("Failed fetching data from ESPN")
+    raise ValueError("Error obtaining scoreboard data from ESPN API")
