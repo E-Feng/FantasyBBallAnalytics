@@ -10,6 +10,7 @@ __pycache__/
 .env
 config/.env
 dags/keys/.env
+client/src/utils/config.js
 browserconfig.xml
 humans.txt
 robots.txt
