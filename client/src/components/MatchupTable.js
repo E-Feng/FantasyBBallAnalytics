@@ -150,7 +150,7 @@ function MatchupTable(props) {
                       // Conditional background color rendering
                       const catId = cell.column.id;
                       const isFirstRow = cell.row.index === 0;
-                      const isTeamId = cell.column.id === 'teamId';
+                      const isTeamId = cell.column.id === 'fullTeamName';
                       const isName = cell.column.id === 'firstName';
                       const isTied = props.home[catId] === cell.value;
                       let isGreater = props.home[catId] > cell.value;
