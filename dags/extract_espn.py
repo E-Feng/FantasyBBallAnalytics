@@ -51,3 +51,36 @@ def extract_scoreboard_info(**context):
   else:
     print("Failed fetching data from ESPN")
     raise ValueError("Error obtaining scoreboard data from ESPN API")
+
+def extract_daily_score_info(**context):
+  """
+  Extracts daily scores from given scoring period id
+  """
+
+  raw_json = context['ti'].xcom_pull(key='team_data', task_ids=['extract_team_info'])
+  
+  # Getting scoring period id from yesterday
+  scoring_id = str(raw_json[0]['scoringPeriodId'] - 1)
+  #scoring_id = 56
+
+  header_value = '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_id, scoring_id)
+
+  #print(header_value)
+  print(f'Scoring period {scoring_id}')
+
+  header = {'x-fantasy-filter': header_value}
+
+  r = requests.get(league_url,
+                    params = {'view': 'kona_playercard'},
+                    headers = header,
+                    cookies = cookies)
+
+  if r.status_code == 200:
+    data = r.json()
+
+    context['ti'].xcom_push(key='daily_score_data', value=data)
+    print("Successfully fetched data from ESPN and pushed to xcom")
+  else:
+    print("Failed fetching data from ESPN")
+    print(r.text)
+    raise ValueError("Error obtaining scoreboard data from ESPN API")

@@ -1,12 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
 import TeamStats from './pages/TeamStats';
 import { fetchFirebase } from './utils/webAPI';
-
 
 const maxWidth = 1200;
 
@@ -16,15 +15,16 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
-      staleTime: Infinity,
-    }
-  }
+      cacheTime: Infinity,
+    },
+  },
 });
 
 const fetchAllData = () => {
   queryClient.prefetchQuery('team.json', fetchFirebase);
   queryClient.prefetchQuery('scoreboard.json', fetchFirebase);
-}
+  queryClient.prefetchQuery('messageboard.json', fetchFirebase);
+};
 
 function App() {
   fetchAllData();

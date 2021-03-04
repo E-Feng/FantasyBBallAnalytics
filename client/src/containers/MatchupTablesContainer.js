@@ -104,8 +104,9 @@ const TablesList = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-evenly;
 
+  max-width: 100%;
   padding: 1rem 0;
 `;
 

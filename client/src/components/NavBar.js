@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {FaGithub, FaLinkedin, FaInstagram, FaHome} from 'react-icons/fa';
 
 import styled from 'styled-components';
 
@@ -18,18 +19,23 @@ function NavBar(props) {
       </LinksContainer>
       <Icons>
         <li>
-          <a href='https://github.com/E-Feng/Portfolio'>
-            <i className='fa fa-github'></i>
+          <a href='https://elvinfeng.com/'>
+            <FaHome></FaHome>
+          </a>
+        </li>
+        <li>
+          <a href='https://github.com/E-Feng/FantasyBBallAnalytics'>
+            <FaGithub></FaGithub>
           </a>
         </li>
         <li>
           <a href='https://www.linkedin.com/in/elvin-feng-527b8b81/'>
-            <i className='fa fa-linkedin'></i>
+            <FaLinkedin></FaLinkedin>
           </a>
         </li>
         <li>
           <a href='https://www.instagram.com/ig.elvin/?hl=en'>
-            <i className='fa fa-instagram'></i>
+            <FaInstagram></FaInstagram>
           </a>
         </li>
       </Icons>

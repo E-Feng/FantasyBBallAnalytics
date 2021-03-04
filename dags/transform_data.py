@@ -3,6 +3,7 @@ import math
 import pandas as pd
 
 import consts
+from util import calculate_gamescore
 
 
 def transform_scoreboard_to_df(**context):
@@ -82,9 +83,63 @@ def transform_team_to_df(**context):
         row['firstName'] = member['firstName']
         row['lastName'] = member['lastName']
 
-    print(row)
+    #print(row)
     df = df.append(row, ignore_index=True)
+  
+  print(df.to_string())
 
   # Convert to json and push to xcom for next task
   team_json = df.to_json(orient='records')
   context['ti'].xcom_push(key='team_df', value=team_json)  
+
+def transform_daily_score_to_df(**context):
+  """
+  Transforms daily score raw json data from ESPN API to pandas dataframe
+  """
+
+  raw_json = context['ti'].xcom_pull(key='daily_score_data', task_ids=['extract_daily_score_info'])
+  data = raw_json[0]
+
+  df = pd.DataFrame()
+
+  # Iterate through all teams
+  for player in data['players']:
+    # Check if player has played
+    if len(player['player']['stats']) > 0:
+      if len(player['player']['stats'][0]['stats']) > 0:
+        row = {}
+
+        row['id'] = player['id']
+        row['teamId'] = player['onTeamId']
+        row['name'] = player['player']['fullName']
+
+        stats = player['player']['stats'][0]['stats']
+
+        row['fgPer'] = stats[consts.FG_PER]
+        row['ftPer'] = stats[consts.FT_PER]
+        row['fgAtt'] = stats[consts.FGA]
+        row['fgMade'] = stats[consts.FGM]
+        row['ftAtt'] = stats[consts.FTA]
+        row['ftMade'] = stats[consts.FTM]
+        row['threes'] = stats[consts.THREES]
+        row['threesAtt'] = stats[consts.THREEA]
+        row['rebs'] = stats[consts.REBS]
+        row['asts'] = stats[consts.ASTS]
+        row['stls'] = stats[consts.STLS]
+        row['blks'] = stats[consts.BLKS]
+        row['tos'] = stats[consts.TOS]
+        row['ejs'] = stats[consts.EJS]
+        row['pts'] = stats[consts.PTS]
+        row['mins'] = stats[consts.MINS]
+
+        row['gs'] = calculate_gamescore(row)
+
+        #print(row['name'], row['gs'])
+
+        df = df.append(row, ignore_index=True)
+        
+  print(df.to_string())
+
+  # Convert to json and push to xcom for next task
+  daily_score_json = df.to_json(orient='records')
+  context['ti'].xcom_push(key='daily_score_df', value=daily_score_json)  

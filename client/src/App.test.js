@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('Renders home page with message board', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(screen.getByText('Home')).toBeInTheDocument();
+  expect(screen.getByText('Team Stats')).toBeInTheDocument();
+
+  expect(screen.getByText('github')).toBeInTheDocument();
+
+  expect(screen.getByText(/League Board/)).toBeInTheDocument();
+  expect(screen.getByText('SEND')).toBeInTheDocument();
 });

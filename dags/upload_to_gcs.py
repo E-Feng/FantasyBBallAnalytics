@@ -4,34 +4,35 @@ import tempfile
 import requests
 import pandas as pd
 
+from util import authed_session
+
 
 def upload_scoreboard_to_firebase(**context):
   """
   Convert string json of scoreboard dataframe to temp file then upload to firebase realtime
   database
   """
-  firebase_key = os.environ['FIREBASE_KEY']
-  url = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/{firebase_key}/scoreboard.json'
+  url = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/scoreboard.json'
 
   raw_json = context['ti'].xcom_pull(key='scoreboard_df', task_ids='transform_scoreboard_to_df')
   
-  r = requests.put(url, data=raw_json)
+  r = authed_session.put(url, data=raw_json)
 
   if r.status_code == 200:
     print("Scoreboard successfully sent to firebase")
     return 
+
 
 def upload_team_to_firebase(**context):
   """
   Convert string json of team dataframe to temp file then upload to firebase realtime
   database
   """
-  firebase_key = os.environ['FIREBASE_KEY']
-  url = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/{firebase_key}/team.json'
+  url = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/team.json'
 
   raw_json = context['ti'].xcom_pull(key='team_df', task_ids='transform_team_to_df')
   
-  r = requests.put(url, data=raw_json)
+  r = authed_session.put(url, data=raw_json)
 
   if r.status_code == 200:
     print("Team successfully sent to firebase")

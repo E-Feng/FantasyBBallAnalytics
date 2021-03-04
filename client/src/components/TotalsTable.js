@@ -219,14 +219,14 @@ function TotalsTable(props) {
 
 const Container = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
 
   overflow: auto;
-  padding: 0 0.5rem;
 `;
 
 const Table = styled.table`
+  margin: 0 auto;
+
   font-family: Arial;
   font-size: 12px;
   text-align: center;

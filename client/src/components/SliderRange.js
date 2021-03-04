@@ -100,6 +100,8 @@ const Container = styled.div`
 
 const Display = styled.output`
   margin-top: -0.4rem;
+
+  z-index: 2;
 `
 
 export default SliderRange;

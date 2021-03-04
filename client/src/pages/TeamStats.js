@@ -4,6 +4,8 @@ import { useQueryClient, useIsFetching } from 'react-query';
 import Layout from '../components/Layout';
 import MatchupTablesContainer from '../containers/MatchupTablesContainer';
 import TotalsContainer from '../containers/TotalsContainer';
+import TooltipHeader from '../components/TooltipHeader';
+import LoadingIcon from '../components/LoadingIcon';
 
 import styled from 'styled-components';
 
@@ -13,30 +15,47 @@ function TeamStats(props) {
   const teamData = queryClient.getQueryData('team.json');
 
   const isLoading = useIsFetching();
+  //const isLoading = true;
 
   let currentWeek = 1;
   if (!isLoading) {
     currentWeek = scoreboardData[scoreboardData.length - 1].week;
   }
 
-  if (isLoading) return 'Loading...';
+  const totalCategoryInfo = `This table calculates the total category record compared to 
+    everyone else regardless of matchup unless the (Only Matchups) checkbox is selected. 
+    Numbers represented are percentages and color coded for better visuals. A weekly 
+    slider range is available to filter specific week ranges.`;
+  const weeklyMatchupInfo = `These tables show the matchup compared to everyone else, 
+    with the scheduled matchup bordered in blue. Filters available to go through 
+    each week or team.`;
 
   return (
     <Layout maxWidth={props.maxWidth}>
-      <Container maxWidth={props.maxWidth}>
-        <Title>Total Category Record</Title>
-        <TotalsContainer
-          data={scoreboardData}
-          teams={teamData}
-          currentWeek={currentWeek}
-        ></TotalsContainer>
-        <Title>Weekly Matchup Comparisons</Title>
-        <MatchupTablesContainer
-          data={scoreboardData}
-          teams={teamData}
-          currentWeek={currentWeek}
-        />
-      </Container>
+      {isLoading ? (
+        <LoadingIcon></LoadingIcon>
+      ) : (
+        <Container maxWidth={props.maxWidth}>
+          <TooltipHeader
+            title='Total Category Record'
+            info={totalCategoryInfo}
+          ></TooltipHeader>
+          <TotalsContainer
+            data={scoreboardData}
+            teams={teamData}
+            currentWeek={currentWeek}
+          ></TotalsContainer>
+          <TooltipHeader
+            title='Weekly Matchup Comparisons'
+            info={weeklyMatchupInfo}
+          ></TooltipHeader>
+          <MatchupTablesContainer
+            data={scoreboardData}
+            teams={teamData}
+            currentWeek={currentWeek}
+          />
+        </Container>
+      )}
     </Layout>
   );
 }
@@ -51,12 +70,6 @@ const Container = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
   }
-`;
-
-const Title = styled.h1`
-  text-align: center;
-
-  margin-top: 1rem;
 `;
 
 export default TeamStats;
