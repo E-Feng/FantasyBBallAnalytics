@@ -20,22 +20,22 @@ function NavBar(props) {
       <Icons>
         <li>
           <a href='https://elvinfeng.com/'>
-            <FaHome></FaHome>
+            <FaHome title='Main'></FaHome>
           </a>
         </li>
         <li>
           <a href='https://github.com/E-Feng/FantasyBBallAnalytics'>
-            <FaGithub></FaGithub>
+            <FaGithub title='Github'></FaGithub>
           </a>
         </li>
         <li>
           <a href='https://www.linkedin.com/in/elvin-feng-527b8b81/'>
-            <FaLinkedin></FaLinkedin>
+            <FaLinkedin title='Linkedin'></FaLinkedin>
           </a>
         </li>
         <li>
           <a href='https://www.instagram.com/ig.elvin/?hl=en'>
-            <FaInstagram></FaInstagram>
+            <FaInstagram title='Instagram'></FaInstagram>
           </a>
         </li>
       </Icons>

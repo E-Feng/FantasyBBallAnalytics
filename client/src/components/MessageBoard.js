@@ -17,25 +17,35 @@ function MessageBoard() {
   const onSubmit = (data) => {
     reset({ name: data.name });
 
-    const dateString = new Date().toISOString();
+    const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+
+    const dateString = (new Date(Date.now() - tzOffset)).toISOString();
     const date = dateString.slice(0, 10);
     const time = dateString.slice(11).replace('.', '-');
 
     const payload = {
       user: data.name,
       msg: data.msg,
+      date: date,
       time: time,
       type: 'chat',
     };
 
+    // Return error if username is same as reserved BOT
+    if (data.name === 'BOT') {
+      return
+    }
+
     // Updating messageData
+    messageData[date] = messageData[date] ? messageData[date] : []
+
     messageData[date][time] = payload;
     queryClient.setQueryData('messageboard.json', messageData);
 
-    // Posting to firebase
-    const url = `https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/messageboard/${date}/${time}.json`;
+    // Sending request to server
+    const pre = (process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : '';
 
-    fetch(url, {
+    fetch(pre + '/api/chat/', {
       method: 'put',
       headers: {
         Accept: 'application/json, text/plain, */*',
@@ -43,6 +53,7 @@ function MessageBoard() {
       },
       body: JSON.stringify(payload),
     }).then((res) => {
+      console.log("Post status ", res.status);
       return res.status;
     });
   };
@@ -67,7 +78,7 @@ function MessageBoard() {
           day: 'numeric',
         };
         const split = msg.date.split('-');
-        const date = new Date(split[0], split[1], split[2]);
+        const date = new Date(split[0], split[1] - 1, split[2]);
 
         const formattedDate = date.toLocaleDateString('en-US', options);
 

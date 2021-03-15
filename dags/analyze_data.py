@@ -12,12 +12,9 @@ def calculate_and_upload_daily_alert(**context):
   Calculates which daily stats to put in the alert, high gamescore, leading stat categories
   and posts it to firebase
   """
-  gamescore_cutoff = 35
+  gamescore_cutoff = 32.5
   date = context['ti'].start_date.strftime('%Y-%m-%d')
   #date = '2021-02-16'
-  firebase_key = os.environ['FIREBASE_KEY']
-  #firebase_token = os.environ['FIREBASE_TOKEN']
-
 
   json = context['ti'].xcom_pull(key='daily_score_df', task_ids=['transform_daily_score_to_df'])
   df = pd.read_json(json[0], orient='records')
