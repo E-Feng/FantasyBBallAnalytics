@@ -43,7 +43,10 @@ function DraftRecapContainer(props) {
           </option>
           <option value='ranking' key='ranking'>
             Sort By Ranking
-          </option>          
+          </option>   
+          <option value='rankingDiff' key='rankingDiff'>
+            Sort By Ranking Difference
+          </option>        
         </DropDown>
         <Checkbox>
           <input

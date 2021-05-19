@@ -24,8 +24,9 @@ function DraftRecapTable(props) {
       break;
     case 'ranking':
       data.sort((a, b) => a.ranking - b.ranking)
-      //borderMod = data.length + 1;
       break
+    case 'rankingDiff':
+      data.sort((a, b) => b.rankingDiff - a.rankingDiff)
     default:
       break;
   }
