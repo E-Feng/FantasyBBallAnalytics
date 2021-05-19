@@ -17,9 +17,9 @@ function MessageBoard() {
   const onSubmit = (data) => {
     reset({ name: data.name });
 
-    const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+    const tzOffset = new Date().getTimezoneOffset() * 60000;
 
-    const dateString = (new Date(Date.now() - tzOffset)).toISOString();
+    const dateString = new Date(Date.now() - tzOffset).toISOString();
     const date = dateString.slice(0, 10);
     const time = dateString.slice(11).replace('.', '-');
 
@@ -33,17 +33,18 @@ function MessageBoard() {
 
     // Return error if username is same as reserved BOT
     if (data.name === 'BOT') {
-      return
+      return;
     }
 
     // Updating messageData
-    messageData[date] = messageData[date] ? messageData[date] : []
+    messageData[date] = messageData[date] ? messageData[date] : [];
 
     messageData[date][time] = payload;
     queryClient.setQueryData('messageboard.json', messageData);
 
     // Sending request to server
-    const pre = (process.env.NODE_ENV === 'development') ? 'http://localhost:5000' : '';
+    const pre =
+      process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : '';
 
     fetch(pre + '/api/chat/', {
       method: 'put',
@@ -53,7 +54,7 @@ function MessageBoard() {
       },
       body: JSON.stringify(payload),
     }).then((res) => {
-      console.log("Post status ", res.status);
+      console.log('Post status ', res.status);
       return res.status;
     });
   };
@@ -130,7 +131,12 @@ function MessageBoard() {
       </ScrollWrapper>
       <ChatForm onSubmit={handleSubmit(onSubmit)}>
         <label>Name:</label>
-        <Name type='text' name='name' ref={register({ required: true })} />
+        <Name
+          type='text'
+          name='name'
+          placeholder='Enter name'
+          ref={register({ required: true })}
+        />
         <Textbox
           type='text'
           name='msg'

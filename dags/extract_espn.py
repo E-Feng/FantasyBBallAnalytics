@@ -2,6 +2,8 @@ import os
 import requests
 import json
 
+from airflow.decorators import task
+
 
 # Initializing API URLs from ESPN and cookies
 league_year = 2021
@@ -16,52 +18,51 @@ cookie_swid = os.environ['COOKIE_SWID']
 cookies = {"swid": cookie_swid, "espn_s2": cookie_espn}
 
 
-def extract_team_info(**context):
+@task
+def extract_from_espn_api(view: list, header: dict = {}):
   """
-  Extracts team data from ESPN API
+  Extracts all data from ESPN API
   """
 
-  r = requests.get(league_url,
-                   params = {"view": "mTeam"},
-                   cookies = cookies)
+  if header:
+    r = requests.get(
+      league_url,
+      params = {"view": view},
+      headers = header,
+      cookies = cookies
+    )
+  else:
+    r = requests.get(
+      league_url,
+      params = {"view": view},
+      cookies = cookies
+    )   
 
   if r.status_code == 200:
     data = r.json()
 
-    context['ti'].xcom_push(key='team_data', value=data)
-    print("Successfully fetched data from ESPN and pushed to xcom")
+    print(f"Successfully fetched {view} from ESPN and pushed to xcom")
+    return data
   else:
-    print("Failed fetching data from ESPN")
-    raise ValueError("Error obtaining team data from ESPN API")
+    print(f"Failed fetching {view} from ESPN")
+    raise ValueError(f"Error obtaining {view} from ESPN API")  
 
-def extract_scoreboard_info(**context):
-  """
-  Extracts scoreboard_info from ESPN API
-  """
 
-  r = requests.get(league_url,
-                    params = {"view": "mScoreboard"},
-                    cookies = cookies)
-
-  if r.status_code == 200:
-    data = r.json()
-
-    context['ti'].xcom_push(key='scoreboard_data', value=data)
-    print("Successfully fetched data from ESPN and pushed to xcom")
-  else:
-    print("Failed fetching data from ESPN")
-    raise ValueError("Error obtaining scoreboard data from ESPN API")
-
-def extract_daily_score_info(**context):
+@task
+def extract_daily_score_info(settings: dict):
   """
   Extracts daily scores from given scoring period id
   """
-
-  raw_json = context['ti'].xcom_pull(key='team_data', task_ids=['extract_team_info'])
   
   # Getting scoring period id from yesterday
-  scoring_id = str(raw_json[0]['scoringPeriodId'] - 1)
-  #scoring_id = 56
+  scoring_id = settings['scoringPeriodId']
+  last_scoring_id = settings['status']['finalScoringPeriod']
+
+  # Stopping writing if season is over
+  if scoring_id > last_scoring_id:
+    return
+
+  scoring_id = str(scoring_id - 1)
 
   header_value = '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_id, scoring_id)
 
@@ -78,8 +79,8 @@ def extract_daily_score_info(**context):
   if r.status_code == 200:
     data = r.json()
 
-    context['ti'].xcom_push(key='daily_score_data', value=data)
     print("Successfully fetched data from ESPN and pushed to xcom")
+    return data
   else:
     print("Failed fetching data from ESPN")
     print(r.text)

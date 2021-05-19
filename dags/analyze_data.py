@@ -3,24 +3,28 @@ import json
 import requests
 from datetime import datetime
 import pandas as pd
+pd.options.mode.chained_assignment = None
+
+from airflow.decorators import task
+from airflow.operators.python import get_current_context
 
 from util import authed_session
 
 
-def calculate_and_upload_daily_alert(**context):
+@task
+def calculate_and_upload_daily_alert(daily_score_df: str, team_info_df: str):
   """
   Calculates which daily stats to put in the alert, high gamescore, leading stat categories
   and posts it to firebase
   """
   gamescore_cutoff = 32.5
-  date = context['ti'].start_date.strftime('%Y-%m-%d')
+
+  ti = get_current_context()['ti']
+  date = ti.start_date.strftime('%Y-%m-%d')
   #date = '2021-02-16'
 
-  json = context['ti'].xcom_pull(key='daily_score_df', task_ids=['transform_daily_score_to_df'])
-  df = pd.read_json(json[0], orient='records')
-
-  team_json = context['ti'].xcom_pull(key='team_df', task_ids=['transform_team_to_df'])
-  team_df = pd.read_json(team_json[0], orient='records')
+  df = pd.read_json(daily_score_df, orient='records')
+  team_df = pd.read_json(team_info_df, orient='records')
 
   ### Checking for notable games by gamescore and best free agent game (unowned player)
   best_free_agent_game = df[df.teamId == 0].iloc[0]

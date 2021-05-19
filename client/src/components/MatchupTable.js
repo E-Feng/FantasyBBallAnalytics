@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTable } from 'react-table';
+
 import { calculateMatchup } from '../utils/matchupUtils';
 
 import styled from 'styled-components';

@@ -1,38 +1,44 @@
 import React from 'react';
 import { useTable } from 'react-table';
 
-import {getHSLColor} from '../utils/colorsUtil';
+import { getHSLColor } from '../utils/colorsUtil';
 
 import styled from 'styled-components';
 
-function TotalsTable(props) {
-  const showPercent = (props) => {
-    const denom = props.value[0] + props.value[1];
-    const percent = denom !== 0 ? (props.value[0] * 100) / denom : 100;
-    return <React.Fragment>{percent.toFixed(0)}</React.Fragment>;
-  };
+function DraftRecapTable(props) {
+  const ratingColorRange = [0, 15]
+  const diffColorRange = [-100, 100]
 
   const data = props.data;
-  data.sort((a, b) => a.seed - b.seed);
+  data.sort((a, b) => a.pickNumber - b.pickNumber);
 
-  const cats = [
-    'fgPer',
-    'ftPer',
-    'threes',
-    'rebs',
-    'asts',
-    'stls',
-    'blks',
-    'tos',
-    'ejs',
-    'pts',
-  ];
+  const numTeams = data.filter((player) => player.round === 1).length;
+  const numPicks = data.length / numTeams;
+
+  let borderMod = numTeams;
+
+  switch (props.sortMode) {
+    case 'team':
+      data.sort((a, b) => a.teamId - b.teamId);
+      borderMod = numPicks;
+      break;
+    case 'ranking':
+      data.sort((a, b) => a.ranking - b.ranking)
+      //borderMod = data.length + 1;
+      break
+    default:
+      break;
+  }
 
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Rank',
-        accessor: 'seed',
+        Header: 'Pick',
+        accessor: 'pickNumber',
+      },
+      {
+        Header: 'Round',
+        accessor: 'round',
       },
       {
         Header: 'Team',
@@ -43,80 +49,24 @@ function TotalsTable(props) {
         ),
       },
       {
-        Header: 'Name',
-        accessor: 'firstName',
+        Header: 'Player',
+        accessor: 'playerName',
+      },
+      {
+        Header: 'Ranking',
+        accessor: 'ranking',
+      },
+      {
+        Header: 'Rating',
+        accessor: 'rating',
 
         Cell: (props) => (
-          <React.Fragment> {props.value.substring(0, 8)} </React.Fragment>
+          <React.Fragment>{props.value.toFixed(2)}</React.Fragment>
         ),
       },
       {
-        Header: 'W',
-        accessor: 'wins',
-      },
-      {
-        Header: 'L',
-        accessor: 'losses',
-      },
-      {
-        Header: 'FG%',
-        accessor: 'fgPer',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'FT%',
-        accessor: 'ftPer',
-
-        Cell: showPercent,
-      },
-      {
-        Header: '3PM',
-        accessor: 'threes',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'REB',
-        accessor: 'rebs',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'AST',
-        accessor: 'asts',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'STL',
-        accessor: 'stls',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'BLK',
-        accessor: 'blks',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'TO',
-        accessor: 'tos',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'EJ',
-        accessor: 'ejs',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'PTS',
-        accessor: 'pts',
-
-        Cell: showPercent,
+        Header: 'Difference',
+        accessor: 'rankingDiff',
       },
     ],
     []
@@ -124,13 +74,8 @@ function TotalsTable(props) {
 
   const tableInstance = useTable({ columns, data });
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    tableInstance;
 
   return (
     <Container>
@@ -144,13 +89,17 @@ function TotalsTable(props) {
                 {
                   // Loop over the headers in each row
                   headerGroup.headers.map((column) => {
-                    const isCat = cats.includes(column.id);
+                    //const isCat = cats.includes(column.id);
                     return (
                       // Apply the header cell props
-                      <th {...column.getHeaderProps()}
-                      style={{
-                        minWidth: isCat ? '25px' : '0px'
-                      }}>
+                      <th
+                        {...column.getHeaderProps()}
+                        style={
+                          {
+                            //minWidth: isCat ? '25px' : '0px',
+                          }
+                        }
+                      >
                         {
                           // Render the header
                           column.render('Header')
@@ -168,21 +117,34 @@ function TotalsTable(props) {
           {
             // Loop over the table rows
             rows.map((row) => {
+              // Conditional borders separating the rounds
+              const isEndOfRound = (row.index + 1) % borderMod === 0;
+
               // Prepare the row for display
               prepareRow(row);
               return (
                 // Apply the row props
-                <tr {...row.getRowProps()}>
+                <tr
+                  {...row.getRowProps()}
+                  style={{
+                    borderBottom: isEndOfRound
+                      ? '3px solid red'
+                      : '1px solid white',
+                  }}
+                >
                   {
                     // Loop over the rows cells
                     row.cells.map((cell) => {
                       // Conditional background color rendering
+                      const headerId = cell.column.id;
+
                       const val = cell.value;
                       let color = 'gainsboro';
 
-                      if (Array.isArray(cell.value)) {
-                        const denom = val[0] + val[1];
-                        color = getHSLColor(val[0], 0, denom);
+                      if (headerId === 'rankingDiff') {
+                        color = getHSLColor(val, diffColorRange[0], diffColorRange[1]);
+                      } else if (headerId === 'rating') {
+                        color = getHSLColor(val, ratingColorRange[0], ratingColorRange[1]);                        
                       }
 
                       return (
@@ -210,8 +172,9 @@ function TotalsTable(props) {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-
   overflow: auto;
+
+  padding: 0.25rem 0;
 `;
 
 const Table = styled.table`
@@ -253,4 +216,4 @@ const Table = styled.table`
   }
 `;
 
-export default TotalsTable;
+export default DraftRecapTable;

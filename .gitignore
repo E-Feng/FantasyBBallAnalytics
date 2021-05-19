@@ -10,6 +10,7 @@ __pycache__/
 .env
 config/.env
 dags/keys/.env
+dags/keys/*.json
 client/src/utils/config.js
 browserconfig.xml
 humans.txt

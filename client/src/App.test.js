@@ -1,9 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { useQueryClient, useIsFetching } from 'react-query';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
-import MessageBoard from './components/MessageBoard';
 
-test('Renders home page with message board', () => {
+test('Renders navigation bar', () => {
   render(<App />);
 
   expect(screen.getByText('Home')).toBeInTheDocument();
@@ -17,17 +15,20 @@ test('Renders home page with message board', () => {
     'href',
     'https://www.instagram.com/ig.elvin/?hl=en'
   );
-
-  expect(screen.getByText(/League Board/)).toBeInTheDocument();
-  expect(
-    screen.getByPlaceholderText('Type your message here')
-  ).toBeInTheDocument();
-  expect(screen.getByText('SEND')).toBeInTheDocument();
 });
 
-test('Renders messages onto message board', () => {
-  //jest.mock('react-query');
+test('Renders home screen with message board', () => {
+  render(<App />);
 
-  render(<MessageBoard />);
-  screen.getByRole('list');
+  expect(screen.getByText(/League Board/)).toBeInTheDocument();
+
+  const name = screen.getByPlaceholderText('Enter name');
+  const input = screen.getByPlaceholderText('Type your message here');
+  const button = screen.getByText('SEND')
+  expect(input).toBeInTheDocument();
+  expect(button).toBeInTheDocument();
+
+  fireEvent.change(name, {target: {value: 'Tester'}})
+  fireEvent.change(input, {target: {value: 'Test Message'}});
+  fireEvent.click(button);
 });

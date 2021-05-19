@@ -12,7 +12,7 @@ import styled from 'styled-components';
 function TeamStats(props) {
   const queryClient = useQueryClient();
   const scoreboardData = queryClient.getQueryData('scoreboard.json');
-  const teamData = queryClient.getQueryData('team.json');
+  const teamData = queryClient.getQueryData('teams.json');
 
   const isLoading = useIsFetching();
   //const isLoading = true;
@@ -39,7 +39,7 @@ function TeamStats(props) {
           <TooltipHeader
             title='Total Category Record'
             info={totalCategoryInfo}
-          ></TooltipHeader>
+          />
           <TotalsContainer
             data={scoreboardData}
             teams={teamData}
@@ -48,7 +48,7 @@ function TeamStats(props) {
           <TooltipHeader
             title='Weekly Matchup Comparisons'
             info={weeklyMatchupInfo}
-          ></TooltipHeader>
+          />
           <MatchupTablesContainer
             data={scoreboardData}
             teams={teamData}

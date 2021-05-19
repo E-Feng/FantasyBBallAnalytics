@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
 import TeamStats from './pages/TeamStats';
+import DraftRecap from './pages/DraftRecap';
 import { fetchFirebase } from './utils/webAPI';
 
 const maxWidth = 1200;
@@ -21,9 +22,11 @@ const queryClient = new QueryClient({
 });
 
 const fetchAllData = () => {
-  queryClient.prefetchQuery('team.json', fetchFirebase);
-  queryClient.prefetchQuery('scoreboard.json', fetchFirebase);
-  queryClient.prefetchQuery('messageboard.json', fetchFirebase);
+  const data = ['teams', 'scoreboard', 'messageboard', 'draftrecap'];
+
+  data.forEach(name => {
+    queryClient.prefetchQuery(`${name}.json`, fetchFirebase);
+  })  
 };
 
 function App() {
@@ -41,6 +44,10 @@ function App() {
           <Route
             path='/teamstats'
             render={(props) => <TeamStats {...props} maxWidth={maxWidth} />}
+          />
+          <Route 
+            path='/draftrecap'
+            render={(props) => <DraftRecap {...props} maxWidth={maxWidth} />}
           />
         </Switch>
       </Router>
