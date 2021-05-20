@@ -33,7 +33,7 @@ function TeamStats(props) {
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
-        <LoadingIcon></LoadingIcon>
+        <LoadingIcon />
       ) : (
         <Container maxWidth={props.maxWidth}>
           <TooltipHeader

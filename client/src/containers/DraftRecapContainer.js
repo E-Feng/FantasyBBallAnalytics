@@ -9,9 +9,11 @@ function DraftRecapContainer(props) {
   const [ejsChecked, setChecked] = useState(false);
 
   // Adjusting raw data, calculating difference
-  const data = props.data.map(player => {
-    const team = props.teams.filter(team => team.teamId === player.teamId);
-    const ranking = ejsChecked ? player.rankingSeason : player.rankingNoEjsSeason;
+  const data = props.data.map((player) => {
+    const team = props.teams.filter((team) => team.teamId === player.teamId);
+    const ranking = ejsChecked
+      ? player.rankingSeason
+      : player.rankingNoEjsSeason;
     const rating = ejsChecked ? player.ratingSeason : player.ratingNoEjsSeason;
 
     return {
@@ -19,13 +21,15 @@ function DraftRecapContainer(props) {
       fullTeamName: team[0].fullTeamName,
       ranking: ranking,
       rating: rating,
-      rankingDiff: (player.pickNumber - ranking)
-    }
-  })
+      difference: player.pickNumber - ranking,
+    };
+  });
+
+  const sortList = ['round', 'team', 'ranking', 'difference'];
 
   const handleSortChange = (e) => {
-    setSortMode(e.target.value)
-  }
+    setSortMode(e.target.value);
+  };
 
   const handleCheckbox = (e) => {
     setChecked(!ejsChecked);
@@ -35,18 +39,14 @@ function DraftRecapContainer(props) {
     <Container>
       <Forms>
         <DropDown value={sortMode} onChange={handleSortChange}>
-          <option value='round' key='round'>
-            Sort By Round
-          </option>
-          <option value='team' key='team'>
-            Sort By Team
-          </option>
-          <option value='ranking' key='ranking'>
-            Sort By Ranking
-          </option>   
-          <option value='rankingDiff' key='rankingDiff'>
-            Sort By Ranking Difference
-          </option>        
+          {sortList.map((mode) => {
+            const capital = mode[0].toUpperCase() + mode.slice(1)
+            return (
+              <option value={mode} key={mode}>
+                Sort By {capital}
+              </option>
+            );
+          })}
         </DropDown>
         <Checkbox>
           <input
@@ -57,7 +57,7 @@ function DraftRecapContainer(props) {
           Count Ejections
         </Checkbox>
       </Forms>
-      <DraftRecapTable data={data} sortMode={sortMode}/>
+      <DraftRecapTable data={data} sortMode={sortMode} />
     </Container>
   );
 }

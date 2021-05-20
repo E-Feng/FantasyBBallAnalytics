@@ -24,9 +24,10 @@ function DraftRecapTable(props) {
       break;
     case 'ranking':
       data.sort((a, b) => a.ranking - b.ranking)
-      break
-    case 'rankingDiff':
-      data.sort((a, b) => b.rankingDiff - a.rankingDiff)
+      break;
+    case 'difference':
+      data.sort((a, b) => b.difference - a.difference)
+      break;
     default:
       break;
   }
@@ -67,7 +68,7 @@ function DraftRecapTable(props) {
       },
       {
         Header: 'Difference',
-        accessor: 'rankingDiff',
+        accessor: 'difference',
       },
     ],
     []
@@ -142,7 +143,7 @@ function DraftRecapTable(props) {
                       const val = cell.value;
                       let color = 'gainsboro';
 
-                      if (headerId === 'rankingDiff') {
+                      if (headerId === 'difference') {
                         color = getHSLColor(val, diffColorRange[0], diffColorRange[1]);
                       } else if (headerId === 'rating') {
                         color = getHSLColor(val, ratingColorRange[0], ratingColorRange[1]);                        
