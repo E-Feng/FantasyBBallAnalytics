@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
 
 import Layout from '../components/Layout';
+import SeasonContext from '../components/SeasonContext';
 import MatchupTablesContainer from '../containers/MatchupTablesContainer';
 import TotalsContainer from '../containers/TotalsContainer';
 import TooltipHeader from '../components/TooltipHeader';
@@ -10,12 +11,16 @@ import LoadingIcon from '../components/LoadingIcon';
 import styled from 'styled-components';
 
 function TeamStats(props) {
-  const queryClient = useQueryClient();
-  const scoreboardData = queryClient.getQueryData('scoreboard.json');
-  const teamData = queryClient.getQueryData('teams.json');
+  const { seasonYear } = useContext(SeasonContext);
 
-  const isLoading = useIsFetching();
-  //const isLoading = true;
+  const queryClient = useQueryClient();
+  const scoreboardData = queryClient.getQueryData([seasonYear, 'scoreboard']);
+  const teamData = queryClient.getQueryData([seasonYear, 'teams']);
+
+  const isDataLoaded = (scoreboardData !== undefined && teamData !== undefined);
+  const isFetching = useIsFetching() > 0;
+
+  const isLoading = !isDataLoaded || isFetching;
 
   let currentWeek = 1;
   if (!isLoading) {

@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {FaGithub, FaLinkedin, FaInstagram, FaHome} from 'react-icons/fa';
 
+import SeasonDropdown from './SeasonDropdown';
+
 import styled from 'styled-components';
 
 function NavBar(props) {
@@ -20,6 +22,8 @@ function NavBar(props) {
           </li>
         </LinksList>
       </LinksContainer>
+      <Filler />
+      <SeasonDropdown />
       <Icons>
         <li>
           <a href='https://elvinfeng.com/'>
@@ -59,6 +63,12 @@ const NavContainer = styled.div`
     list-style: none;
     padding: 0;
     margin: 0.25rem 0.5rem;
+  }
+
+  @media (max-width: 450px) {
+    flex-direction: column;
+    align-items: center;
+    padding: 0.25rem 0;
   }
 `;
 
@@ -107,6 +117,10 @@ const LinksList = styled.ul`
   align-items: center;
 
   font-size: 20px;
+`;
+
+const Filler = styled.div`
+  flex-grow: 2;
 `;
 
 const Icons = styled.ul`

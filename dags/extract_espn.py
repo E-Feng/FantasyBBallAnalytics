@@ -3,19 +3,21 @@ import requests
 import json
 
 from airflow.decorators import task
+from airflow.models import Variable
+from airflow.exceptions import AirflowSkipException
 
 
 # Initializing API URLs from ESPN and cookies
-league_year = 2021
-league_id = 48375511
+LEAGUE_YEAR = os.environ['LEAGUE_YEAR']
+LEAGUE_ID = os.environ['LEAGUE_ID']
 
 base_url = 'https://fantasy.espn.com/apis/v3/games/fba/seasons/{}/segments/0/leagues/{}'
-league_url = base_url.format(league_year, league_id)
+league_url = base_url.format(LEAGUE_YEAR, LEAGUE_ID)
 
-cookie_espn = os.environ['COOKIE_ESPN_S2']
-cookie_swid = os.environ['COOKIE_SWID']
+COOKIE_ESPN = os.environ['COOKIE_ESPN_S2']
+COOKIE_SWID = os.environ['COOKIE_SWID']
 
-cookies = {"swid": cookie_swid, "espn_s2": cookie_espn}
+cookies = {"swid": COOKIE_SWID, "espn_s2": COOKIE_ESPN}
 
 
 @task
@@ -60,7 +62,7 @@ def extract_daily_score_info(settings: dict):
 
   # Stopping writing if season is over
   if scoring_id > last_scoring_id:
-    return
+    raise AirflowSkipException
 
   scoring_id = str(scoring_id - 1)
 

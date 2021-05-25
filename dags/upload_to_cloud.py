@@ -5,6 +5,7 @@ import requests
 import pandas as pd
 
 from airflow.decorators import task
+from airflow.models import Variable
 from airflow.operators.python import get_current_context
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 
@@ -12,7 +13,8 @@ from util import authed_session
 
 
 CONN_ID = 'google_cloud_created'
-FIREBASE_URL = 'https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/'
+LEAGUE_YEAR = Variable.get('LEAGUE_YEAR')
+FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/{LEAGUE_YEAR}/'
 
 
 @task
@@ -20,6 +22,7 @@ def upload_to_firebase(data_df: str, name: str):
   """
   Uploads dataframe data as string/json to firebase
   """
+
   url = FIREBASE_URL + name + '.json'
   
   r = authed_session.put(url, data=data_df)

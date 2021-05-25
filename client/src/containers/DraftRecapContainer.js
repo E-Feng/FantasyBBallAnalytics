@@ -15,13 +15,14 @@ function DraftRecapContainer(props) {
       ? player.rankingSeason
       : player.rankingNoEjsSeason;
     const rating = ejsChecked ? player.ratingSeason : player.ratingNoEjsSeason;
+    const difference = player.pickNumber - ranking;
 
     return {
       ...player,
       fullTeamName: team[0].fullTeamName,
       ranking: ranking,
       rating: rating,
-      difference: player.pickNumber - ranking,
+      difference: difference,
     };
   });
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import MatchupTable from '../components/MatchupTable';
 
 import styled from 'styled-components';
@@ -7,29 +8,38 @@ function MatchupTablesContainer(props) {
   const data = props.data;
   const teams = props.teams;
 
+  // Joining team names to data
+  const joinedData = data.map(row => {
+    const team = teams.filter((team) => team.teamId === row.teamId);
+
+    return {
+      ...row,
+      fullTeamName: team[0].fullTeamName,
+      firstName: team[0].firstName
+    }
+  })
+
   const [week, setWeek] = useState(props.currentWeek);
   const [teamId, setTeamId] = useState('');
   const [displayList, setDisplayList] = useState(
-    data.filter((row) => row.week === props.currentWeek)
+    joinedData.filter((row) => row.week === week)
   );
 
-  const weekArray = Array.from(new Array(props.currentWeek), (x, i) => i + 1);
-  const teamArray = teams.map(o => o.teamId);
+  // Adjustment for changing contexts
+  if (week > props.currentWeek) {
+    setWeek(props.currentWeek);
+    setTeamId('');
+    setDisplayList(joinedData.filter((row) => row.week === props.currentWeek));
+  }
 
-  const teamObj = {}
-  teams.forEach(team => {
-    teamObj[team.teamId] = {
-      'fullTeamName': team.fullTeamName,
-      'firstName': team.firstName
-    }
-  })
+  const weekArray = Array.from(new Array(props.currentWeek), (x, i) => i + 1);
 
   const handleWeekChange = (e) => {
     const val = parseInt(e.target.value);
     setWeek(val);
     setTeamId('');
 
-    setDisplayList(data.filter((row) => row.week === val));
+    setDisplayList(joinedData.filter((row) => row.week === val));
   };
 
   const handleTeamIdChange = (e) => {
@@ -37,7 +47,7 @@ function MatchupTablesContainer(props) {
     setTeamId(val);
     setWeek('');
 
-    setDisplayList(data.filter((row) => row.teamId === val));
+    setDisplayList(joinedData.filter((row) => row.teamId === val));
   };
 
   return (
@@ -59,10 +69,10 @@ function MatchupTablesContainer(props) {
           <option value='' key={0}>
             Select Team
           </option>
-          {teamArray.map((o) => {
+          {teams.map((o) => {
             return (
-              <option value={o} key={o}>
-                {teamObj[o].fullTeamName}
+              <option value={o.teamId} key={o.teamId}>
+                {o.fullTeamName}
               </option>
             );
           })}
@@ -73,9 +83,8 @@ function MatchupTablesContainer(props) {
           return (
             <MatchupTable
               key={displayRow.week + displayRow.teamId}
-              teamKey={teamObj}
               home={displayRow}
-              away={data.filter(
+              away={joinedData.filter(
                 (row) =>
                   row.week === displayRow.week &&
                   row.teamId !== displayRow.teamId

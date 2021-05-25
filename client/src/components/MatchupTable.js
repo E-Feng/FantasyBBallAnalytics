@@ -6,8 +6,6 @@ import { calculateMatchup } from '../utils/matchupUtils';
 import styled from 'styled-components';
 
 function MatchupTable(props) {
-  const teamKey = props.teamKey;
-
   const columns = React.useMemo(
     () => [
       {
@@ -80,12 +78,6 @@ function MatchupTable(props) {
 
   const data = [].concat([props.home], props.away);
 
-  // Adding full team name and first name to data from key
-  data.forEach((row) => {
-    row.firstName = teamKey[row.teamId].firstName;
-    row.fullTeamName = teamKey[row.teamId].fullTeamName;
-  });
-
   const tableInstance = useTable({ columns, data });
 
   const {
@@ -99,7 +91,7 @@ function MatchupTable(props) {
   return (
     <Container>
       <Title>
-        {teamKey[props.home.teamId].fullTeamName} - Week {props.home.week}
+        {props.home.fullTeamName} - Week {props.home.week}
       </Title>
       <TableContainer>
         <Table {...getTableProps()}>

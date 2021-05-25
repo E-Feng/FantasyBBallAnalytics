@@ -8,7 +8,12 @@ import styled from 'styled-components';
 
 function MessageBoard() {
   const queryClient = useQueryClient();
-  const messageData = queryClient.getQueryData('messageboard.json');
+  const messageData = queryClient.getQueryData(['messageboard']);
+
+  const isDataLoaded = messageData !== undefined;
+  const isFetching = useIsFetching() > 0;
+
+  const isLoading = !isDataLoaded && isFetching;
 
   const messageArray = [];
 
@@ -103,8 +108,6 @@ function MessageBoard() {
     );
   };
 
-  const isLoading = useIsFetching();
-  //const isLoading = true;
   if (!isLoading) {
     // Formatting chat messages from json data
     Object.keys(messageData).forEach((date) => {

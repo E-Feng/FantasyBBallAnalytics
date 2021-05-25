@@ -4,10 +4,10 @@ import pendulum
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.decorators import task
 from airflow.operators.python import get_current_context
 from airflow.utils.db import provide_session
-from airflow.models import XCom
+from airflow.models import XCom, Variable
 
 from bigquery_operations import (
   create_tables,
@@ -40,14 +40,11 @@ local_tz = pendulum.timezone('US/Eastern')
 default_args = {
   'owner': 'Airflow',
   'start_date': datetime(2021, 1, 1, tzinfo=local_tz),
-  'end_date': datetime(2021, 5, 17, tzinfo=local_tz),
+  'end_date': None,
   'retries': 1,
   'retry_delay': timedelta(seconds=3),
   'gcp_conn_id': CONN_ID
 }
-
-# Config for GCP connection
-
 
 @provide_session
 def cleanup_xcom(context, session=None):
@@ -65,8 +62,20 @@ with DAG(
   template_searchpath=['/usr/local/airflow/dags/sql/'],
   on_success_callback=cleanup_xcom,
 ) as dag:
-
   ### Tasks
+  # Parameter initialization
+  @task
+  def initialize_parameters():
+    context = get_current_context()
+    conf_vars = context['dag_run'].conf
+
+    for param in conf_vars:
+      print("Setting ", param, "to ", conf_vars[param])
+      os.environ[param] = conf_vars[param]
+
+  init = initialize_parameters()
+
+
   # Initializing tables in bigquery
   table = create_tables()
   check_table_team_exists = check_table_exists('teams')
@@ -84,6 +93,7 @@ with DAG(
 
   # Settings info
   settings_raw = extract_from_espn_api(['mSettings'])
+  init >> settings_raw
 
 
   # Team info ETL
