@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import MatchupTable from '../components/MatchupTable';
+import MatchupTable from '../tables/MatchupTable';
 
 import styled from 'styled-components';
 

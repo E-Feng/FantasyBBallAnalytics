@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import DraftRecapTable from '../components/DraftRecapTable';
+import DraftRecapTable from '../tables/DraftRecapTable';
 
 import styled from 'styled-components';
 

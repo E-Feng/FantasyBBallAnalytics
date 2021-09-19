@@ -1,11 +1,12 @@
 import React from 'react';
 import { useTable } from 'react-table';
+import styled from 'styled-components';
 
 import { calculateMatchup } from '../utils/matchupUtils';
 
-import styled from 'styled-components';
-
 function MatchupTable(props) {
+  const data = [].concat([props.home], props.away);
+
   const columns = React.useMemo(
     () => [
       {
@@ -76,17 +77,10 @@ function MatchupTable(props) {
     []
   );
 
-  const data = [].concat([props.home], props.away);
-
   const tableInstance = useTable({ columns, data });
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    tableInstance;
 
   return (
     <Container>

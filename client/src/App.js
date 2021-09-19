@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
 import TeamStats from './pages/TeamStats';
+import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
 import SeasonContext from './components/SeasonContext';
 import { fetchFirebase } from './utils/webAPI';
@@ -59,6 +60,10 @@ function App() {
             <Route
               path='/teamstats'
               render={(props) => <TeamStats {...props} maxWidth={maxWidth} />}
+            />
+            <Route
+              path='/compare'
+              render={(props) => <Compare {...props} maxWidth={maxWidth} />}
             />
             <Route
               path='/draftrecap'

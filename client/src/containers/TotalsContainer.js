@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import SliderRange from '../components/SliderRange';
-import TotalsTable from '../components/TotalsTable';
+import TotalsTable from '../tables/TotalsTable';
 
 import styled from 'styled-components';
 
