@@ -15,8 +15,16 @@ function CompareSummaryTable(props) {
         Header: 'Summary',
         columns: [
           {
-            Header: 'Average',
+            Header: 'Wins',
+            accessor: 'wins'
+          },
+          {
+            Header: 'Mean',
             accessor: 'mean',
+          },
+          {
+            Header: 'StDev',
+            accessor: 'stdev'
           },
           {
             Header: 'Min',

@@ -4,14 +4,17 @@ import styled from 'styled-components';
 import CompareTable from '../tables/CompareTable';
 import CompareSummaryTable from '../tables/CompareSummaryTable';
 import * as arrayMath from '../utils/arrayMath';
+import * as catUtils from '../utils/categoryUtils';
 
 function CompareContainer(props) {
   const [selectedTeams, setSelectedTeams] = useState(['', '']);
 
   const teams = props.teams;
   const scoreboardData = props.data;
+  const currentWeek = props.currentWeek;
 
   const data = [];
+  const summaryData = {};
 
   // Filtering out unselected teams
   const filteredData = scoreboardData.filter((row) =>
@@ -19,8 +22,8 @@ function CompareContainer(props) {
   );
 
   const cats = [
-    { name: 'fgPer', display: 'FG%' },
-    { name: 'ftPer', display: 'FT%' },
+    { name: 'fgPer', display: 'FG%', digits: 4 },
+    { name: 'ftPer', display: 'FT%', digits: 4 },
     { name: 'threes', display: '3PM' },
     { name: 'rebs', display: 'REB' },
     { name: 'asts', display: 'AST' },
@@ -31,31 +34,71 @@ function CompareContainer(props) {
     { name: 'pts', display: 'PTS' },
   ];
 
-  for (const cat of cats) {
-    const name = cat.name;
-    const display = cat.display;
-    for (const team of selectedTeams) {
-      const dataRow = {};
-      dataRow['rowHeader'] = display;
+  // Calculating comparison table and summary table
+  if (!selectedTeams.includes('')) {
+    for (const cat of cats) {
+      const catName = cat.name;
+      const display = cat.display;
+      const digits = cat.digits ? cat.digits : 0;
 
-      filteredData.forEach((row) => {
-        if (row.teamId.toString() === team) {
-          dataRow['week' + row.week] = Number.isInteger(row[name])
-            ? row[name]
-            : row[name].toFixed(4);
-        }
-      });
+      const allCatValues = [];
+      for (const team of selectedTeams) {
+        const dataRow = {};
+        dataRow['rowHeader'] = display;
+        dataRow['catId'] = catName;
 
-      data.push(dataRow);
+        filteredData.forEach((row) => {
+          if (row.teamId.toString() === team) {
+            const dataPoint = row[catName];
+
+            // Setting individual team data
+            dataRow['week' + row.week] = dataPoint.toFixed(digits);
+
+            // Setting summary data
+            allCatValues.push(dataPoint);
+          }
+        });
+        const dataRowValues = Object.values(dataRow);
+        const mean = arrayMath.mean(dataRowValues).toFixed(digits);
+        const stdev = arrayMath.stdev(dataRowValues).toFixed(digits);
+        const min = Math.min(...arrayMath.filterNaN(dataRowValues));
+        const max = Math.max(...arrayMath.filterNaN(dataRowValues));
+
+        dataRow.mean = mean;
+        dataRow.stdev = stdev;
+        dataRow.min = min;
+        dataRow.max = max;
+
+        data.push(dataRow);
+      }
+      // Calculating summary cat data
+      summaryData[display] = {
+        mean: arrayMath.mean(allCatValues),
+        stdev: arrayMath.stdev(allCatValues),
+      };
     }
   }
 
-  console.log(Object.values(data[0]));
-  console.log(arrayMath.mean(Object.values(data[0])));
+  // Calculating the wins between teams for each category
+  data.forEach(row => {
+    row.wins = 0;
+    const filteredCat = data.filter(o => o.rowHeader === row.rowHeader && o !== row)
 
-  console.log(data);
+    // Going through the weeks to add wins
+    for (let week = 1; week <= currentWeek; week++) {
+      const weekKey = 'week' + week
 
-  const isDataLoaded = (data.length !== 0) & !selectedTeams.includes('');
+      const allCatValues = filteredCat.map(val => {
+        return val[weekKey]
+      })
+
+      if (catUtils.determineWinner(row[weekKey], allCatValues, row.catId)) {
+        row.wins = row.wins + 1;
+      }
+    }
+  })
+
+  const isDataLoaded = data.length !== 0 && !selectedTeams.includes('');
 
   // Function to handle changing drop down list
   const handleTeamChange = (e) => {
@@ -100,8 +143,12 @@ function CompareContainer(props) {
       </DropDownList>
       {isDataLoaded ? (
         <TableContainer>
-          <CompareTable data={data} currentWeek={props.currentWeek} />
-          <CompareSummaryTable data={data} currentWeek={props.currentWeek} />
+          <CompareTable
+            data={data}
+            summaryData={summaryData}
+            currentWeek={currentWeek}
+          />
+          <CompareSummaryTable data={data} currentWeek={currentWeek} />
         </TableContainer>
       ) : (
         <br />
@@ -135,6 +182,6 @@ const TableContainer = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-`
+`;
 
 export default CompareContainer;

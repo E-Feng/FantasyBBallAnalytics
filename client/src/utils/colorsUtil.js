@@ -5,15 +5,19 @@
  * @param {*} start
  * @param {*} end
  */
-export const getHSLColor = (val, start, end) => {
+export const getHSLColor = (val, start, end, inverse) => {
   const hueA = 10;
   const hueB = 110;
 
   val = Math.min(val, end);
   val = Math.max(val, start);
 
-  const mappedVal =
+  let mappedVal =
     hueA + ((hueB - hueA) / (end - start)) * (val - start);
+
+  if (inverse) {
+    mappedVal = 100 - mappedVal;
+  }
 
   // Return a CSS HSL string
   return `hsl(${mappedVal}, 100%, 50%)`;

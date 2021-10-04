@@ -1,29 +1,31 @@
 import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
+import { getHSLColor } from '../utils/colorsUtil';
+import { categoryDetails, determineWinner } from '../utils/categoryUtils';
 
 function CompareTable(props) {
   const data = props.data;
-  //const currentWeek = props.currentWeek;
-  const currentWeek = 5;
+  const summaryData = props.summaryData;
+  const currentWeek = props.currentWeek;
+  //const currentWeek = 5;
 
   const numCompare = data.filter(
     (row) => row.rowHeader === data[0].rowHeader
   ).length;
 
-  const weekArray = Array.from({ length: currentWeek }, (_, i) => i + 1);
+  const columns = React.useMemo(() => {
+    const weekArray = Array.from({ length: currentWeek }, (_, i) => i + 1);
 
-  const columns = React.useMemo(
-    () => [
+    return [
       {
         Header: 'Week',
         columns: weekArray.map((week) => {
           return { Header: `${week}`, accessor: `week${week}` };
         }),
       },
-    ],
-    []
-  );
+    ];
+  }, [currentWeek]);
 
   columns.unshift({
     Header: '',
@@ -99,7 +101,6 @@ function CompareTable(props) {
                     {
                       // Loop over the rows cells
                       row.cells.map((cell) => {
-                        //console.log(cell);
                         // Conditional rendering for row header span
                         const headerId = cell.column.id;
                         const isRowHeader = headerId === 'rowHeader';
@@ -111,21 +112,37 @@ function CompareTable(props) {
                           return val[headerId];
                         });
 
-                        let isLargest
-                        const rowHeader = cell.row.original.rowHeader
+                        let color = 'gainsboro';
+                        const rowHeader = cell.row.original.rowHeader;
+                        const catId = cell.row.original.catId;
 
-                        if (rowHeader === 'TO' || rowHeader === 'EJ') {
-                          isLargest = cell.value < Math.min(...compare);
-                        } else {
-                          isLargest = cell.value > Math.max(...compare);
-                        }
+                        const isWinner = determineWinner(
+                          cell.value,
+                          compare,
+                          catId
+                        );
+
+                        const inverse = categoryDetails[catId].inverse
+                          ? true
+                          : false;
+
+                        const mean = summaryData[rowHeader].mean;
+                        const stdev = summaryData[rowHeader].stdev;
+
+                        const mult = 2;
+                        const lo = mean - stdev * mult;
+                        const hi = mean + stdev * mult;
+
+                        color = isRowHeader
+                          ? color
+                          : getHSLColor(cell.value, lo, hi, inverse);
 
                         // Apply the cell props
                         return (
                           <td
                             {...cell.getCellProps()}
                             style={{
-                              background: isLargest ? 'limegreen' : 'gainsboro',
+                              background: color,
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
                             rowSpan={
