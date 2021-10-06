@@ -12,8 +12,8 @@ function Compare(props) {
   const { seasonYear } = useContext(SeasonContext);
 
   const queryClient = useQueryClient();
-  const scoreboardData = queryClient.getQueryData([seasonYear, 'scoreboard']);
-  const teamData = queryClient.getQueryData([seasonYear, 'teams']);
+  const scoreboardData = queryClient.getQueryData(['scoreboard']);
+  const teamData = queryClient.getQueryData(['teams']);
 
   const isDataLoaded = scoreboardData !== undefined && teamData !== undefined;
   const isFetching = useIsFetching() > 0;
@@ -25,7 +25,9 @@ function Compare(props) {
     currentWeek = scoreboardData[scoreboardData.length - 1].week;
   }
 
-  const compareInfo = `Compare two teams`;
+  const compareInfo = `Select two teams to compare weekly head to head 
+    categories with a summary all weeks. It is color coded relative to 
+    the average of all selected teams.`;
 
   return (
     <Layout maxWidth={props.maxWidth}>

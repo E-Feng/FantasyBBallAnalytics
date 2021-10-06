@@ -14,8 +14,8 @@ function TeamStats(props) {
   const { seasonYear } = useContext(SeasonContext);
 
   const queryClient = useQueryClient();
-  const scoreboardData = queryClient.getQueryData([seasonYear, 'scoreboard']);
-  const teamData = queryClient.getQueryData([seasonYear, 'teams']);
+  const scoreboardData = queryClient.getQueryData(['scoreboard']);
+  const teamData = queryClient.getQueryData(['teams']);
 
   const isDataLoaded = (scoreboardData !== undefined && teamData !== undefined);
   const isFetching = useIsFetching() > 0;

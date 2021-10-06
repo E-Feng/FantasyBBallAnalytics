@@ -8,10 +8,12 @@ import TeamStats from './pages/TeamStats';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
 import SeasonContext from './components/SeasonContext';
-import { fetchFirebase } from './utils/webAPI';
+import { fetchFirebase, fetchDynamo } from './utils/webAPI';
 
 const maxWidth = 1200;
-const defaultYear = '2021';
+
+const defaultLeagueId = '00000001';
+const defaultLeagueYear = '2021';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,28 +26,44 @@ const queryClient = new QueryClient({
   },
 });
 
-const fetchAllData = (seasonYear) => {
-  const data = ['messageboard', 'teams', 'scoreboard', 'draftrecap'];
+const fetchAllData = (leagueKey) => {
+  function setLeagueQueryData(leagueData) {
+    const dataGroups = ['teams', 'scoreboard', 'draftRecap'];
+    queryClient.setQueryData(leagueKey, true);
+  
+    dataGroups.forEach(group => {  
+      queryClient.setQueryData(group, leagueData[group])
+    })
+  }
 
-  data.forEach((name) => {
-    let queryKey = [seasonYear, name];
-    if (name === 'messageboard') {
-      queryKey = [name];
-    }
+  const status = queryClient.getQueryState(leagueKey);
 
-    const status = queryClient.getQueryState(queryKey);
-    if (status === undefined) {
-      queryClient.prefetchQuery(queryKey, fetchFirebase);
-    }
-  });
+  if (status === undefined) {
+    const leagueData = fetchDynamo(leagueKey, setLeagueQueryData);
+  }
+
+  // const data = ['messageboard', 'teams', 'scoreboard', 'draftrecap'];
+
+  // data.forEach((name) => {
+  //   let queryKey = [leagueId, leagueId];
+  //   if (name === 'messageboard') {
+  //     queryKey = [name];
+  //   }
+
+  //   const status = queryClient.getQueryState(queryKey);
+  //   if (status === undefined) {
+  //     queryClient.prefetchQuery(queryKey, fetchFirebase);
+  //   }
+  // });
 };
 
 function App() {
   console.log('Rendering app...');
-  const [seasonYear, setSeasonYear] = useState(defaultYear);
-  const value = { seasonYear, setSeasonYear };
+  const [leagueId, setLeagueId] = useState(defaultLeagueId);
+  const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
+  const value = { leagueYear, setLeagueYear };
 
-  fetchAllData(seasonYear);
+  fetchAllData([leagueId, leagueYear]);
 
   return (
     <SeasonContext.Provider value={value}>

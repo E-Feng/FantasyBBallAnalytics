@@ -13,7 +13,7 @@ function DraftRecap(props) {
   const { seasonYear } = useContext(SeasonContext);
 
   const queryClient = useQueryClient();
-  const draftData = queryClient.getQueryData([seasonYear, 'draftrecap']);
+  const draftData = queryClient.getQueryData([seasonYear, 'draftRecap']);
   const teamData = queryClient.getQueryData([seasonYear, 'teams']);
 
   const isDataLoaded = (draftData !== undefined && teamData !== undefined);
