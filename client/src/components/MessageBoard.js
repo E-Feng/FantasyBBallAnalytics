@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
 import { useForm } from 'react-hook-form';
 
+import LeagueContext from '../components/LeagueContext';
 import LoadingIcon from './LoadingIcon';
 
 import styled from 'styled-components';
 
 function MessageBoard() {
-  const queryClient = useQueryClient();
-  const messageData = queryClient.getQueryData(['messageboard']);
+  const { leagueKey } = useContext(LeagueContext);
+  const leagueYear = leagueKey[1]
 
-  const isDataLoaded = messageData !== undefined;
+  const queryClient = useQueryClient();
+  const data = queryClient.getQueryData([leagueYear, 'common']);
+
+  const isDataLoaded = data !== undefined;
   const isFetching = useIsFetching() > 0;
 
-  const isLoading = !isDataLoaded && isFetching;
+  const isLoading = !isDataLoaded || isFetching;
+
+  const messageData = isLoading ? null : data.messageboard;
 
   const messageArray = [];
 

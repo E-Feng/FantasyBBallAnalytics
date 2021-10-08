@@ -7,8 +7,8 @@ import Home from './pages/Home';
 import TeamStats from './pages/TeamStats';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
-import SeasonContext from './components/SeasonContext';
-import { fetchFirebase, fetchDynamo } from './utils/webAPI';
+import LeagueContext from './components/LeagueContext';
+import { fetchDynamo, fetchFirebase } from './utils/webAPI';
 
 const maxWidth = 1200;
 
@@ -26,47 +26,36 @@ const queryClient = new QueryClient({
   },
 });
 
-const fetchAllData = (leagueKey) => {
-  function setLeagueQueryData(leagueData) {
-    const dataGroups = ['teams', 'scoreboard', 'draftRecap'];
-    queryClient.setQueryData(leagueKey, true);
-  
-    dataGroups.forEach(group => {  
-      queryClient.setQueryData(group, leagueData[group])
-    })
-  }
+const fetchAllData = async (leagueKey) => {
+  const leagueYear = leagueKey[1]
 
   const status = queryClient.getQueryState(leagueKey);
 
   if (status === undefined) {
-    const leagueData = fetchDynamo(leagueKey, setLeagueQueryData);
+    try {
+      queryClient.prefetchQuery(leagueKey, fetchDynamo);
+      queryClient.prefetchQuery([leagueYear, 'common'], fetchFirebase);
+    } catch (e) {
+      console.log(e);
+    }
   }
-
-  // const data = ['messageboard', 'teams', 'scoreboard', 'draftrecap'];
-
-  // data.forEach((name) => {
-  //   let queryKey = [leagueId, leagueId];
-  //   if (name === 'messageboard') {
-  //     queryKey = [name];
-  //   }
-
-  //   const status = queryClient.getQueryState(queryKey);
-  //   if (status === undefined) {
-  //     queryClient.prefetchQuery(queryKey, fetchFirebase);
-  //   }
-  // });
 };
 
 function App() {
   console.log('Rendering app...');
   const [leagueId, setLeagueId] = useState(defaultLeagueId);
   const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
-  const value = { leagueYear, setLeagueYear };
 
-  fetchAllData([leagueId, leagueYear]);
+  const leagueKey = [leagueId, leagueYear];
+  const contextValue = {
+    leagueKey: [leagueId, leagueYear],
+    setters: [setLeagueId, setLeagueYear],
+  };
+
+  fetchAllData(leagueKey);
 
   return (
-    <SeasonContext.Provider value={value}>
+    <LeagueContext.Provider value={contextValue}>
       <QueryClientProvider client={queryClient}>
         <Router>
           <Switch>
@@ -91,7 +80,7 @@ function App() {
         </Router>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    </SeasonContext.Provider>
+    </LeagueContext.Provider>
   );
 }
 

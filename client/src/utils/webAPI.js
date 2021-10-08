@@ -1,24 +1,29 @@
-const commonData = ['messageboard'];
-
 const awsURL =
   'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/data?';
-const firebaseURL = 'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/data';
+const firebaseURL = 'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/';
 
 export const fetchFirebase = async ({ queryKey }) => {
-  // const leagueId = queryKey[0];
-  // const leagueYear = queryKey[1];
-  // let fetchURL;
-  // if (queryKey[0] === 'messageboard') {
-  //   fetchURL = `https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/messageboard.json`;
-  // } else {
-  //   fetchURL = `https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/${seasonYear}/${key}.json`;
-  // }
-  // const res = await fetch(fetchURL);
-  // return res.json();
+  const leagueYear = queryKey[0];
+
+
+  let fetchURL;
+  if (queryKey.includes('common')) {
+     fetchURL = firebaseURL + `${leagueYear}/common.json`;
+   } else {
+     fetchURL = firebaseURL + `${leagueYear}/sample.json`;
+   }
+
+  const res = await fetch(fetchURL);
+  const data = res.json()
+
+  console.log(data)
+
+  return data;
 };
 
-export const fetchDynamo = async (leagueKey, setLeagueQueryData) => {
-  const [leagueId, leagueYear] = leagueKey;
+export const fetchDynamo = async ({ queryKey }) => {
+  console.log("Fetching from dynamo with key: ", queryKey);
+  const [leagueId, leagueYear] = queryKey;
 
   const fullURL =
     awsURL +
@@ -33,7 +38,5 @@ export const fetchDynamo = async (leagueKey, setLeagueQueryData) => {
   });
   const data = await res.json();
 
-  setLeagueQueryData(data)
-
-  return data
+  return data;
 };

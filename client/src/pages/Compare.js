@@ -3,22 +3,24 @@ import { useQueryClient, useIsFetching } from 'react-query';
 import styled from 'styled-components';
 
 import Layout from '../components/Layout';
-import SeasonContext from '../components/SeasonContext';
+import LeagueContext from '../components/LeagueContext';
 import CompareContainer from '../containers/CompareContainer';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 
 function Compare(props) {
-  const { seasonYear } = useContext(SeasonContext);
+  const { leagueKey } = useContext(LeagueContext);
 
   const queryClient = useQueryClient();
-  const scoreboardData = queryClient.getQueryData(['scoreboard']);
-  const teamData = queryClient.getQueryData(['teams']);
+  const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = scoreboardData !== undefined && teamData !== undefined;
+  const isDataLoaded = (data !== undefined);
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
+
+  const scoreboardData = isLoading ? null : data.scoreboard;
+  const teamData = isLoading ? null : data.teams;
 
   let currentWeek = 1;
   if (!isLoading) {

@@ -9,6 +9,10 @@ export const getHSLColor = (val, start, end, inverse) => {
   const hueA = 10;
   const hueB = 110;
 
+  if (start === end) {
+    return `hsl(60, 100%, 50%)`;
+  }
+
   val = Math.min(val, end);
   val = Math.max(val, start);
 

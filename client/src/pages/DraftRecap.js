@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
 
 import Layout from '../components/Layout';
-import SeasonContext from '../components/SeasonContext';
+import LeagueContext from '../components/LeagueContext';
 import TooltipHeader from '../components/TooltipHeader';
 import DraftRecapContainer from '../containers/DraftRecapContainer';
 import LoadingIcon from '../components/LoadingIcon';
@@ -10,16 +10,18 @@ import LoadingIcon from '../components/LoadingIcon';
 import styled from 'styled-components';
 
 function DraftRecap(props) {
-  const { seasonYear } = useContext(SeasonContext);
+  const { leagueKey } = useContext(LeagueContext);
 
   const queryClient = useQueryClient();
-  const draftData = queryClient.getQueryData([seasonYear, 'draftRecap']);
-  const teamData = queryClient.getQueryData([seasonYear, 'teams']);
+  const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = (draftData !== undefined && teamData !== undefined);
+  const isDataLoaded = (data !== undefined);
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
+
+  const draftData = isLoading ? null : data.draftRecap;
+  const teamData = isLoading ? null : data.teams;
 
   const draftRecapInfo = `This table shows a recap of the draft with the end of
     season stats rating and overall ranking. The pick number to ranking difference 
