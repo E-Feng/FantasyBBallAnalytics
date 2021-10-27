@@ -15,7 +15,7 @@ from airflow.providers.google.cloud.sensors.bigquery import (
 )
 
 
-CONN_ID = 'google_cloud_created'
+CONN_ID = 'GCP_BQ'
 
 PROJECT_ID = 'fantasy-cc6ec'
 DATASET_NAME = 'fantasy'

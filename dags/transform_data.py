@@ -9,6 +9,32 @@ from util import calculate_gamescore
 
 
 @task
+def transform_raw_to_df(endpoint: list, raw_data: dict):
+  """
+  Index function for all endpoint transformations
+  """
+  # Temperory replacement until match supported in Python 3.10
+  if endpoint == 'teams':
+    df = transform_team_to_df(raw_data)
+  elif endpoint == 'scoreboard':
+    df = transform_scoreboard_to_df(raw_data)
+  elif endpoint == 'draftRecap':
+    df = transform_draft_to_df(raw_data)
+  elif endpoint == 'ratings':
+    df = transform_ratings_to_df(raw_data)
+  elif endpoint == 'settings':
+    df = transform_settings_to_df(raw_data)
+  elif endpoint == 'daily':
+    df = transform_daily_to_df(raw_data)
+  else:
+    df = pd.DataFrame()
+
+  # Convert to json and push to xcom for next task
+  json = df.to_json(orient='records')
+
+  return json
+
+
 def transform_team_to_df(team_info: dict):
   """
   Transforms team raw json data from ESPN API to pandas dataframe
@@ -43,12 +69,9 @@ def transform_team_to_df(team_info: dict):
   
   print(df.to_string())
 
-  # Convert to json and push to xcom for next task
-  team_json = df.to_json(orient='records')
-  return team_json
+  return df
 
 
-@task
 def transform_scoreboard_to_df(scoreboard: dict):
   """
   Transforms scoreboard raw json data from ESPN API to pandas dataframe
@@ -80,16 +103,20 @@ def transform_scoreboard_to_df(scoreboard: dict):
           row['awayId'] = match[away]['teamId']
           row['week'] = math.ceil((match['id'] - num_byes)/(num_teams/2))
           row['won'] = True if (match['winner'].lower() == side) else False
-          row['fgPer'] = match[side]['cumulativeScore']['scoreByStat'][consts.FG_PER]['score']
-          row['ftPer'] = match[side]['cumulativeScore']['scoreByStat'][consts.FT_PER]['score']
-          row['threes'] = match[side]['cumulativeScore']['scoreByStat'][consts.THREES]['score']
-          row['rebs'] = match[side]['cumulativeScore']['scoreByStat'][consts.REBS]['score']
-          row['asts'] = match[side]['cumulativeScore']['scoreByStat'][consts.ASTS]['score']
-          row['stls'] = match[side]['cumulativeScore']['scoreByStat'][consts.STLS]['score']
-          row['blks'] = match[side]['cumulativeScore']['scoreByStat'][consts.BLKS]['score']
-          row['tos'] = match[side]['cumulativeScore']['scoreByStat'][consts.TOS]['score']
-          row['ejs'] = match[side]['cumulativeScore']['scoreByStat'][consts.EJS]['score']
-          row['pts'] = match[side]['cumulativeScore']['scoreByStat'][consts.PTS]['score']
+
+          # Category stats, using .get() for potential KeyErrors
+          scores = match[side]['cumulativeScore']['scoreByStat']
+
+          row['fgPer'] = scores.get(consts.FG_PER, {}).get('score')
+          row['ftPer'] = scores.get(consts.FT_PER, {}).get('score')
+          row['threes'] = scores.get(consts.THREES, {}).get('score')
+          row['rebs'] = scores.get(consts.REBS, {}).get('score')
+          row['asts'] = scores.get(consts.ASTS, {}).get('score')
+          row['stls'] = scores.get(consts.STLS, {}).get('score')
+          row['blks'] = scores.get(consts.BLKS, {}).get('score')
+          row['tos'] = scores.get(consts.TOS, {}).get('score')
+          row['ejs'] = scores.get(consts.EJS, {}).get('score')
+          row['pts'] = scores.get(consts.PTS, {}).get('score')
 
           # Appending full match details into df
           print(row)
@@ -99,13 +126,11 @@ def transform_scoreboard_to_df(scoreboard: dict):
     elif (sides[0] in match) & (sides[1] not in match):
       num_byes += 0.5
 
+  print(df.to_string())
 
-  # Convert to json and push to xcom for next task
-  scoreboard_json = df.to_json(orient='records')
-  return scoreboard_json
+  return df
 
 
-@task
 def transform_draft_to_df(draft_info: dict):
   """
   Transforms draft detail raw json data from ESPN API to pandas dataframe
@@ -122,19 +147,16 @@ def transform_draft_to_df(draft_info: dict):
     row['pickNumber'] = pick['overallPickNumber']
     row['round'] = pick['roundId']
     row['teamId'] = pick['teamId']
-    row['playerId'] = pick['playerId']
+    row['playerId'] = str(pick['playerId'])
 
     #print(row)
     df = df.append(row, ignore_index=True)
   
   print(df.to_string())
 
-  # Convert to json and push to xcom for next task
-  draft_json = df.to_json(orient='records')
-  return draft_json
+  return df
 
 
-@task
 def transform_ratings_to_df(ratings: dict):
   """
   Transforms rankings raw json data from ESPN API to pandas dataframe
@@ -148,30 +170,31 @@ def transform_ratings_to_df(ratings: dict):
   for player in data['players']:
     row = {}
 
-    row['id'] = player['id']
+    row['playerId'] = str(player['id'])
     row['playerName'] = player['player']['fullName']
-    row['ratingSeason'] = player['ratings']['0']['totalRating']
-    row['rankingSeason'] = player['ratings']['0']['totalRanking']
 
-    # Calculating rating without ejections
-    rating = 0
-    for stat in player['ratings']['0']['statRankings']:
-      if stat['forStat'] != int(consts.EJS):
-        rating = rating + stat['rating']
+    # Check if ratings exist for player
+    if 'ratings' in player:
+      row['ratingSeason'] = player['ratings']['0']['totalRating']
+      row['rankingSeason'] = player['ratings']['0']['totalRanking']
 
-    row['ratingNoEjsSeason'] = rating
+      # Calculating rating without ejections
+      rating = 0
+      for stat in player['ratings']['0']['statRankings']:
+        if stat['forStat'] != int(consts.EJS):
+          rating = rating + stat['rating']
+
+      row['ratingNoEjsSeason'] = rating
 
     #print(row)
     df = df.append(row, ignore_index=True)
   
   print(df.to_string())
 
-  # Convert to json and push to xcom for next task
-  ratings_json = df.to_json(orient='records')
-  return ratings_json
+  return df
 
-@task
-def transform_daily_score_to_df(daily_score: dict):
+
+def transform_daily_to_df(daily_score: dict):
   """
   Transforms daily score raw json data from ESPN API to pandas dataframe
   """
@@ -187,9 +210,9 @@ def transform_daily_score_to_df(daily_score: dict):
       if len(player['player']['stats'][0]['stats']) > 0:
         row = {}
 
-        row['id'] = player['id']
+        row['playerId'] = player['id']
         row['teamId'] = player['onTeamId']
-        row['name'] = player['player']['fullName']
+        row['fullName'] = player['player']['fullName']
 
         stats = player['player']['stats'][0]['stats']
 
@@ -220,6 +243,25 @@ def transform_daily_score_to_df(daily_score: dict):
   df = df.sort_values(by=['gs', 'pts'], ascending=False)
   print('\n' + df.to_string())
 
-  # Convert to json and push to xcom for next task
-  daily_score_json = df.to_json(orient='records')
-  return daily_score_json
+  return df
+
+
+def transform_settings_to_df(settings: dict):
+  """
+  Transforms settings raw json data from ESPN API to pandas dataframe
+  """
+  data = settings
+
+  df = pd.DataFrame()
+
+  # Iterate through all category ids
+  row = {}
+  row['categoryIds'] = []
+  for category in data['settings']['scoringSettings']['scoringItems']:
+    row['categoryIds'].append(category['statId'])
+
+  df = df.append(row, ignore_index=True)
+
+  print(df.to_string())
+
+  return df

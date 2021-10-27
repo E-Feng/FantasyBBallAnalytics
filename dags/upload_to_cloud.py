@@ -13,8 +13,8 @@ from util import authed_session
 
 
 CONN_ID = 'google_cloud_created'
-LEAGUE_YEAR = Variable.get('LEAGUE_YEAR')
-FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/{LEAGUE_YEAR}/'
+#LEAGUE_YEAR = Variable.get('LEAGUE_YEAR')
+#FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/data/{LEAGUE_YEAR}/'
 
 
 @task

@@ -89,6 +89,7 @@ function TotalsContainer(props) {
 
   return (
     <Container>
+      {props.currentWeek !== 1 ? (
       <Forms>
         <SliderRange
           weekRange={weekRange}
@@ -104,6 +105,7 @@ function TotalsContainer(props) {
           Only Matchups
         </Checkbox>
       </Forms>
+      ) : (<br></br>)}
       <TotalsTable data={aggData}></TotalsTable>
     </Container>
   );

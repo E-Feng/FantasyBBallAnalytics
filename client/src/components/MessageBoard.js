@@ -122,6 +122,7 @@ function MessageBoard() {
         messageArray.push(messageData[date][key]);
       });
     });
+    console.log(messageArray)
   }
 
   return (

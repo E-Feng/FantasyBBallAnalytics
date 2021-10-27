@@ -13,12 +13,15 @@ function SeasonDropdown() {
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = (data !== undefined);
+  const isDataLoaded = data !== undefined;
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const yearList = isLoading ? ['2021'] : data['allYears']
+  const yearList =
+    isLoading || data['allYears'] === undefined ? ['2022'] : data['allYears'];
+
+  yearList.sort((a, b) => parseInt(b) - parseInt(a))
 
   const handleSeasonChange = (e) => {
     setLeagueYear(e.target.value);
@@ -28,12 +31,12 @@ function SeasonDropdown() {
     <Container>
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
-        {yearList.map(year => {
+        {yearList.map((year) => {
           return (
             <option value={year} key={year}>
               {year}
             </option>
-          )
+          );
         })}
       </Dropdown>
     </Container>
