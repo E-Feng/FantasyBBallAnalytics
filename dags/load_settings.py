@@ -43,6 +43,7 @@ def get_league_id_list():
     formatted_league_ids['cookieSwid'].append(league[4])
 
   Variable.set(key='league_ids', value=formatted_league_ids, serialize_json=True)
+  Variable.set(key='league_year', value=formatted_league_ids['leagueYear'][0])
 
   print("League ID Data", type(league_ids))
   for row in league_ids:

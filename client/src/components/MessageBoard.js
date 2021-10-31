@@ -79,7 +79,7 @@ function MessageBoard() {
         const shootingStats = `(${msg.fgMade}/${msg.fgAtt},
                                   ${msg.threes}/${msg.threesAtt},   
                                   ${msg.ftMade}/${msg.ftAtt})`;
-        content = `${msg.name} [${msg.abbrev}] with ${mainStats} on ${shootingStats} shooting in ${msg.mins} minutes`;
+        content = `${msg.fullName} with ${mainStats} on ${shootingStats} shooting in ${msg.mins} minutes`;
         break;
       case 'date':
         // Formatting new date break lines
@@ -101,7 +101,7 @@ function MessageBoard() {
         );
       case 'ejection':
         // Formatting ejections
-        content = `${msg.name} [${msg.abbrev}] has been ejected!`;
+        content = `${msg.fullName} has been ejected!`;
         break;
       default:
         content = msg.msg;

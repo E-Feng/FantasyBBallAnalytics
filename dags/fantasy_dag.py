@@ -7,7 +7,7 @@ from airflow import DAG
 from airflow.decorators import task
 from airflow.utils.task_group import TaskGroup
 from airflow.utils.db import provide_session
-from airflow.models import XCom, Variable
+from airflow.models import Variable
 
 from load_settings import (
   get_league_id_list,
@@ -17,7 +17,7 @@ from rds_operations import (
   create_rds_tables,
   truncate_rds_tables,
   insert_data_into_rds_tables,
-  rds_run_query
+  rds_run_query_task
 )
 from bigquery_operations import (
   create_tables,
@@ -31,7 +31,7 @@ from extract_espn import (
 from transform_data import (
   transform_raw_to_df,
 )
-from analyze_data import calculate_and_upload_daily_alert
+from analyze_data import create_common_daily_alert
 from upload_to_aws import (
   upload_league_data_to_dynamo
 )
@@ -95,8 +95,14 @@ with DAG(
         df = transform_raw_to_df(endpoint, raw_data)
         insert_data_into_rds_tables(-1, endpoint, df)
 
-        #common_data[endpoint] = 
+        common_data[endpoint] = df
+    
+  with TaskGroup(group_id='queries_common') as common_queries:
+    # Running queries on common data
+    daily_alert = create_common_daily_alert()
+    upload_to_firebase(daily_alert, 'alert')
 
+  extract_common_tg >> common_queries
 
   # Taskgroup for full ETL for each league
   data_endpoints = {
@@ -153,7 +159,7 @@ with DAG(
       # All endpoints extracted and transformed
       # Performing queries
       with TaskGroup(group_id=f'queries') as queries_tg:
-        draft_query = rds_run_query(i, 'rds/join_draft_and_ratings.sql')
+        draft_query = rds_run_query_task(i, 'rds/join_draft_and_ratings.sql')
 
         league_data['draftRecap'] = draft_query
 

@@ -3,12 +3,67 @@ import json
 import requests
 from datetime import datetime
 import pandas as pd
+
+from rds_operations import rds_run_query
 pd.options.mode.chained_assignment = None
 
 from airflow.decorators import task
 from airflow.operators.python import get_current_context
 
 from util import authed_session
+
+
+@task
+def create_common_daily_alert():
+  """
+  Create daily alert for common data (eg. no league specific free agents) by 
+  highest gamescore, ejections
+  """
+  # Getting best gamescore alerts
+  gamescore_cutoff = 32.5
+  min_alerts = 3
+
+  best_gamescores_sql = """
+    (SELECT fullname, pts, rebs, asts, stls, blks, tos, fgmade, fgatt, threes, threesatt, ftmade, ftatt, mins, gs
+    FROM daily
+    WHERE gs >= %s)
+    UNION
+      (SELECT fullname, pts, rebs, asts, stls, blks, tos, fgmade, fgatt, threes, threesatt, ftmade, ftatt, mins, gs
+      FROM daily
+      ORDER BY gs DESC
+      LIMIT %s)
+    ORDER BY gs DESC
+  """
+  best_gamescores = rds_run_query(-1, best_gamescores_sql, (gamescore_cutoff, min_alerts))
+
+  # Getting ejections
+  ejections_sql = """
+    SELECT fullname
+    FROM daily
+    WHERE ejs > 0
+  """
+  ejections = rds_run_query(-1, ejections_sql)
+
+  # Creating daily alert json object
+  context = get_current_context()
+  date = context['data_interval_end'].to_date_string()
+
+  alert_data = {}
+  alert_data[date] = {}
+
+  for i, gamescore in enumerate(best_gamescores):
+    gamescore['type'] = 'stat'
+    gamescore['user'] = 'BOT'
+    gamescore['time'] = str(datetime.now().time())
+    alert_data[date][f'!stat{i}'] = gamescore
+
+  for i, ejection in enumerate(ejections):
+    ejection['type'] = 'ejection'
+    ejection['user'] = 'BOT'
+    ejection['time'] = str(datetime.now().time())
+    alert_data[date][f'!ejection{i}'] = ejection
+
+  return alert_data
 
 
 @task

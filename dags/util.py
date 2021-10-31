@@ -38,7 +38,9 @@ def capitalize_dict_keys(data):
     'picknumber': 'pickNumber', 'playername': 'playerName',
     'teamid': 'teamId', 'ratingseason': 'ratingSeason',
     'ratingnoejsseason': 'ratingNoEjsSeason', 'rankingseason': 'rankingSeason',
-    'rankingnoejsseason': 'rankingNoEjsSeason'
+    'rankingnoejsseason': 'rankingNoEjsSeason', 'fgmade': 'fgMade',
+    'fgatt': 'fgAtt', 'ftmade': 'ftMade', 'ftatt': 'ftAtt', 'threesatt': 'threesAtt',
+    'fullname': 'fullName'
   }
 
   new_data = []

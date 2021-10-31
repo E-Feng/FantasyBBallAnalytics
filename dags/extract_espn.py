@@ -4,7 +4,6 @@ import json
 
 from airflow.decorators import task
 from airflow.models import Variable
-from airflow.exceptions import AirflowSkipException
 
 
 # Initializing parameters
@@ -15,7 +14,7 @@ base_url = 'https://fantasy.espn.com/apis/v3/games/fba/seasons/{}/segments/0/lea
 def extract_from_espn_api(league_index: int, view: list, header: dict = {}):
   """
   Extracts all data from ESPN API
-  """
+  """  
   league_ids = Variable.get("league_ids", deserialize_json=True)
 
   league_id = league_ids['leagueId'][league_index]

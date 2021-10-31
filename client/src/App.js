@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Switch, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
@@ -12,8 +12,8 @@ import { fetchDynamo, fetchFirebase } from './utils/webAPI';
 
 const maxWidth = 1200;
 
-const defaultLeagueId = '48375511';
-const defaultLeagueYear = '2022';
+let defaultLeagueId = '00000001';
+let defaultLeagueYear = '2021';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,13 +27,21 @@ const queryClient = new QueryClient({
 });
 
 const fetchAllData = async (leagueKey) => {
-  const leagueYear = leagueKey[1]
+  const leagueYear = leagueKey[1];
 
-  const status = queryClient.getQueryState(leagueKey);
+  const statusLeagueKey = queryClient.getQueryState(leagueKey);
+  const statusCommon = queryClient.getQueryState([leagueYear, 'common']);
 
-  if (status === undefined) {
+  if (statusLeagueKey === undefined) {
     try {
       queryClient.prefetchQuery(leagueKey, fetchDynamo);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  if (statusCommon === undefined) {
+    try {
       queryClient.prefetchQuery([leagueYear, 'common'], fetchFirebase);
     } catch (e) {
       console.log(e);
@@ -43,8 +51,14 @@ const fetchAllData = async (leagueKey) => {
 
 function App() {
   console.log('Rendering app...');
+  const leagueParam = new URLSearchParams(useLocation().search).get('league');
+  defaultLeagueId = leagueParam || defaultLeagueId;
+  defaultLeagueYear = leagueParam ? '2022' : defaultLeagueYear;
+
   const [leagueId, setLeagueId] = useState(defaultLeagueId);
   const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
+
+  console.log(leagueId);
 
   const leagueKey = [leagueId, leagueYear];
   const contextValue = {
@@ -57,27 +71,25 @@ function App() {
   return (
     <LeagueContext.Provider value={contextValue}>
       <QueryClientProvider client={queryClient}>
-        <Router>
-          <Switch>
-            <Route
-              exact
-              path='/'
-              render={(props) => <Home {...props} maxWidth={maxWidth} />}
-            />
-            <Route
-              path='/teamstats'
-              render={(props) => <TeamStats {...props} maxWidth={maxWidth} />}
-            />
-            <Route
-              path='/compare'
-              render={(props) => <Compare {...props} maxWidth={maxWidth} />}
-            />
-            <Route
-              path='/draftrecap'
-              render={(props) => <DraftRecap {...props} maxWidth={maxWidth} />}
-            />
-          </Switch>
-        </Router>
+        <Switch>
+          <Route
+            exact
+            path='/'
+            render={(props) => <Home {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/teamstats'
+            render={(props) => <TeamStats {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/compare'
+            render={(props) => <Compare {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/draftrecap'
+            render={(props) => <DraftRecap {...props} maxWidth={maxWidth} />}
+          />
+        </Switch>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </LeagueContext.Provider>

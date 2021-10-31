@@ -29,6 +29,7 @@ def read_sql_file(file_path):
 
   return sql
 
+
 @task
 def create_rds_tables():
   hook = PostgresHook(postgres_conn_id=AWS_CONN_ID)
@@ -48,6 +49,7 @@ def create_rds_tables():
   conn.commit()
   return
 
+
 @task
 def truncate_rds_tables():
   hook = PostgresHook(postgres_conn_id=AWS_CONN_ID)
@@ -62,8 +64,9 @@ def truncate_rds_tables():
   conn.commit()
   return
 
+
 @task
-def insert_data_into_rds_tables(i, endpoint, data):
+def insert_data_into_rds_tables(i: int, endpoint: str, data: str):
   hook = PostgresHook(postgres_conn_id=AWS_CONN_ID)
   conn = hook.get_conn()
   cursor = conn.cursor()
@@ -96,8 +99,13 @@ def insert_data_into_rds_tables(i, endpoint, data):
 
   return
 
+
 @task
-def rds_run_query(i: int, sql: str):
+def rds_run_query_task(i: int, sql: str, params: tuple = ()):
+  return rds_run_query(i, sql, params)
+
+
+def rds_run_query(i: int, sql: str, params: tuple = ()):
   hook = PostgresHook(postgres_conn_id=AWS_CONN_ID)
   conn = hook.get_conn()
   cursor = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
@@ -113,12 +121,10 @@ def rds_run_query(i: int, sql: str):
 
     sql = sql.format(league_id, league_year)
 
-  cursor.execute(sql)
+  cursor.execute(sql, params)
 
   data = cursor.fetchall()
-  print(data)
 
   formatted_data = capitalize_dict_keys(data)
-  print(formatted_data)
 
   return formatted_data
