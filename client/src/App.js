@@ -48,9 +48,20 @@ function App() {
   };
 
   console.log('Rendering app...');
-  const leagueParam = new URLSearchParams(useLocation().search).get('league');
-  defaultLeagueId = leagueParam || defaultLeagueId;
-  defaultLeagueYear = leagueParam ? '2022' : defaultLeagueYear;
+  // Determining league id using URL params and localstorage
+  let initialLeagueId;
+
+  const paramId = new URLSearchParams(useLocation().search).get('league');
+
+  if (paramId) {
+    localStorage.setItem('leagueId', paramId);
+    initialLeagueId = paramId;
+  } else {
+    initialLeagueId = localStorage.getItem('leagueId');
+  }
+
+  defaultLeagueId = initialLeagueId || defaultLeagueId;
+  defaultLeagueYear = initialLeagueId ? '2022' : defaultLeagueYear;
 
   const [leagueId, setLeagueId] = useState(defaultLeagueId);
   const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
