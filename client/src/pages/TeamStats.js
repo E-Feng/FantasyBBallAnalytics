@@ -16,7 +16,7 @@ function TeamStats(props) {
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = (data !== undefined);
+  const isDataLoaded = (data !== undefined && data !== null);
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;

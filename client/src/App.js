@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import TeamStats from './pages/TeamStats';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
+import Error from './pages/Error';
 import LeagueContext from './components/LeagueContext';
 import { fetchDynamo, fetchFirebase } from './utils/webAPI';
 
@@ -26,30 +27,26 @@ const queryClient = new QueryClient({
   },
 });
 
-const fetchAllData = async (leagueKey) => {
-  const leagueYear = leagueKey[1];
-
-  const statusLeagueKey = queryClient.getQueryState(leagueKey);
-  const statusCommon = queryClient.getQueryState([leagueYear, 'common']);
-
-  if (statusLeagueKey === undefined) {
-    try {
-      queryClient.prefetchQuery(leagueKey, fetchDynamo);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  if (statusCommon === undefined) {
-    try {
-      queryClient.prefetchQuery([leagueYear, 'common'], fetchFirebase);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-};
-
 function App() {
+  const fetchAllData = async (leagueKey) => {
+    const leagueYear = leagueKey[1];
+
+    const statusLeagueKey = queryClient.getQueryState(leagueKey);
+    const statusCommon = queryClient.getQueryState([leagueYear, 'common']);
+
+    if (statusLeagueKey === undefined || statusCommon === undefined) {
+      const dataLeague = await queryClient.fetchQuery(leagueKey, fetchDynamo);
+      const dataCommon = await queryClient.fetchQuery(
+        [leagueYear, 'common'],
+        fetchFirebase
+      );
+
+      if (dataLeague === null || dataCommon === null) {
+        setLeagueAvail(false);
+      }
+    }
+  };
+
   console.log('Rendering app...');
   const leagueParam = new URLSearchParams(useLocation().search).get('league');
   defaultLeagueId = leagueParam || defaultLeagueId;
@@ -57,8 +54,7 @@ function App() {
 
   const [leagueId, setLeagueId] = useState(defaultLeagueId);
   const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
-
-  console.log(leagueId);
+  const [leagueAvailable, setLeagueAvail] = useState(true);
 
   const leagueKey = [leagueId, leagueYear];
   const contextValue = {
@@ -66,7 +62,11 @@ function App() {
     setters: [setLeagueId, setLeagueYear],
   };
 
-  fetchAllData(leagueKey);
+  if (leagueAvailable) {
+    fetchAllData(leagueKey);
+  } else {
+    return <Error isLeagueError={true} maxWidth={maxWidth} />;
+  }
 
   return (
     <LeagueContext.Provider value={contextValue}>
@@ -89,6 +89,7 @@ function App() {
             path='/draftrecap'
             render={(props) => <DraftRecap {...props} maxWidth={maxWidth} />}
           />
+          <Route render={(props) => <Error {...props} maxWidth={maxWidth} />} />
         </Switch>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 function Layout(props) {
   return (
     <Container>
-      <NavBar maxWidth={props.maxWidth} />
+      <NavBar maxWidth={props.maxWidth} isError={props.isError}/>
       <Border />
       <Children >{props.children}</Children>
     </Container>

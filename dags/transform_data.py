@@ -107,20 +107,21 @@ def transform_scoreboard_to_df(scoreboard: dict):
           # Category stats, using .get() for potential KeyErrors
           scores = match[side]['cumulativeScore']['scoreByStat']
 
-          row['fgPer'] = scores.get(consts.FG_PER, {}).get('score')
-          row['ftPer'] = scores.get(consts.FT_PER, {}).get('score')
-          row['threes'] = scores.get(consts.THREES, {}).get('score')
-          row['rebs'] = scores.get(consts.REBS, {}).get('score')
-          row['asts'] = scores.get(consts.ASTS, {}).get('score')
-          row['stls'] = scores.get(consts.STLS, {}).get('score')
-          row['blks'] = scores.get(consts.BLKS, {}).get('score')
-          row['tos'] = scores.get(consts.TOS, {}).get('score')
-          row['ejs'] = scores.get(consts.EJS, {}).get('score')
-          row['pts'] = scores.get(consts.PTS, {}).get('score')
+          if scores:
+            row['fgPer'] = scores.get(consts.FG_PER, {}).get('score')
+            row['ftPer'] = scores.get(consts.FT_PER, {}).get('score')
+            row['threes'] = scores.get(consts.THREES, {}).get('score')
+            row['rebs'] = scores.get(consts.REBS, {}).get('score')
+            row['asts'] = scores.get(consts.ASTS, {}).get('score')
+            row['stls'] = scores.get(consts.STLS, {}).get('score')
+            row['blks'] = scores.get(consts.BLKS, {}).get('score')
+            row['tos'] = scores.get(consts.TOS, {}).get('score')
+            row['ejs'] = scores.get(consts.EJS, {}).get('score')
+            row['pts'] = scores.get(consts.PTS, {}).get('score')
 
-          # Appending full match details into df
-          print(row)
-          df = df.append(row, ignore_index = True)
+            # Appending full match details into df
+            print(row)
+            df = df.append(row, ignore_index = True)
 
     # Adjusting id/week for byes
     elif (sides[0] in match) & (sides[1] not in match):

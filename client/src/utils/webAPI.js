@@ -16,8 +16,6 @@ export const fetchFirebase = async ({ queryKey }) => {
   const res = await fetch(fetchURL);
   const data = res.json()
 
-  console.log(data)
-
   return data;
 };
 

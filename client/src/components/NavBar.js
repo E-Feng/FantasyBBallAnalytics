@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {FaGithub, FaLinkedin, FaInstagram, FaHome} from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaInstagram, FaHome } from 'react-icons/fa';
 
 import SeasonDropdown from './SeasonDropdown';
 
@@ -26,7 +26,7 @@ function NavBar(props) {
         </LinksList>
       </LinksContainer>
       <Filler />
-      <SeasonDropdown />
+      {props.isError ? <Filler /> : <SeasonDropdown />}
       <Icons>
         <li>
           <a href='https://elvinfeng.com/'>

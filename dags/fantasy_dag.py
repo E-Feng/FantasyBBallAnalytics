@@ -172,8 +172,8 @@ with DAG(
     league_groups.append(etl_league)
 
 
-  scoring_period >> extract_common_tg >> init_league_ids
-  init_league_ids >> league_groups
+  init_league_ids >> scoring_period >> extract_common_tg
+  extract_common_tg >> league_groups
   init_rds >> league_groups
 
   # Initializing tables in bigquery
