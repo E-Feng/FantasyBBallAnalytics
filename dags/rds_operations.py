@@ -119,12 +119,16 @@ def rds_run_query(i: int, sql: str, params: tuple = ()):
     league_id = leagues_xcom['leagueId'][i]
     league_year = leagues_xcom['leagueYear'][i]
 
-    sql = sql.format(league_id, league_year)
+    sql = sql.format(league_id=league_id, league_year=league_year)
 
   cursor.execute(sql, params)
 
-  data = cursor.fetchall()
+  try:
+    data = cursor.fetchall()
+    formatted_data = capitalize_dict_keys(data)
 
-  formatted_data = capitalize_dict_keys(data)
-
-  return formatted_data
+    conn.commit()
+    return formatted_data
+  except:
+    conn.commit()
+    return ()

@@ -3,4 +3,4 @@ SELECT pickNumber, round, playerName, teamId, ratingSeason, ratingNoEjsSeason, r
 FROM draftrecap
 JOIN ratings
 ON draftrecap.playerId = ratings.playerId
-WHERE draftrecap.LeagueId = '{}' AND draftrecap.LeagueYear = '{}'
+WHERE draftrecap.LeagueId = '{league_id}' AND draftrecap.LeagueYear = '{league_year}'

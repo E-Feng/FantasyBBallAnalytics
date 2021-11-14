@@ -22,6 +22,7 @@ def get_league_id_list():
     """
     SELECT LeagueId, LeagueYear, LastYear, CookieEspnS2, CookieSwid 
     FROM leagues
+    WHERE Active
     """
   )
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaGithub, FaLinkedin, FaInstagram, FaHome } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaHome } from 'react-icons/fa';
 
-import SeasonDropdown from './SeasonDropdown';
+import LeagueSettings from './LeagueSettings';
 
 import styled from 'styled-components';
 
@@ -26,7 +26,7 @@ function NavBar(props) {
         </LinksList>
       </LinksContainer>
       <Filler />
-      {props.isError ? <Filler /> : <SeasonDropdown />}
+      {props.isError ? <Filler /> : <LeagueSettings />}
       <Icons>
         <li>
           <a href='https://elvinfeng.com/'>
@@ -41,11 +41,6 @@ function NavBar(props) {
         <li>
           <a href='https://www.linkedin.com/in/elvin-feng-527b8b81/'>
             <FaLinkedin title='Linkedin'></FaLinkedin>
-          </a>
-        </li>
-        <li>
-          <a href='https://www.instagram.com/ig.elvin/?hl=en'>
-            <FaInstagram title='Instagram'></FaInstagram>
           </a>
         </li>
       </Icons>
@@ -78,12 +73,28 @@ const NavContainer = styled.div`
 const LinksContainer = styled.div`
   display: flex;
   flex-direction: column;
+`;
 
-  ul li a {
+const LinksList = styled.ul`
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+
+  font-size: 20px;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  li a {
     position: relative;
     margin: 0 0.5rem;
     text-decoration: none;
     text-transform: uppercase;
+    text-align: center;
     color: #ffffff;
 
     :after,
@@ -107,19 +118,11 @@ const LinksContainer = styled.div`
 
   @media (max-width: 450px) {
     li a {
-      margin: 0 0.4rem;
+      margin: auto;
+      padding: 0 0.4rem;
       font-size: min(20px, 5vw);
     }
   }
-`;
-
-const LinksList = styled.ul`
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  align-items: center;
-
-  font-size: 20px;
 `;
 
 const Filler = styled.div`

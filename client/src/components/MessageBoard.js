@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
 import { useForm } from 'react-hook-form';
+import styled from 'styled-components';
 
 import LeagueContext from '../components/LeagueContext';
 import LoadingIcon from './LoadingIcon';
 
-import styled from 'styled-components';
 
 function MessageBoard() {
   const { leagueKey } = useContext(LeagueContext);

@@ -13,8 +13,8 @@ import { fetchDynamo, fetchFirebase } from './utils/webAPI';
 
 const maxWidth = 1200;
 
-let defaultLeagueId = '00000001';
-let defaultLeagueYear = '2021';
+const defaultLeagueId = '00000001';
+const defaultLeagueYear = '2022';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,7 +42,7 @@ function App() {
       );
 
       if (dataLeague === null || dataCommon === null) {
-        setLeagueAvail(false);
+        setLeagueId(defaultLeagueId)
       }
     }
   };
@@ -52,32 +52,29 @@ function App() {
   let initialLeagueId;
 
   const paramId = new URLSearchParams(useLocation().search).get('league');
+  const storageId = localStorage.getItem('leagueId');
 
-  if (paramId) {
-    localStorage.setItem('leagueId', paramId);
-    initialLeagueId = paramId;
-  } else {
-    initialLeagueId = localStorage.getItem('leagueId');
+  initialLeagueId = paramId || storageId;
+
+  if (initialLeagueId) {
+    localStorage.setItem('leagueId', initialLeagueId);
   }
 
-  defaultLeagueId = initialLeagueId || defaultLeagueId;
-  defaultLeagueYear = initialLeagueId ? '2022' : defaultLeagueYear;
+  const defaultShowModal = initialLeagueId ? false : true;
 
-  const [leagueId, setLeagueId] = useState(defaultLeagueId);
+  const [leagueId, setLeagueId] = useState(initialLeagueId || defaultLeagueId);
   const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
-  const [leagueAvailable, setLeagueAvail] = useState(true);
+  const [showLeagueModal, setShowLeagueModal] = useState(defaultShowModal);
 
   const leagueKey = [leagueId, leagueYear];
   const contextValue = {
     leagueKey: [leagueId, leagueYear],
-    setters: [setLeagueId, setLeagueYear],
+    id: [leagueId, setLeagueId],
+    year: [leagueYear, setLeagueYear],
+    modal: [showLeagueModal, setShowLeagueModal],
   };
 
-  if (leagueAvailable) {
-    fetchAllData(leagueKey);
-  } else {
-    return <Error isLeagueError={true} maxWidth={maxWidth} />;
-  }
+  fetchAllData(leagueKey);
 
   return (
     <LeagueContext.Provider value={contextValue}>

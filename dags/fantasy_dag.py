@@ -166,8 +166,9 @@ with DAG(
 
       # Uploading to DynamoDB after all endpoints processed
       upload_dynamo = upload_league_data_to_dynamo(league_data)
+      last_updated = rds_run_query_task(i, 'rds/update_leagues_table.sql')
 
-      endpoint_groups >> queries_tg >> upload_dynamo
+      endpoint_groups >> queries_tg >> upload_dynamo >> last_updated
 
     league_groups.append(etl_league)
 
