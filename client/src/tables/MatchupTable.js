@@ -3,12 +3,17 @@ import { useTable } from 'react-table';
 import styled from 'styled-components';
 
 import { calculateMatchup } from '../utils/matchupUtils';
+import { categoryDetails } from '../utils/categoryUtils';
 
 function MatchupTable(props) {
   const data = [].concat([props.home], props.away);
 
-  const columns = React.useMemo(
-    () => [
+  const cats = categoryDetails.filter((cat) => {
+    return Object.keys(data[0]).includes(cat.name);
+  });
+
+  const columns = React.useMemo(() => {
+    const teamHeaders = [
       {
         Header: 'Team',
         accessor: 'fullTeamName',
@@ -25,57 +30,23 @@ function MatchupTable(props) {
           <React.Fragment> {props.value.substring(0, 8)} </React.Fragment>
         ),
       },
-      {
-        Header: 'FG%',
-        accessor: 'fgPer',
+    ];
+    const catHeaders = cats.map((cat) => {
+      return {
+        Header: cat.display,
+        accessor: cat.name,
 
         Cell: (props) => (
-          <React.Fragment> {props.value.toFixed(4)} </React.Fragment>
+          <React.Fragment>
+            {props.value && props.value.toFixed(cat.digits)}
+          </React.Fragment>
         ),
-      },
-      {
-        Header: 'FT%',
-        accessor: 'ftPer',
+      };
+    });
 
-        Cell: (props) => (
-          <React.Fragment> {props.value.toFixed(4)} </React.Fragment>
-        ),
-      },
-      {
-        Header: '3PM',
-        accessor: 'threes',
-      },
-      {
-        Header: 'REB',
-        accessor: 'rebs',
-      },
-      {
-        Header: 'AST',
-        accessor: 'asts',
-      },
-      {
-        Header: 'STL',
-        accessor: 'stls',
-      },
-      {
-        Header: 'BLK',
-        accessor: 'blks',
-      },
-      {
-        Header: 'TO',
-        accessor: 'tos',
-      },
-      {
-        Header: 'EJ',
-        accessor: 'ejs',
-      },
-      {
-        Header: 'PTS',
-        accessor: 'pts',
-      },
-    ],
-    []
-  );
+    return teamHeaders.concat(catHeaders);
+    // eslint-disable-next-line
+  }, []);
 
   const tableInstance = useTable({ columns, data });
 

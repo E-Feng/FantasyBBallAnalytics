@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Switch, Route, useLocation } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
@@ -42,7 +42,7 @@ function App() {
       );
 
       if (dataLeague === null || dataCommon === null) {
-        setLeagueId(defaultLeagueId)
+        setLeagueId(defaultLeagueId);
       }
     }
   };
@@ -51,7 +51,7 @@ function App() {
   // Determining league id using URL params and localstorage
   let initialLeagueId;
 
-  const paramId = new URLSearchParams(useLocation().search).get('league');
+  const paramId = new URLSearchParams(window.location.search).get('league');
   const storageId = localStorage.getItem('leagueId');
 
   initialLeagueId = paramId || storageId;
@@ -74,7 +74,10 @@ function App() {
     modal: [showLeagueModal, setShowLeagueModal],
   };
 
-  fetchAllData(leagueKey);
+  const status = queryClient.getQueryState(leagueKey);
+  if (status === undefined) {
+    fetchAllData(leagueKey);
+  }
 
   return (
     <LeagueContext.Provider value={contextValue}>

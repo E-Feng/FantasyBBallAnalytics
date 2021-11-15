@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 
 import MatchupTable from '../tables/MatchupTable';
 
-import styled from 'styled-components';
 
 function MatchupTablesContainer(props) {
   const data = props.data;

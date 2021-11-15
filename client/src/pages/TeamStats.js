@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
+import styled from 'styled-components';
 
 import Layout from '../components/Layout';
 import LeagueContext from '../components/LeagueContext';
@@ -8,7 +9,6 @@ import TotalsContainer from '../containers/TotalsContainer';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 
-import styled from 'styled-components';
 
 function TeamStats(props) {
   const { leagueKey } = useContext(LeagueContext);
@@ -23,6 +23,7 @@ function TeamStats(props) {
 
   const scoreboardData = isLoading ? null : data.scoreboard;
   const teamData = isLoading ? null : data.teams;
+  const settingsData = isLoading ? null : data.settings;
 
   let currentWeek = 1;
   if (!isLoading) {
@@ -50,6 +51,7 @@ function TeamStats(props) {
           <TotalsContainer
             data={scoreboardData}
             teams={teamData}
+            settings={settingsData}
             currentWeek={currentWeek}
           ></TotalsContainer>
           <TooltipHeader
@@ -59,6 +61,7 @@ function TeamStats(props) {
           <MatchupTablesContainer
             data={scoreboardData}
             teams={teamData}
+            settings={settingsData}
             currentWeek={currentWeek}
           />
         </Container>

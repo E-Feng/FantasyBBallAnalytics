@@ -1,52 +1,92 @@
-export const categoryDetails = {
-  fgPer: {
+export const categoryDetails = [
+  {
+    name: 'fgPer',
     display: 'FG%',
+    espnId: 19,
     digits: 4,
   },
-  ftPer: {
+  {
+    name: 'ftPer',
     display: 'FT%',
+    espnId: 20,
     digits: 4,
   },
-  threes: {
+  {
+    name: 'threes',
     display: '3PM',
+    espnId: 17,
+    digits: 0,
   },
-  rebs: {
+  {
+    name: 'rebs',
     display: 'REB',
+    espnId: 6,
+    digits: 0,
   },
-  asts: {
+  {
+    name: 'asts',
     display: 'AST',
+    espnId: 3,
+    digits: 0,
   },
-  stls: {
+  {
+    name: 'stls',
     display: 'STL',
+    espnId: 2,
+    digits: 0,
   },
-  blks: {
+  {
+    name: 'blks',
     display: 'BLK',
+    espnId: 1,
+    digits: 0,
   },
-  tos: {
+  {
+    name: 'tos',
     display: 'TO',
+    espnId: 11,
     inverse: true,
+    digits: 0,
   },
-  ejs: {
+  {
+    name: 'ejs',
     display: 'EJ',
+    espnId: 7,
     inverse: true,
+    digits: 0,
   },
-  pts: {
+  {
+    name: 'pts',
     display: 'PTS',
+    espnId: 0,
+    digits: 0,
   },
-};
+  {
+    name: 'all',
+    display: 'ALL',
+    espnId: -1,
+    digits: 0,
+  }
+];
+
+export const getCatInverse = (cat) => {
+  return categoryDetails.filter((o) => o.name === cat).inverse
+  ? true
+  : false;
+}
 
 export const determineWinner = (a, b, cat) => {
-  const inverse = categoryDetails[cat].inverse ? true : false;
+  const inverse = getCatInverse(cat)
 
   let isWinner;
 
   if (inverse) {
-    const compareValue = Math.min(b)
+    const compareValue = Math.min(b);
     isWinner = a < compareValue;
   } else {
-    const compareValue = Math.max(b)
+    const compareValue = Math.max(b);
     isWinner = a > compareValue;
   }
 
   return isWinner;
-}
+};

@@ -25,7 +25,7 @@ def upload_league_data_to_dynamo(data: dict):
   payload = json.dumps(data)
 
   # Random sleep to prevent dynamodb write throttling
-  sleep(randint(0, 120))
+  sleep(randint(0, 180))
   r = requests.put(AWS_DDB_URL, data=payload, headers=headers)
 
   if r.status_code == 500:

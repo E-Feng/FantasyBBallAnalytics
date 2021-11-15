@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 
 import SliderRange from '../components/SliderRange';
 import TotalsTable from '../tables/TotalsTable';
+import { categoryDetails } from '../utils/categoryUtils';
 
-import styled from 'styled-components';
 
 function TotalsContainer(props) {
   /**
@@ -14,26 +15,21 @@ function TotalsContainer(props) {
    * @param {*} weekRange
    * @param {*} onlyMatchup
    */
-  const calculateTotalCats = (data, weekRange, onlyMatchup) => {
-    const cats = {
-      fgPer: true,
-      ftPer: true,
-      threes: true,
-      asts: true,
-      rebs: true,
-      stls: true,
-      blks: true,
-      tos: false,
-      ejs: false,
-      pts: true,
-    };
+  const settings = props.settings[0].categoryIds;
+  const cats = categoryDetails.filter(o => {
+    return settings.includes(o.espnId)
+  })
 
+  const calculateTotalCats = (data, weekRange, onlyMatchup) => {
     // Initialize total category object
     const teams = props.teams;
     const totals = teams.map((team) => {
-      for (let cat of Object.keys(cats)) {
-        team[cat] = [0, 0, 0];
+      for (let cat of cats) {
+        team[cat.name] = [0, 0, 0];
       }
+      // For calculating all categories
+      team['all'] = [0, 0, 0];
+
       return team;
     });
 
@@ -47,7 +43,7 @@ function TotalsContainer(props) {
         const index = totals.findIndex(o => o.teamId === stats.teamId);
 
         // Filter out only opposing matchup if selected
-        let opposing = {};
+        let opposing;
         if (onlyMatchup) {
           opposing = weekData.filter((row) => row.teamId === stats.awayId);
         } else {
@@ -55,22 +51,28 @@ function TotalsContainer(props) {
         }
 
         // Iterate through cats to calculate totals
-        for (let cat of Object.keys(cats)) {
-          const val = stats[cat];
-          const opposingValues = opposing.map(o => o[cat]);
+        for (let cat of cats) {
+          const val = stats[cat.name];
+          const opposingValues = opposing.map(o => o[cat.name]);
+          //console.log(opposingValues)
 
           let wins = opposingValues.reduce((a, b) => ((val > b) ? 1 : 0) + a, 0);
           let losses = opposingValues.reduce((a, b) => ((val < b) ? 1 : 0) + a, 0);
-          const ties = Object.keys(cats).length - wins - losses;
+          const ties = opposingValues.length - wins - losses;
 
           // Reverse wins and losses for TOs and EJs (negative stats)
-          if (!cats[cat]) {
+          if (cat.inverse) {
             [wins, losses] = [losses, wins];
           }
 
-          totals[index][cat][0] += wins;
-          totals[index][cat][1] += losses;
-          totals[index][cat][2] += ties;
+          totals[index][cat.name][0] += wins;
+          totals[index][cat.name][1] += losses;
+          totals[index][cat.name][2] += ties;
+
+          // Calculating average of all categories
+          totals[index]['all'][0] += wins;
+          totals[index]['all'][1] += losses;
+          totals[index]['all'][2] += ties;
         }
       }
     }
@@ -86,6 +88,8 @@ function TotalsContainer(props) {
   };
 
   const aggData = calculateTotalCats(props.data, weekRange, onlyChecked);
+
+  console.log(aggData)
 
   return (
     <Container>

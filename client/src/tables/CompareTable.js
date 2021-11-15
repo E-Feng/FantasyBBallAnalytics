@@ -2,7 +2,7 @@ import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
 import { getHSLColor } from '../utils/colorsUtil';
-import { categoryDetails, determineWinner } from '../utils/categoryUtils';
+import { getCatInverse, determineWinner } from '../utils/categoryUtils';
 
 function CompareTable(props) {
   const data = props.data;
@@ -122,9 +122,7 @@ function CompareTable(props) {
                           catId
                         );
 
-                        const inverse = categoryDetails[catId].inverse
-                          ? true
-                          : false;
+                        const inverse = getCatInverse(catId);
 
                         const mean = summaryData[rowHeader].mean;
                         const stdev = summaryData[rowHeader].stdev;

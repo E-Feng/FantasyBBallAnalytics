@@ -119,6 +119,9 @@ def transform_scoreboard_to_df(scoreboard: dict):
             row['ejs'] = scores.get(consts.EJS, {}).get('score')
             row['pts'] = scores.get(consts.PTS, {}).get('score')
 
+            # Clean null values
+            row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
+
             # Appending full match details into df
             print(row)
             df = df.append(row, ignore_index = True)

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTable } from 'react-table';
-
-import {getHSLColor} from '../utils/colorsUtil';
-
 import styled from 'styled-components';
+
+import { categoryDetails } from '../utils/categoryUtils';
+import { getHSLColor } from '../utils/colorsUtil';
 
 function TotalsTable(props) {
   const showPercent = (props) => {
@@ -15,21 +15,13 @@ function TotalsTable(props) {
   const data = props.data;
   data.sort((a, b) => a.seed - b.seed);
 
-  const cats = [
-    'fgPer',
-    'ftPer',
-    'threes',
-    'rebs',
-    'asts',
-    'stls',
-    'blks',
-    'tos',
-    'ejs',
-    'pts',
-  ];
+  // Getting cats for the league
+  const cats = categoryDetails.filter((cat) => {
+    return Object.keys(data[0]).includes(cat.name);
+  });
 
-  const columns = React.useMemo(
-    () => [
+  const columns = React.useMemo(() => {
+    const teamHeaders = [
       {
         Header: 'Rank',
         accessor: 'seed',
@@ -58,79 +50,24 @@ function TotalsTable(props) {
         Header: 'L',
         accessor: 'losses',
       },
-      {
-        Header: 'FG%',
-        accessor: 'fgPer',
+    ];
+    const catHeaders = cats.map(cat => {
+      return {
+        Header: cat.display,
+        accessor: cat.name,
 
         Cell: showPercent,
-      },
-      {
-        Header: 'FT%',
-        accessor: 'ftPer',
+      }
+    });
 
-        Cell: showPercent,
-      },
-      {
-        Header: '3PM',
-        accessor: 'threes',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'REB',
-        accessor: 'rebs',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'AST',
-        accessor: 'asts',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'STL',
-        accessor: 'stls',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'BLK',
-        accessor: 'blks',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'TO',
-        accessor: 'tos',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'EJ',
-        accessor: 'ejs',
-
-        Cell: showPercent,
-      },
-      {
-        Header: 'PTS',
-        accessor: 'pts',
-
-        Cell: showPercent,
-      },
-    ],
-    []
-  );
+    return (teamHeaders.concat(catHeaders));
+    // eslint-disable-next-line
+  }, []);
 
   const tableInstance = useTable({ columns, data });
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    tableInstance;
 
   return (
     <Container>
@@ -147,10 +84,12 @@ function TotalsTable(props) {
                     const isCat = cats.includes(column.id);
                     return (
                       // Apply the header cell props
-                      <th {...column.getHeaderProps()}
-                      style={{
-                        minWidth: isCat ? '25px' : '0px'
-                      }}>
+                      <th
+                        {...column.getHeaderProps()}
+                        style={{
+                          minWidth: isCat ? '25px' : '0px',
+                        }}
+                      >
                         {
                           // Render the header
                           column.render('Header')
