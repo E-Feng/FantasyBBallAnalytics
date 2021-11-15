@@ -5,7 +5,11 @@ CREATE TABLE IF NOT EXISTS Scoreboard (
   AwayId INTEGER,
   Week INTEGER,
   Won INTEGER,
+  FgMade INTEGER,
+  FgAtt INTEGER,
   FgPer FLOAT8, 
+  FtMade INTEGER,
+  FtAtt INTEGER,
   FtPer FLOAT8,
   Threes INTEGER,
   Rebs INTEGER,
@@ -13,6 +17,11 @@ CREATE TABLE IF NOT EXISTS Scoreboard (
   Stls INTEGER,
   Blks INTEGER,
   Tos INTEGER,
+  Dqs INTEGER,
   Ejs INTEGER,
-  Pts INTEGER
+  Flags INTEGER,
+  Pfs INTEGER,
+  Techs INTEGER,
+  Pts INTEGER,
+  Fpts INTEGER
 )

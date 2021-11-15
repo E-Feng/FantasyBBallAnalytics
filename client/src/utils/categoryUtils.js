@@ -1,9 +1,34 @@
 export const categoryDetails = [
   {
+    name: 'fgMade',
+    display: 'FGM',
+    espnId: 13,
+    digits: 0,
+  },{
+    name: 'fgAtt',
+    display: 'FGA',
+    espnId: 16,
+    digits: 0,
+    inverse: true,
+  },
+  {
     name: 'fgPer',
     display: 'FG%',
     espnId: 19,
     digits: 4,
+  },
+  {
+    name: 'ftMade',
+    display: 'FTM',
+    espnId: 15,
+    digits: 0,
+  },
+  {
+    name: 'ftAtt',
+    display: 'FTA',
+    espnId: 14,
+    digits: 0,
+    inverse: true,
   },
   {
     name: 'ftPer',
@@ -15,6 +40,18 @@ export const categoryDetails = [
     name: 'threes',
     display: '3PM',
     espnId: 17,
+    digits: 0,
+  },
+  {
+    name: 'orebs',
+    display: 'OREB',
+    espnId: 4,
+    digits: 0,
+  },  
+  {
+    name: 'drebs',
+    display: 'DREB',
+    espnId: 5,
     digits: 0,
   },
   {
@@ -49,9 +86,37 @@ export const categoryDetails = [
     digits: 0,
   },
   {
+    name: 'dqs',
+    display: 'DQ',
+    espnId: 12,
+    inverse: true,
+    digits: 0,
+  },
+  {
     name: 'ejs',
     display: 'EJ',
     espnId: 7,
+    inverse: true,
+    digits: 0,
+  },
+  {
+    name: 'flags',
+    display: 'FF',
+    espnId: 8,
+    inverse: true,
+    digits: 0,
+  },
+  {
+    name: 'pfs',
+    display: 'PF',
+    espnId: 9,
+    inverse: true,
+    digits: 0,
+  },
+  {
+    name: 'techs',
+    display: 'TF',
+    espnId: 10,
     inverse: true,
     digits: 0,
   },
@@ -62,9 +127,15 @@ export const categoryDetails = [
     digits: 0,
   },
   {
+    name: 'fpts',
+    display: 'FPTS',
+    espnId: -1,
+    digits: 0,
+  },
+  {
     name: 'all',
     display: 'ALL',
-    espnId: -1,
+    espnId: -2,
     digits: 0,
   }
 ];

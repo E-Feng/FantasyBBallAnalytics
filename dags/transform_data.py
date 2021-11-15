@@ -108,16 +108,27 @@ def transform_scoreboard_to_df(scoreboard: dict):
           scores = match[side]['cumulativeScore']['scoreByStat']
 
           if scores:
+            row['fgMade'] = scores.get(consts.FG_MADE, {}).get('score')
+            row['fgAtt'] = scores.get(consts.FG_ATT, {}).get('score')
             row['fgPer'] = scores.get(consts.FG_PER, {}).get('score')
+            row['ftMade'] = scores.get(consts.FT_MADE, {}).get('score')
+            row['ftAtt'] = scores.get(consts.FT_ATT, {}).get('score')
             row['ftPer'] = scores.get(consts.FT_PER, {}).get('score')
             row['threes'] = scores.get(consts.THREES, {}).get('score')
+            row['orebs'] = scores.get(consts.OREBS, {}).get('score')
+            row['drebs'] = scores.get(consts.DREBS, {}).get('score')
             row['rebs'] = scores.get(consts.REBS, {}).get('score')
             row['asts'] = scores.get(consts.ASTS, {}).get('score')
             row['stls'] = scores.get(consts.STLS, {}).get('score')
             row['blks'] = scores.get(consts.BLKS, {}).get('score')
             row['tos'] = scores.get(consts.TOS, {}).get('score')
+            row['dqs'] = scores.get(consts.DQS, {}).get('score')
             row['ejs'] = scores.get(consts.EJS, {}).get('score')
+            row['flags'] = scores.get(consts.FLAGS, {}).get('score')
+            row['pfs'] = scores.get(consts.PFS, {}).get('score')
+            row['techs'] = scores.get(consts.TECHS, {}).get('score')
             row['pts'] = scores.get(consts.PTS, {}).get('score')
+            row['fpts'] = match[side]['totalPoints']
 
             # Clean null values
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
@@ -222,10 +233,10 @@ def transform_daily_to_df(daily_score: dict):
 
         row['fgPer'] = stats[consts.FG_PER]
         row['ftPer'] = stats[consts.FT_PER]
-        row['fgAtt'] = stats[consts.FGA]
-        row['fgMade'] = stats[consts.FGM]
-        row['ftAtt'] = stats[consts.FTA]
-        row['ftMade'] = stats[consts.FTM]
+        row['fgAtt'] = stats[consts.FG_ATT]
+        row['fgMade'] = stats[consts.FG_MADE]
+        row['ftAtt'] = stats[consts.FT_ATT]
+        row['ftMade'] = stats[consts.FT_MADE]
         row['threes'] = stats[consts.THREES]
         row['threesAtt'] = stats[consts.THREEA]
         row['rebs'] = stats[consts.REBS]
@@ -263,6 +274,10 @@ def transform_settings_to_df(settings: dict):
   row['categoryIds'] = []
   for category in data['settings']['scoringSettings']['scoringItems']:
     row['categoryIds'].append(category['statId'])
+
+  # Check if points league, fantasy points will be appended as -1
+  if data['settings']['scoringSettings']['scoringType'] == 'H2H_POINTS':
+    row['categoryIds'].append(-1)
 
   df = df.append(row, ignore_index=True)
 
