@@ -89,8 +89,6 @@ function TotalsContainer(props) {
 
   const aggData = calculateTotalCats(props.data, weekRange, onlyChecked);
 
-  console.log(aggData)
-
   return (
     <Container>
       {props.currentWeek !== 1 ? (
