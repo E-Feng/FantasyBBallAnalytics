@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import MatchupTable from '../tables/MatchupTable';
+import { categoryDetails } from '../utils/categoryUtils';
 
 
 function MatchupTablesContainer(props) {
   const data = props.data;
   const teams = props.teams;
+  const settings = props.settings[0].categoryIds;
+
+  const cats = categoryDetails.filter((o) => {
+    return settings.includes(o.espnId)
+  });
 
   // Joining team names to data
   const joinedData = data.map(row => {
@@ -83,6 +89,7 @@ function MatchupTablesContainer(props) {
           return (
             <MatchupTable
               key={displayRow.week + displayRow.teamId}
+              cats={cats}
               home={displayRow}
               away={joinedData.filter(
                 (row) =>

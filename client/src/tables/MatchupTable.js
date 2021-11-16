@@ -7,10 +7,7 @@ import { categoryDetails } from '../utils/categoryUtils';
 
 function MatchupTable(props) {
   const data = [].concat([props.home], props.away);
-
-  const cats = categoryDetails.filter((cat) => {
-    return Object.keys(data[0]).includes(cat.name);
-  });
+  const cats = props.cats;
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
