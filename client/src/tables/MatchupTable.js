@@ -114,10 +114,11 @@ function MatchupTable(props) {
                         const isTied = props.home[catId] === cell.value;
                         let isGreater = props.home[catId] > cell.value;
 
-                        if (
-                          cell.column.id === 'tos' ||
-                          cell.column.id === 'ejs'
-                        ) {
+                        // Checking inverse categories and flipping
+                        const catDetail = categoryDetails.filter(
+                          (o) => o.name === cell.column.id
+                        )[0]
+                        if (catDetail && catDetail.inverse) {
                           isGreater = !isGreater;
                         }
 

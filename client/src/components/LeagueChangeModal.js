@@ -8,7 +8,7 @@ import { requestLeagueId } from '../utils/webAPI';
 function LeagueChangeModal(props) {
   const { register, handleSubmit, errors, formState } = useForm();
   const [responseMsg, setResponseMsg] = useState('');
-  
+
   const responseColor = responseMsg.includes('requested') ? 'green' : 'red';
 
   const closeModal = () => {
@@ -47,7 +47,7 @@ function LeagueChangeModal(props) {
     <>
       <Modal>
         <Header>Change/Request League Id</Header>
-        <h4>ESPN Public Only</h4>
+        <h4>ESPN Public Only*</h4>
         <Text>{description}</Text>
         <URLExample>
           https://fantasy.espn.com/basketball/league?leagueId=

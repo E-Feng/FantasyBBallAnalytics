@@ -11,6 +11,7 @@ function CompareContainer(props) {
 
   const teams = props.teams;
   const scoreboardData = props.data;
+  const catSettings = props.settings[0].categoryIds;
   const currentWeek = props.currentWeek;
 
   const data = [];
@@ -21,18 +22,10 @@ function CompareContainer(props) {
     selectedTeams.includes(row.teamId.toString())
   );
 
-  const cats = [
-    { name: 'fgPer', display: 'FG%', digits: 4 },
-    { name: 'ftPer', display: 'FT%', digits: 4 },
-    { name: 'threes', display: '3PM' },
-    { name: 'rebs', display: 'REB' },
-    { name: 'asts', display: 'AST' },
-    { name: 'stls', display: 'STL' },
-    { name: 'blks', display: 'BLK' },
-    { name: 'tos', display: 'TO' },
-    { name: 'ejs', display: 'EJ' },
-    { name: 'pts', display: 'PTS' },
-  ];
+  // Filtering out the categories
+  const cats = catUtils.categoryDetails.filter(o => {
+    return catSettings.includes(o.espnId)
+  })
 
   // Calculating comparison table and summary table
   if (!selectedTeams.includes('')) {

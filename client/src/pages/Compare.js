@@ -21,6 +21,7 @@ function Compare(props) {
 
   const scoreboardData = isLoading ? null : data.scoreboard;
   const teamData = isLoading ? null : data.teams;
+  const settingsData = isLoading ? null : data.settings;
 
   let currentWeek = 1;
   if (!isLoading) {
@@ -41,6 +42,7 @@ function Compare(props) {
           <CompareContainer
             teams={teamData}
             data={scoreboardData}
+            settings={settingsData}
             currentWeek={currentWeek}
           />
         </Container>
