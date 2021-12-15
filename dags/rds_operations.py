@@ -73,6 +73,10 @@ def insert_data_into_rds_tables(i: int, endpoint: str, data: str):
 
   data = json.loads(data)
 
+  # Return if there is no data
+  if not data:
+    return
+
   # Only append league info for leagues, not common data
   if i >= 0:
     leagues_xcom = Variable.get('league_ids', deserialize_json=True)

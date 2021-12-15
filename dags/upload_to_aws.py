@@ -14,7 +14,7 @@ AWS_DDB_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/data'
 @task
 def upload_league_data_to_dynamo(data: dict):
   """
-  Post process the league data and uploads to dynamodb
+  Post process the league data and upload to dynamodb
   """
   for key in data.keys():
     value = data[key]

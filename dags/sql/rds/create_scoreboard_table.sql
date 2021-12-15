@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS Scoreboard (
   FtAtt INTEGER,
   FtPer FLOAT8,
   Threes INTEGER,
+  DRebs INTEGER,
+  ORebs INTEGER,
   Rebs INTEGER,
   Asts INTEGER,
   Stls INTEGER,

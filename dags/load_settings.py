@@ -22,7 +22,9 @@ def get_league_id_list():
     """
     SELECT LeagueId, LeagueYear, LastYear, CookieEspnS2, CookieSwid 
     FROM leagues
-    WHERE Active
+    WHERE Active AND LeagueYear='2022' AND
+      ((NOW() - LastViewed < INTERVAL '7 day') OR
+        (NOW() - LastUpdated > INTERVAL '7 day'))
     """
   )
 

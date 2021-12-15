@@ -255,8 +255,9 @@ def transform_daily_to_df(daily_score: dict):
         df = df.append(row, ignore_index=True)
 
   # Sort by gamescore, then points      
-  df = df.sort_values(by=['gs', 'pts'], ascending=False)
-  print('\n' + df.to_string())
+  if not df.empty:
+    df = df.sort_values(by=['gs', 'pts'], ascending=False)
+    print('\n' + df.to_string())
 
   return df
 

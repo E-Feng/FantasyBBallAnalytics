@@ -4,9 +4,7 @@ import pendulum
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.decorators import task
 from airflow.utils.task_group import TaskGroup
-from airflow.utils.db import provide_session
 from airflow.models import Variable
 
 from load_settings import (
@@ -21,9 +19,7 @@ from rds_operations import (
 )
 from bigquery_operations import (
   create_tables,
-  check_table_exists,
-  transfer_gcs_to_bigquery_table,
-  join_draft_and_ratings
+  check_table_exists
 )
 from extract_espn import (
   extract_from_espn_api
@@ -36,8 +32,7 @@ from upload_to_aws import (
   upload_league_data_to_dynamo
 )
 from upload_to_cloud import (
-  upload_to_firebase, 
-  upload_to_gcs
+  upload_to_firebase
 )
 
 
@@ -91,7 +86,7 @@ with DAG(
       with TaskGroup(group_id=f'common_endpoint_{endpoint}') as common_etl:
         header = {'x-fantasy-filter': common_headers[endpoint]}
 
-        raw_data = extract_from_espn_api(0, common_endpoints[endpoint], header)
+        raw_data = extract_from_espn_api(-1, common_endpoints[endpoint], header)
         df = transform_raw_to_df(endpoint, raw_data)
         insert_data_into_rds_tables(-1, endpoint, df)
 
@@ -190,9 +185,3 @@ with DAG(
     check_table_draft_exists,
     check_table_ratings_exists
   ]
-
-  # Daily Score ETL
-  #daily_score_raw = extract_daily_score_info()
-  #daily_score_df = transform_daily_score_to_df(daily_score_raw)
-  #daily_alert = calculate_and_upload_daily_alert(daily_score_df, team_info_df)
-
