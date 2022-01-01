@@ -58,9 +58,11 @@ def transform_team_to_df(team_info: dict):
 
     row['fullTeamName'] = team['location'] + ' ' + team['nickname']
 
-    # Getting first and last name from 'members' key
+    # Getting first and last name from teams key
+    row['firstName'] = 'Unowned'
+    row['lastName'] = 'Unowned'
     for member in data['members']:
-      if member['id'] == team['primaryOwner']:
+      if member['id'] == team.get('primaryOwner'):
         row['firstName'] = member['firstName']
         row['lastName'] = member['lastName']
 
