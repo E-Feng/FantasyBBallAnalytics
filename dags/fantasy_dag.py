@@ -41,7 +41,7 @@ local_tz = pendulum.timezone('US/Eastern')
 default_args = {
   'owner': 'Airflow',
   'start_date': datetime(2021, 1, 1, tzinfo=local_tz),
-  'end_date': None,
+  'end_date': datetime(2022, 4, 11, tzinfo=local_tz),
   'retries': 1,
   'retry_delay': timedelta(seconds=3),
 }
