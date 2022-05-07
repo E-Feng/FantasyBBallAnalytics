@@ -2,20 +2,21 @@ import os
 import requests
 import json
 
-from airflow.decorators import task
-from airflow.models import Variable
-
 
 # Initializing parameters
 base_url = 'https://fantasy.espn.com/apis/v3/games/fba/seasons/{}/segments/0/leagues/{}'
 
 
-@task
-def extract_from_espn_api(league_index: int, view: list, header: dict = {}):
+def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
   """
-  Extracts all data from ESPN API
+  Extracts data from ESPN API endpoint with specific view and any headers
   """
-  league_ids = Variable.get("league_ids", deserialize_json=True)
+  #league_ids = Variable.get("league_ids", deserialize_json=True)
+
+  league_id = league_info.get('leagueId', None)
+  league_year = league_info.get('leagueYear', None)
+
+
 
   # Separating common data with league specific
   if league_index == -1:
