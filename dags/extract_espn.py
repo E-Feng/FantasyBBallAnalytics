@@ -16,26 +16,14 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
   league_id = league_info.get('leagueId', None)
   league_year = league_info.get('leagueYear', None)
 
+  if league_id is None or league_year is None:
+    raise ValueError(f"No league id or year provided")  
 
-
-
-  # Separating common data with league specific
-  if league_index == -1:
-    default_league_id = '48375511'
-
-    if default_league_id in league_ids['leagueId']:
-      league_index = league_ids['leagueId'].index(default_league_id)
-    else:
-      league_index = 0
-
-  league_id = league_ids['leagueId'][league_index]
-  league_year = league_ids['leagueYear'][league_index]
-  cookie_espn = league_ids['cookieEspnS2'][league_index]
-  cookie_swid = league_ids['cookieSwid'][league_index]
-
+  cookie_espn = league_info.get('cookieEspnS2', None)
+  cookie_swid = league_info.get('cookieSwid', None)
 
   cookies = {}
-  if not cookie_espn is None:
+  if cookie_espn is not None or cookie_swid is not None:
     cookies = {"espn_s2": cookie_espn, "swid": cookie_swid}
 
   league_url = base_url.format(league_year, league_id)
