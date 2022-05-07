@@ -18,6 +18,7 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
 
 
 
+
   # Separating common data with league specific
   if league_index == -1:
     default_league_id = '48375511'
