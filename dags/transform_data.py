@@ -2,13 +2,10 @@ import json
 import math
 import pandas as pd
 
-from airflow.decorators import task
-
 import consts
 from util import calculate_gamescore
 
 
-@task
 def transform_raw_to_df(endpoint: list, raw_data: dict):
   """
   Index function for all endpoint transformations
