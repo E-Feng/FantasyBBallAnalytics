@@ -41,7 +41,7 @@ def lambda_handler(event, context):
 
     for endpoint in api_endpoints.keys():
       view = api_endpoints[endpoint]
-      header = headers.get(endpoint, {})
+      header = {'x-fantasy-filter': headers.get(endpoint, {})}
 
       data_endpoint = extract_from_espn_api(league_info, view, header)
       df_endpoint = transform_raw_to_df(endpoint, data_endpoint)
