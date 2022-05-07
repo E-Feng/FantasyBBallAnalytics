@@ -1,0 +1,34 @@
+
+name: Deploy Lambda Function #Name of the Workflow
+
+on:  #Name of the GitHub event that triggers the workflow
+  push:   #On Push Event We need to take action
+    branches:  #Now we need to specify the branch name
+    - lambda-integration   
+
+jobs:  #Workflow run is made up of one or more jobs
+  deploy_lambda:
+    runs-on: ubuntu-latest  #Through which Server OS we need to Work (type of machine to run the job on)
+    steps:
+    #Using versioned actions 
+      - uses: actions/checkout@v2  # --> Reference a specific version
+      - uses: actions/setup-node@v2 # --> To Setup the Server With Node Env
+        with:  
+          node-version: '14' #--> Specify the Version of the Node 
+      - name: Configure AWS Credentials  
+        uses: aws-actions/configure-aws-credentials@v1 #--> Setup the Credential for the AWS cli
+        with:
+        # Created the Secrets Under the Repo only with These Variables
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1 #--> Define Region of the AWS-CLI 
+      - name: npm install
+        env:
+          CI: true
+        run: |
+          npm ci 
+      - name: deploy
+        run: |
+          zip -j deploy.zip ./* #--> Zip the Code As we know lambda function accept the zip file.
+          aws lambda update-function-code --function-name=requestLeagueAnalysis --zip-file=fileb://deploy.zip 
+# At last the AWS CLI command to Update the Zip file with existing One (With Correct Function Name)
