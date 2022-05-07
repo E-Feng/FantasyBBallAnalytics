@@ -24,7 +24,9 @@ def get_league_id_list():
     FROM leagues
     WHERE Active AND LeagueYear='2022' AND
       ((NOW() - LastViewed < INTERVAL '7 day') OR
-        (NOW() - LastUpdated > INTERVAL '7 day'))
+        (NOW() - LastUpdated > INTERVAL '7 day') OR
+	      LastUpdated IS NULL
+      )
     """
   )
 
