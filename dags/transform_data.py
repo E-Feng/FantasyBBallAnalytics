@@ -64,7 +64,7 @@ def transform_team_to_df(team_info: dict):
         row['lastName'] = member['lastName']
 
     #print(row)
-    df = df.append(row, ignore_index=True)
+    df = pd.concat([df, row])
   
   print(df.to_string())
 
@@ -134,7 +134,7 @@ def transform_scoreboard_to_df(scoreboard: dict):
 
             # Appending full match details into df
             print(row)
-            df = df.append(row, ignore_index = True)
+            df = pd.concat([df, row])
 
     # Adjusting id/week for byes
     elif (sides[0] in match) & (sides[1] not in match):
@@ -164,7 +164,7 @@ def transform_draft_to_df(draft_info: dict):
     row['playerId'] = str(pick['playerId'])
 
     #print(row)
-    df = df.append(row, ignore_index=True)
+    df = pd.concat([df, row])
   
   print(df.to_string())
 
@@ -201,7 +201,7 @@ def transform_ratings_to_df(ratings: dict):
       row['ratingNoEjsSeason'] = rating
 
     #print(row)
-    df = df.append(row, ignore_index=True)
+    df = pd.concat([df, row])
   
   print(df.to_string())
 
@@ -251,7 +251,7 @@ def transform_daily_to_df(daily_score: dict):
 
         #print(row['name'], row['gs'])
 
-        df = df.append(row, ignore_index=True)
+        df = pd.concat([df, row])
 
   # Sort by gamescore, then points      
   if not df.empty:
@@ -279,7 +279,7 @@ def transform_settings_to_df(settings: dict):
   if data['settings']['scoringSettings']['scoringType'] == 'H2H_POINTS':
     row['categoryIds'].append(-1)
 
-  df = df.append(row, ignore_index=True)
+  df = pd.concat([df, row])
 
   print(df.to_string())
 
