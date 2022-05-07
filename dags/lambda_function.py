@@ -37,7 +37,7 @@ def lambda_handler(event, context):
   }
 
   year_check_failures = 0
-  while year_check_failures < 0:
+  while year_check_failures < 3:
     league_info['league_year'] = str(league_year_start)
 
     year_check_data = extract_from_espn_api(league_info, [''])
