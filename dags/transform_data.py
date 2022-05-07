@@ -136,7 +136,6 @@ def transform_scoreboard_to_df(scoreboard: dict):
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
 
             # Appending full match details into df
-            print(row)
             data_array.append(row)
 
     # Adjusting id/week for byes
