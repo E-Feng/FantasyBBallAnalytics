@@ -40,10 +40,13 @@ def lambda_handler(event, context):
   while year_check_failures < 3:
     league_info['league_year'] = str(league_year_start)
 
-    year_check_data = extract_from_espn_api(league_info, [''])
-
-    print(type(year_check_data))
-    print(year_check_data)
+    try:
+      year_check_data = extract_from_espn_api(league_info, [''])
+    except:
+      year_check_failures += 1
+    else:
+      print(type(year_check_data))
+      print(year_check_data)
 
   while False:
     print(f"Starting data extraction for {league_year_start}...")
