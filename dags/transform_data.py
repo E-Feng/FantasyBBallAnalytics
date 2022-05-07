@@ -39,7 +39,7 @@ def transform_team_to_df(team_info: dict):
 
   data = team_info
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all teams
   for team in data['teams']:
@@ -64,8 +64,9 @@ def transform_team_to_df(team_info: dict):
         row['lastName'] = member['lastName']
 
     #print(row)
-    df = pd.concat([df, row])
+    data_array.append(row)
   
+  df = pd.DataFrame.from_records(data_array)
   print(df.to_string())
 
   return df
@@ -82,7 +83,7 @@ def transform_scoreboard_to_df(scoreboard: dict):
 
   num_byes = 0
 
-  df = pd.DataFrame()
+  data_array = []
 
   sides = ('home', 'away')
 
@@ -134,12 +135,13 @@ def transform_scoreboard_to_df(scoreboard: dict):
 
             # Appending full match details into df
             print(row)
-            df = pd.concat([df, row])
+            data_array.append(row)
 
     # Adjusting id/week for byes
     elif (sides[0] in match) & (sides[1] not in match):
       num_byes += 0.5
 
+  df = pd.DataFrame.from_records(data_array)
   print(df.to_string())
 
   return df
@@ -152,7 +154,7 @@ def transform_draft_to_df(draft_info: dict):
 
   data = draft_info
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all teams
   for pick in data['draftDetail']['picks']:
@@ -164,8 +166,9 @@ def transform_draft_to_df(draft_info: dict):
     row['playerId'] = str(pick['playerId'])
 
     #print(row)
-    df = pd.concat([df, row])
-  
+    data_array.append(row)
+
+  df = pd.DataFrame.from_records(data_array)  
   print(df.to_string())
 
   return df
@@ -178,7 +181,7 @@ def transform_ratings_to_df(ratings: dict):
 
   data = ratings  
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all players
   for player in data['players']:
@@ -201,8 +204,9 @@ def transform_ratings_to_df(ratings: dict):
       row['ratingNoEjsSeason'] = rating
 
     #print(row)
-    df = pd.concat([df, row])
-  
+    data_array.append(row)
+
+  df = pd.DataFrame.from_records(data_array)  
   print(df.to_string())
 
   return df
@@ -215,7 +219,7 @@ def transform_daily_to_df(daily_score: dict):
 
   data = daily_score
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all teams
   for player in data['players']:
@@ -251,7 +255,9 @@ def transform_daily_to_df(daily_score: dict):
 
         #print(row['name'], row['gs'])
 
-        df = pd.concat([df, row])
+        data_array.append(row)
+
+  df = pd.DataFrame.from_records(data_array)
 
   # Sort by gamescore, then points      
   if not df.empty:
@@ -267,7 +273,7 @@ def transform_settings_to_df(settings: dict):
   """
   data = settings
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all category ids
   row = {}
@@ -279,8 +285,9 @@ def transform_settings_to_df(settings: dict):
   if data['settings']['scoringSettings']['scoringType'] == 'H2H_POINTS':
     row['categoryIds'].append(-1)
 
-  df = pd.concat([df, row])
+  data_array.append(row)
 
+  df = pd.DataFrame.from_records(data_array)
   print(df.to_string())
 
   return df
