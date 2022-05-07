@@ -45,15 +45,20 @@ def lambda_handler(event, context):
     except:
       year_check_failures += 1
     else:
+      league_years.append(league_year_start)
       print(type(year_check_data))
       print(year_check_data)
+    finally:
+      league_year_start = league_year_start - 1
 
-  while False:
-    print(f"Starting data extraction for {league_year_start}...")
+  print("Active years ", league_years)
+
+  for league_year in league_years:
+    print(f"Starting data extraction for {league_year}...")
+
+    league_info['league_year'] = league_year
 
     league_data = []
-
-    league_years.append(league_year_start)
 
     for endpoint in api_endpoints.keys():
       view = api_endpoints[endpoint]
@@ -64,5 +69,3 @@ def lambda_handler(event, context):
 
       data_endpoint = extract_from_espn_api(league_info, view, header)
       df_endpoint = transform_raw_to_df(endpoint, data_endpoint)
-
-    fetch_data = False
