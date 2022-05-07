@@ -30,6 +30,8 @@ def lambda_handler(event, context):
   fetch_data = True
 
   while fetch_data:
+    print(f"Starting data extraction for {league_year_start}...")
+    
     league_years.append(league_year_start)
 
     league_info = {
@@ -48,3 +50,5 @@ def lambda_handler(event, context):
 
       data_endpoint = extract_from_espn_api(league_info, view, header)
       df_endpoint = transform_raw_to_df(endpoint, data_endpoint)
+
+    fetch_data = False
