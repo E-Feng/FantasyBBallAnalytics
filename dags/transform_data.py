@@ -68,8 +68,8 @@ def transform_team_to_df(team_info: dict):
   
   df = pd.DataFrame.from_records(data_array)
 
-  print(df.head(2))
-  print(df.tail(2))
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -144,8 +144,8 @@ def transform_scoreboard_to_df(scoreboard: dict):
 
   df = pd.DataFrame.from_records(data_array)
 
-  print(df.head(2))
-  print(df.tail(2))
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -173,8 +173,8 @@ def transform_draft_to_df(draft_info: dict):
 
   df = pd.DataFrame.from_records(data_array)  
 
-  print(df.head(2))
-  print(df.tail(2))
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -213,8 +213,8 @@ def transform_ratings_to_df(ratings: dict):
 
   df = pd.DataFrame.from_records(data_array)  
 
-  print(df.head(2))
-  print(df.tail(2))
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -270,8 +270,8 @@ def transform_daily_to_df(daily_score: dict):
   if not df.empty:
     df = df.sort_values(by=['gs', 'pts'], ascending=False)
 
-    print(df.head(2))
-    print(df.tail(2))
+    #print(df.head(2))
+    #print(df.tail(2))
 
   return df
 
@@ -298,7 +298,7 @@ def transform_settings_to_df(settings: dict):
 
   df = pd.DataFrame.from_records(data_array)
 
-  print(df.head(2))
-  print(df.tail(2))
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
