@@ -73,6 +73,8 @@ def lambda_handler(event, context):
       data_endpoint = extract_from_espn_api(league_info, view, header)
       league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
 
+    print(league_data)
+    print(league_data['settings'])
     has_ejections_cat = int(consts.EJS) in league_data['settings'].iloc[0]['categoryIds']
     print("has ejections ", has_ejections_cat)
 
