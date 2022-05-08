@@ -14,7 +14,7 @@ api_endpoints = {
   'settings': ['mSettings'],
   'teams': ['mTeam'],
   'scoreboard': ['mScoreboard'], 
-  'draft_recap': ['mDraftDetail'],
+  'draftRecap': ['mDraftDetail'],
   'ratings': ['kona_player_info', 'mStatRatings']
 }
 
@@ -31,15 +31,15 @@ def lambda_handler(event, context):
   league_year_start = datetime.now().year + 1
 
   league_info = {
-    "league_id": league_id,
-    "league_year": str(league_year_start),
-    "cookie_espn": cookie_espn,
-    "cookie_swid": cookie_swid 
+    "leagueId": league_id,
+    "leagueYear": str(league_year_start),
+    "cookieEspn": cookie_espn,
+    "cookieSwid": cookie_swid 
   }
 
   year_check_failures = 0
   while year_check_failures < 3:
-    league_info['league_year'] = str(league_year_start)
+    league_info['leagueYear'] = str(league_year_start)
 
     try:
       extract_from_espn_api(league_info, [''])
@@ -55,9 +55,13 @@ def lambda_handler(event, context):
   for league_year in league_years:
     print(f"Starting data extraction for {league_year}...")
 
-    league_info['league_year'] = league_year
+    league_info['leagueYear'] = league_year
 
-    league_data = []
+    league_data = {
+      'leagueId': league_id,
+      'leagueYear': league_year,
+      'allYears': league_years
+    }
 
     for endpoint in api_endpoints.keys():
       view = api_endpoints[endpoint]
@@ -72,5 +76,5 @@ def lambda_handler(event, context):
   has_ejections_cat = int(consts.EJS) in league_data['settings']['categoryIds']
   print("has ejections ", has_ejections_cat)
 
-  full_draft_recap = pd.merge(league_data['draft_recap'], league_data['ratings'], how='left', on='playerId')
+  full_draft_recap = pd.merge(league_data['draftRecap'], league_data['ratings'], how='left', on='playerId')
 

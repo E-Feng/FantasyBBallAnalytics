@@ -13,14 +13,14 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
   """
   #league_ids = Variable.get("league_ids", deserialize_json=True)
 
-  league_id = league_info.get('league_id', None)
-  league_year = league_info.get('league_year', None)
+  league_id = league_info.get('leagueId', None)
+  league_year = league_info.get('leagueYear', None)
 
   if league_id is None or league_year is None:
     raise ValueError(f"No league id or year provided")  
 
-  cookie_espn = league_info.get('cookie_espn', None)
-  cookie_swid = league_info.get('cookie_swid', None)
+  cookie_espn = league_info.get('cookieEspn', None)
+  cookie_swid = league_info.get('cookieSwid', None)
 
   cookies = {}
   if cookie_espn is not None or cookie_swid is not None:
