@@ -300,5 +300,6 @@ def transform_settings_to_df(settings: dict):
 
   #print(df.head(2))
   #print(df.tail(2))
+  print(type(df))
 
   return df
