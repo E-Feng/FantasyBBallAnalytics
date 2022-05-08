@@ -73,7 +73,7 @@ def lambda_handler(event, context):
       data_endpoint = extract_from_espn_api(league_info, view, header)
       league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
 
-    has_ejections_cat = int(consts.EJS) in league_data['settings']['categoryIds']
+    has_ejections_cat = int(consts.EJS) in league_data['settings'].iloc[0]['categoryIds']
     print("has ejections ", has_ejections_cat)
 
     full_draft_recap = pd.merge(league_data['draftRecap'], league_data['ratings'], how='left', on='playerId')
