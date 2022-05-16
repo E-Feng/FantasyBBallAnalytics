@@ -8,6 +8,9 @@ from extract_espn import (
 from transform_data import (
   transform_raw_to_df
 )
+from upload_to_aws import (
+  upload_league_data_to_dynamo
+)
 
 
 api_endpoints = {
@@ -50,7 +53,6 @@ def lambda_handler(event, context):
     finally:
       league_year_start = league_year_start - 1
 
-  print("Active years ", league_years)
 
   for league_year in league_years:
     print(f"Starting data extraction for {league_year}...")
@@ -71,13 +73,36 @@ def lambda_handler(event, context):
         header = {'x-fantasy-filter': headers.get(endpoint)}
 
       data_endpoint = extract_from_espn_api(league_info, view, header)
-      print(type(transform_raw_to_df(endpoint, data_endpoint)))
       league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
 
-    print(league_data)
-    print(league_data['settings'])
+    # Merging draft recap with ratings
     has_ejections_cat = int(consts.EJS) in league_data['settings'].iloc[0]['categoryIds']
-    print("has ejections ", has_ejections_cat)
+    columns = ['pickNumber', 'round', 'playerName', 'teamId', 'ratingSeason', 'rankingSeason']
+    if has_ejections_cat:
+      columns.append('ratingEjsSeason')
+      columns.append('rankingEjsSeason')
 
     full_draft_recap = pd.merge(league_data['draftRecap'], league_data['ratings'], how='left', on='playerId')
 
+    league_data['draftRecap'] = full_draft_recap[columns]
+
+    league_data.pop('ratings', None)
+
+    # Data serialization and upload data to dynamo
+    for key in league_data.keys():
+      if isinstance(league_data[key], pd.DataFrame):
+        league_data[key] = league_data[key].to_json(orient='records')
+    upload_league_data_to_dynamo(league_data)
+
+
+""" 
+event = {
+  "queryStringParameters": {
+    "leagueId": '48375511',
+    "cookieEspnS2": "AEANBh%2BD2CyE%2BH%2FBEYL2sJ%2B4nV9%2FOklCUoyYPiegbqwlFqzfE%2BnViiqW87jner2OdiFYVXKnHjjaSSx%2FJDbZWgyrFSCnaU8AxPJtsGXuMpDzFZw7B8YgcpTmCkSasag97Sd%2Fl1r6igCZh%2F1YyquO0H%2FyMVIXq8%2FUAarrXIFzeSx%2BBiB0ywQn6Iz6Smkiv63RWoJeNrzojIXfuoTbFw%2BVzXSnF6TH5MF4X7ooRKw%2FImPagScBbqIMjrq0EfPf6%2Bcm9XE%3D",
+    "cookieSwid": "A746C402-08B1-42F4-86C4-0208B142F42A"
+  }
+}
+context = None
+lambda_handler(event, context) 
+"""

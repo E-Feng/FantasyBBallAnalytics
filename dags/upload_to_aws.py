@@ -3,16 +3,11 @@ import requests
 from random import randint
 from time import sleep
 
-from airflow.decorators import task
-from airflow.exceptions import AirflowException
-
-
 
 AWS_DDB_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/data'
 AWS_SQS_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/sqs'
 
 
-@task
 def upload_league_data_to_dynamo(data: dict):
   """
   Post process the league data and upload to dynamodb
@@ -34,5 +29,5 @@ def upload_league_data_to_dynamo(data: dict):
   #r = requests.put(AWS_DDB_URL, data=payload, headers=headers)
 
   if r.status_code == 500:
-    raise AirflowException("Error uploading to dynamodb")
+    raise ValueError("Error uploading to dynamodb")
   return

@@ -26,10 +26,7 @@ def transform_raw_to_df(endpoint: list, raw_data: dict):
   else:
     df = pd.DataFrame()
 
-  # Convert to json and push to xcom for next task
-  json = df.to_json(orient='records')
-
-  return json
+  return df
 
 
 def transform_team_to_df(team_info: dict):
@@ -197,8 +194,8 @@ def transform_ratings_to_df(ratings: dict):
 
     # Check if ratings exist for player
     if 'ratings' in player:
-      row['ratingSeason'] = player['ratings']['0']['totalRating']
-      row['rankingSeason'] = player['ratings']['0']['totalRanking']
+      row['ratingEjsSeason'] = player['ratings']['0']['totalRating']
+      row['rankingEjsSeason'] = player['ratings']['0']['totalRanking']
 
       # Calculating rating without ejections
       rating = 0
@@ -206,13 +203,17 @@ def transform_ratings_to_df(ratings: dict):
         if stat['forStat'] != int(consts.EJS):
           rating = rating + stat['rating']
 
-      row['ratingNoEjsSeason'] = rating
+      row['ratingSeason'] = rating
 
     #print(row)
     data_array.append(row)
 
-  df = pd.DataFrame.from_records(data_array)  
 
+  df = pd.DataFrame.from_records(data_array) 
+
+  # Creating rank column for derived ratings column
+  df['rankingSeason'] = df['ratingSeason'].rank(method='min', na_option='top', ascending=False)
+ 
   #print(df.head(2))
   #print(df.tail(2))
 
@@ -300,6 +301,5 @@ def transform_settings_to_df(settings: dict):
 
   #print(df.head(2))
   #print(df.tail(2))
-  print(type(df))
 
   return df

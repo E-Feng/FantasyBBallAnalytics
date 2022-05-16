@@ -161,3 +161,9 @@ export const determineWinner = (a, b, cat) => {
 
   return isWinner;
 };
+
+export const checkLeagueHasEjections = (categoryIds) => {
+  const ejectionId = categoryDetails.filter(o => o.name === 'ejs')[0].espnId;
+
+  return categoryIds.includes(ejectionId)
+}

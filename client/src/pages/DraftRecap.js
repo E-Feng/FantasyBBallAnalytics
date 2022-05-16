@@ -15,13 +15,14 @@ function DraftRecap(props) {
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = (data !== undefined);
+  const isDataLoaded = data !== undefined;
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
 
   const draftData = isLoading ? null : data.draftRecap;
   const teamData = isLoading ? null : data.teams;
+  const settingsData = isLoading ? null : data.settings;
 
   const draftRecapInfo = `This table shows a recap of the draft with the end of
     season stats rating and overall ranking. The pick number to ranking difference 
@@ -37,7 +38,11 @@ function DraftRecap(props) {
       ) : (
         <Container>
           <TooltipHeader title='Draft Recap' info={draftRecapInfo} />
-          <DraftRecapContainer data={draftData} teams={teamData} />
+          <DraftRecapContainer
+            data={draftData}
+            teams={teamData}
+            settings={settingsData}
+          />
         </Container>
       )}
     </Layout>
