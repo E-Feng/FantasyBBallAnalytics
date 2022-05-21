@@ -98,7 +98,8 @@ def lambda_handler(event, context):
   print("Complete...")
 
   return {
-    'statusCode': 200
+    'statusCode': 200,
+    'body': "Test response"
   }
 
 """ 

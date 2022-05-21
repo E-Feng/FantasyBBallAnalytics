@@ -16,8 +16,9 @@ function LeagueChangeModal(props) {
   };
 
   const onSubmit = async (data) => {
-    const newLeagueId = data.leagueId;
+    setResponseMsg('Obtaining league data...')
 
+    const newLeagueId = data.leagueId;
     const reqPayload = {
       leagueId: newLeagueId,
       cookieEspnS2: '',
@@ -38,9 +39,11 @@ function LeagueChangeModal(props) {
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg('League is private, please contact for more information.');
         break;
-      default:
-        setResponseMsg('Error requesting league id, not found or deleted.');
+      case 'GENERAL_NOT_FOUND':
+        setResponseMsg('League id not found or deleted.');
         break;
+      default:
+        setResponseMsg('Error obtaining league information.')
     }
   };
 
