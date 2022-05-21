@@ -23,7 +23,7 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
   cookie_swid = league_info.get('cookieSwid', None)
 
   cookies = {}
-  if cookie_espn is not None or cookie_swid is not None:
+  if cookie_espn or cookie_swid:
     cookies = {"espn_s2": cookie_espn, "swid": cookie_swid}
 
   league_url = base_url.format(league_year, league_id)

@@ -18,7 +18,13 @@ function LeagueChangeModal(props) {
   const onSubmit = async (data) => {
     const newLeagueId = data.leagueId;
 
-    const leagueStatus = await requestLeagueId(newLeagueId);
+    const reqPayload = {
+      leagueId: newLeagueId,
+      cookieEspnS2: '',
+      cookieSwid: ''
+    }
+
+    const leagueStatus = await requestLeagueId(reqPayload);
     console.log(leagueStatus);
     switch (leagueStatus) {
       case 'ACTIVE':

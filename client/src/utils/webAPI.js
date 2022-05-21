@@ -38,9 +38,8 @@ export const fetchDynamo = async ({ queryKey }) => {
   return data;
 };
 
-export const requestLeagueId = async (leagueId) => {
-  const fullURL =
-    awsURL + 'leagues?' + new URLSearchParams({ leagueId: leagueId });
+export const requestLeagueId = async (payload) => {
+  const fullURL = awsURL + 'leagues?' + new URLSearchParams(payload);
 
   const res = await fetch(fullURL, {
     method: 'GET',

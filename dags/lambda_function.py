@@ -9,7 +9,7 @@ from transform_data import (
   transform_raw_to_df
 )
 from upload_to_aws import (
-  upload_league_data_to_dynamo
+  upload_league_data_to_dynamo_via_sqs
 )
 
 
@@ -41,7 +41,8 @@ def lambda_handler(event, context):
   }
 
   year_check_failures = 0
-  while year_check_failures < 3:
+  max_check_failures = 4
+  while year_check_failures < max_check_failures:
     league_info['leagueYear'] = str(league_year_start)
 
     try:
@@ -92,8 +93,13 @@ def lambda_handler(event, context):
     for key in league_data.keys():
       if isinstance(league_data[key], pd.DataFrame):
         league_data[key] = league_data[key].to_json(orient='records')
-    upload_league_data_to_dynamo(league_data)
+    upload_league_data_to_dynamo_via_sqs(league_data)
 
+  print("Complete...")
+
+  return {
+    'statusCode': 200
+  }
 
 """ 
 event = {
