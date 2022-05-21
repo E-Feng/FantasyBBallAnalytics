@@ -21,7 +21,6 @@ def upload_league_data_to_dynamo_via_sqs(data: dict):
   payload = json.dumps(data)
 
   # Write to SQS first prior to dynamodb to prevent throttling, with some delay
-  sleep(random.uniform(0, 1))
   r = requests.put(AWS_SQS_URL, data=payload, headers=headers)
 
   # Random sleep (seconds) to prevent dynamodb write throttling
