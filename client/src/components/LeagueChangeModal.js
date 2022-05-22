@@ -9,14 +9,19 @@ function LeagueChangeModal(props) {
   const { register, handleSubmit, errors, formState } = useForm();
   const [responseMsg, setResponseMsg] = useState('');
 
-  const responseColor = responseMsg.includes('requested') ? 'green' : 'red';
+  const requestingMsg = 'Obtaining league data...'
 
-  const closeModal = () => {
-    props.setShow(false);
+  const responseColor = responseMsg === requestingMsg ? 'yelloww' : 'red';
+
+  const closeModal = (e) => {
+    const isClosedFromButton = e.target instanceof HTMLButtonElement;
+    if (isClosedFromButton || responseMsg !== requestingMsg) {
+      props.setShow(false);
+    }
   };
 
   const onSubmit = async (data) => {
-    setResponseMsg('Obtaining league data...')
+    setResponseMsg(requestingMsg)
 
     const newLeagueId = data.leagueId;
     const reqPayload = {
@@ -30,8 +35,8 @@ function LeagueChangeModal(props) {
     switch (leagueStatus) {
       case 'ACTIVE':
         localStorage.setItem('leagueId', newLeagueId);
+        props.setShow(false)
         props.setLeagueId(newLeagueId);
-        closeModal();
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg('League is private, please contact for more information.');
