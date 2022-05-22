@@ -33,9 +33,6 @@ function LeagueChangeModal(props) {
         props.setLeagueId(newLeagueId);
         closeModal();
         break;
-      case 'PENDING':
-        setResponseMsg('League Id requested.');
-        break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg('League is private, please contact for more information.');
         break;
@@ -47,15 +44,15 @@ function LeagueChangeModal(props) {
     }
   };
 
-  const description = `Change league id or request league to be added during 
-    next update cycle (daily). Currently public ESPN leagues are seamlessly
-    supported, contact for private leagues. Yahoo leagues not currently
-    planned.`;
+  const description = `Change league id or have league processed 
+    and analyzed, please allow a minute (1) to process. Currently 
+    public ESPN leagues are seamlessly supported, contact for 
+    private leagues. Yahoo leagues not currently planned.`;
 
   return ReactDOM.createPortal(
     <>
       <Modal>
-        <Header>Change/Request League Id</Header>
+        <Header>Change/Process League Id</Header>
         <h4>ESPN Public Only*</h4>
         <Text>{description}</Text>
         <URLExample>

@@ -93,7 +93,7 @@ def lambda_handler(event, context):
     for key in league_data.keys():
       if isinstance(league_data[key], pd.DataFrame):
         league_data[key] = league_data[key].to_json(orient='records')
-    upload_league_data_to_dynamo_via_sqs(league_data)
+    upload_league_data_to_dynamo(league_data)
 
   print("Complete...")
 
