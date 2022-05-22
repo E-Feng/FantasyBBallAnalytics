@@ -9,7 +9,7 @@ from transform_data import (
   transform_raw_to_df
 )
 from upload_to_aws import (
-  upload_league_data_to_dynamo_via_sqs
+  upload_league_data_to_dynamo
 )
 
 
