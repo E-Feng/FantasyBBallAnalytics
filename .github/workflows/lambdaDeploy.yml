@@ -4,7 +4,7 @@ name: Deploy Lambda Function #Name of the Workflow
 on:  #Name of the GitHub event that triggers the workflow
   push:   #On Push Event We need to take action
     branches:  #Now we need to specify the branch name
-    - lambda-integration   
+    - v2
 
 jobs:  #Workflow run is made up of one or more jobs
   deploy_lambda:
