@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import DraftRecapTable from '../tables/DraftRecapTable';
+import { checkLeagueHasEjections } from '../utils/categoryUtils';
 
 import styled from 'styled-components';
 
@@ -8,13 +9,13 @@ function DraftRecapContainer(props) {
   const [sortMode, setSortMode] = useState('round');
   const [ejsChecked, setChecked] = useState(false);
 
+  const hasEjections = checkLeagueHasEjections(props.settings[0]['categoryIds']);
+
   // Adjusting raw data, calculating difference
   const data = props.data.map((player) => {
     const team = props.teams.filter((team) => team.teamId === player.teamId);
-    const ranking = ejsChecked
-      ? player.rankingSeason
-      : player.rankingNoEjsSeason;
-    const rating = ejsChecked ? player.ratingSeason : player.ratingNoEjsSeason;
+    const ranking = ejsChecked ? player.rankingEjsSeason : player.rankingSeason;
+    const rating = ejsChecked ? player.ratingEjsSeason : player.ratingSeason;
     const difference = player.pickNumber - ranking;
 
     return {
@@ -41,7 +42,7 @@ function DraftRecapContainer(props) {
       <Forms>
         <DropDown value={sortMode} onChange={handleSortChange}>
           {sortList.map((mode) => {
-            const capital = mode[0].toUpperCase() + mode.slice(1)
+            const capital = mode[0].toUpperCase() + mode.slice(1);
             return (
               <option value={mode} key={mode}>
                 Sort By {capital}
@@ -49,14 +50,18 @@ function DraftRecapContainer(props) {
             );
           })}
         </DropDown>
-        <Checkbox>
-          <input
-            type='checkbox'
-            checked={ejsChecked}
-            onChange={handleCheckbox}
-          />
-          Count Ejections
-        </Checkbox>
+        {hasEjections ? (
+          <Checkbox>
+            <input
+              type='checkbox'
+              checked={ejsChecked}
+              onChange={handleCheckbox}
+            />
+            Count Ejections
+          </Checkbox>
+        ) : (
+          <br />
+        )}
       </Forms>
       <DraftRecapTable data={data} sortMode={sortMode} />
     </Container>

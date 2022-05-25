@@ -8,53 +8,79 @@ import { requestLeagueId } from '../utils/webAPI';
 function LeagueChangeModal(props) {
   const { register, handleSubmit, errors, formState } = useForm();
   const [responseMsg, setResponseMsg] = useState('');
+  const [showCookieForm, setShowCookieForm] = useState(false);
 
-  const responseColor = responseMsg.includes('requested') ? 'green' : 'red';
+  const requestingMsg = 'Obtaining league data...';
 
-  const closeModal = () => {
-    props.setShow(false);
+  const responseColor = responseMsg === requestingMsg ? 'yelloww' : 'red';
+
+  const closeModal = (e) => {
+    const isClosedFromButton = e.target instanceof HTMLButtonElement;
+    if (isClosedFromButton || responseMsg !== requestingMsg) {
+      props.setShow(false);
+    }
+  };
+
+  const toggleCookieForm = () => {
+    setShowCookieForm(!showCookieForm);
   };
 
   const onSubmit = async (data) => {
-    const newLeagueId = data.leagueId;
+    setResponseMsg(requestingMsg);
 
-    const leagueStatus = await requestLeagueId(newLeagueId);
+    const newLeagueId = data.leagueId;
+    const reqPayload = {
+      leagueId: newLeagueId,
+      cookieEspnS2: data.cookieEspnS2,
+      cookieSwid: data.cookieSwid,
+    };
+
+    const leagueStatus = await requestLeagueId(reqPayload);
     console.log(leagueStatus);
     switch (leagueStatus) {
       case 'ACTIVE':
         localStorage.setItem('leagueId', newLeagueId);
+        props.setShow(false);
         props.setLeagueId(newLeagueId);
-        closeModal();
-        break;
-      case 'PENDING':
-        setResponseMsg('League Id requested.');
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
-        setResponseMsg('League is private, please contact for more information.');
+        setResponseMsg(
+          'League is private, please contact for more information.'
+        );
+        break;
+      case 'GENERAL_NOT_FOUND':
+        setResponseMsg('League id not found or deleted.');
         break;
       default:
-        setResponseMsg('Error requesting league id, not found or deleted.');
-        break;
+        setResponseMsg('Error obtaining league information.');
     }
   };
 
-  const description = `Change league id or request league to be added during 
-    next update cycle (daily). Currently public ESPN leagues are seamlessly
-    supported, contact for private leagues. Yahoo leagues not currently
-    planned.`;
+  const description1 = `View league id or have league processed 
+    and analyzed, please allow a minute (1) to process. Public 
+    ESPN leagues are seamlessly supported, private leagues require 
+    cookie information [`;
+  const description2 = `]. Yahoo leagues not currently planned.`;
+
+  const cookieInfoLink =
+    'https://chrome.google.com/webstore/detail/espn-cookie-finder/oapfffhnckhffnpiophbcmjnpomjkfcj';
 
   return ReactDOM.createPortal(
     <>
-      <Modal>
-        <Header>Change/Request League Id</Header>
-        <h4>ESPN Public Only*</h4>
-        <Text>{description}</Text>
+      <Modal extra={showCookieForm}>
+        <Header>View/Process League Id</Header>
+        <h4>ESPN Leagues Only</h4>
+        <Text>
+          {description1}
+          <a href={cookieInfoLink}>info</a>
+          {description2}
+        </Text>
         <URLExample>
           https://fantasy.espn.com/basketball/league?leagueId=
           <Underline>890123456</Underline>
         </URLExample>
         <LeagueForm onSubmit={handleSubmit(onSubmit)}>
-          <label>League Id: </label>
+          <FormLabel>League Id </FormLabel>
           <LeagueInput
             type='text'
             name='leagueId'
@@ -67,7 +93,35 @@ function LeagueChangeModal(props) {
             value='Submit'
             disabled={formState.isSubmitting}
           />
-          {errors.leagueId && <ErrorMsg>Field Required</ErrorMsg>}
+          {errors.leagueId && <ErrorMsg>League Id Field Required</ErrorMsg>}
+          <CookieToggle onClick={toggleCookieForm}>
+            Cookie Info For Private Leagues Only{' '}
+            {showCookieForm ? <span>&#9650;</span> : <span>&#9660;</span>}
+          </CookieToggle>
+          {showCookieForm && (
+            <CookieFormContainer>
+              <CookieField>
+                <FormLabel>Espn S2</FormLabel>
+                <CookieInput
+                  type='text'
+                  name='cookieEspnS2'
+                  placeholder='{A1B2C3D4E5F6.........}'
+                  ref={register()}
+                  disabled={formState.isSubmitting}
+                />
+              </CookieField>
+              <CookieField>
+                <FormLabel>Swid</FormLabel>
+                <CookieInput
+                  type='text'
+                  name='cookieSwid'
+                  placeholder='{ACEG123...}'
+                  ref={register()}
+                  disabled={formState.isSubmitting}
+                />
+              </CookieField>
+            </CookieFormContainer>
+          )}
           <ResponseMsg color={responseColor}>{responseMsg}</ResponseMsg>
         </LeagueForm>
         <Filler />
@@ -85,7 +139,7 @@ const Modal = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  height: 325px;
+  max-height: ${(props) => (props.extra ? '410px' : '360px')};
   width: 600px;
   max-width: 95%;
   background-color: black;
@@ -122,10 +176,33 @@ const Underline = styled.span`
 
 const LeagueForm = styled.form``;
 
+const FormLabel = styled.label`
+  width: 73px;
+`;
+
 const LeagueInput = styled.input`
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 `;
+
+const CookieToggle = styled.p`
+  text-align: center;
+  margin-bottom: 0.25rem;
+`;
+
+const CookieFormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const CookieField = styled.div`
+  display: flex;
+  flex-direction: row;
+
+  margin: 0.15rem 0;
+`;
+
+const CookieInput = styled.input``;
 
 const ErrorMsg = styled.p`
   color: red;
@@ -139,7 +216,7 @@ const ResponseMsg = styled.p`
 `;
 
 const Filler = styled.div`
-  flex-grow: 2;
+  flex-grow: 0;
 `;
 
 const CloseForm = styled.button`
@@ -150,7 +227,7 @@ const CloseForm = styled.button`
   padding: 0;
   text-decoration: underline;
   cursor: pointer;
-  margin: 1rem auto;
+  margin: 0.75rem auto;
 `;
 
 const Overlay = styled.div`

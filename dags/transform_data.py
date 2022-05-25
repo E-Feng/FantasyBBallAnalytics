@@ -2,13 +2,10 @@ import json
 import math
 import pandas as pd
 
-from airflow.decorators import task
-
 import consts
 from util import calculate_gamescore
 
 
-@task
 def transform_raw_to_df(endpoint: list, raw_data: dict):
   """
   Index function for all endpoint transformations
@@ -29,10 +26,7 @@ def transform_raw_to_df(endpoint: list, raw_data: dict):
   else:
     df = pd.DataFrame()
 
-  # Convert to json and push to xcom for next task
-  json = df.to_json(orient='records')
-
-  return json
+  return df
 
 
 def transform_team_to_df(team_info: dict):
@@ -42,7 +36,7 @@ def transform_team_to_df(team_info: dict):
 
   data = team_info
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all teams
   for team in data['teams']:
@@ -67,9 +61,12 @@ def transform_team_to_df(team_info: dict):
         row['lastName'] = member['lastName']
 
     #print(row)
-    df = df.append(row, ignore_index=True)
+    data_array.append(row)
   
-  print(df.to_string())
+  df = pd.DataFrame.from_records(data_array)
+
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -85,7 +82,7 @@ def transform_scoreboard_to_df(scoreboard: dict):
 
   num_byes = 0
 
-  df = pd.DataFrame()
+  data_array = []
 
   sides = ('home', 'away')
 
@@ -136,14 +133,16 @@ def transform_scoreboard_to_df(scoreboard: dict):
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
 
             # Appending full match details into df
-            print(row)
-            df = df.append(row, ignore_index = True)
+            data_array.append(row)
 
     # Adjusting id/week for byes
     elif (sides[0] in match) & (sides[1] not in match):
       num_byes += 0.5
 
-  print(df.to_string())
+  df = pd.DataFrame.from_records(data_array)
+
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -155,7 +154,7 @@ def transform_draft_to_df(draft_info: dict):
 
   data = draft_info
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all teams
   for pick in data['draftDetail']['picks']:
@@ -167,9 +166,12 @@ def transform_draft_to_df(draft_info: dict):
     row['playerId'] = str(pick['playerId'])
 
     #print(row)
-    df = df.append(row, ignore_index=True)
-  
-  print(df.to_string())
+    data_array.append(row)
+
+  df = pd.DataFrame.from_records(data_array)  
+
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -181,7 +183,7 @@ def transform_ratings_to_df(ratings: dict):
 
   data = ratings  
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all players
   for player in data['players']:
@@ -192,8 +194,8 @@ def transform_ratings_to_df(ratings: dict):
 
     # Check if ratings exist for player
     if 'ratings' in player:
-      row['ratingSeason'] = player['ratings']['0']['totalRating']
-      row['rankingSeason'] = player['ratings']['0']['totalRanking']
+      row['ratingEjsSeason'] = player['ratings']['0']['totalRating']
+      row['rankingEjsSeason'] = player['ratings']['0']['totalRanking']
 
       # Calculating rating without ejections
       rating = 0
@@ -201,12 +203,19 @@ def transform_ratings_to_df(ratings: dict):
         if stat['forStat'] != int(consts.EJS):
           rating = rating + stat['rating']
 
-      row['ratingNoEjsSeason'] = rating
+      row['ratingSeason'] = rating
 
     #print(row)
-    df = df.append(row, ignore_index=True)
-  
-  print(df.to_string())
+    data_array.append(row)
+
+
+  df = pd.DataFrame.from_records(data_array) 
+
+  # Creating rank column for derived ratings column
+  df['rankingSeason'] = df['ratingSeason'].rank(method='min', na_option='top', ascending=False)
+ 
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
 
@@ -218,7 +227,7 @@ def transform_daily_to_df(daily_score: dict):
 
   data = daily_score
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all teams
   for player in data['players']:
@@ -254,12 +263,16 @@ def transform_daily_to_df(daily_score: dict):
 
         #print(row['name'], row['gs'])
 
-        df = df.append(row, ignore_index=True)
+        data_array.append(row)
+
+  df = pd.DataFrame.from_records(data_array)
 
   # Sort by gamescore, then points      
   if not df.empty:
     df = df.sort_values(by=['gs', 'pts'], ascending=False)
-    print('\n' + df.to_string())
+
+    #print(df.head(2))
+    #print(df.tail(2))
 
   return df
 
@@ -270,7 +283,7 @@ def transform_settings_to_df(settings: dict):
   """
   data = settings
 
-  df = pd.DataFrame()
+  data_array = []
 
   # Iterate through all category ids
   row = {}
@@ -282,8 +295,11 @@ def transform_settings_to_df(settings: dict):
   if data['settings']['scoringSettings']['scoringType'] == 'H2H_POINTS':
     row['categoryIds'].append(-1)
 
-  df = df.append(row, ignore_index=True)
+  data_array.append(row)
 
-  print(df.to_string())
+  df = pd.DataFrame.from_records(data_array)
+
+  #print(df.head(2))
+  #print(df.tail(2))
 
   return df
