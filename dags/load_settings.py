@@ -57,12 +57,15 @@ def get_league_id_list():
   return
 
 @task
-def get_scoring_period_id():
+def get_scoring_period_id(default_league_info):
   """
   Gets the current scoring period to compute previous daily scores
   """
-  # Hardcoded URL very likely to work, public league
-  url = 'https://fantasy.espn.com/apis/v3/games/fba/seasons/2022/segments/0/leagues/976410188?view=scoringperiodid'
+  league_id = default_league_info.get('leagueId')
+  league_year = default_league_info.get('leagueYear')
+
+  # Hardcoded URL very likely to work, my public league
+  url = f'https://fantasy.espn.com/apis/v3/games/fba/seasons/{league_year}/segments/0/leagues/{league_id}?view=scoringperiodid'
 
   r = requests.get(url)
 

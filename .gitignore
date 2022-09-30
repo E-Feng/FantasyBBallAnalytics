@@ -9,7 +9,7 @@ __pycache__/
 .htaccess
 .env
 config/*.env
-config/*.cfg
+config/*.json
 dags/keys/.env
 dags/keys/*.json
 client/src/utils/config.js

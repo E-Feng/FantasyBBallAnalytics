@@ -10,7 +10,7 @@ pd.options.mode.chained_assignment = None
 from airflow.decorators import task
 from airflow.operators.python import get_current_context
 
-from util import authed_session
+from util_cloud import authed_session
 
 
 @task

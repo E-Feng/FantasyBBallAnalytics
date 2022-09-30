@@ -54,6 +54,12 @@ with DAG(
   catchup=False,
   template_searchpath='/sql/',
 ) as dag:
+  # Parameters
+  default_league_info = {
+    'leagueId': '891817951',
+    'leagueYear': '2023',
+  }
+
   ### Tasks
   # Initializing tables in RDS (alternative)
   with TaskGroup(group_id='init_rds') as init_rds:
@@ -64,16 +70,16 @@ with DAG(
 
   # Getting league ids from 
   init_league_ids = get_league_id_list()
-  scoring_period = get_scoring_period_id()
+  scoring_period = get_scoring_period_id(default_league_info)
 
   # Extracting common data from ESPN (not league specific)
   common_endpoints = {
     'ratings': ['kona_player_info', 'mStatRatings'],
-    'daily': ['kona_playercard']
+    #'daily': ['kona_playercard']
   }
   common_headers = {
     'ratings': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}''',
-    'daily': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
+    #'daily': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
   }
 
   common_data = {}
@@ -86,7 +92,7 @@ with DAG(
       with TaskGroup(group_id=f'common_endpoint_{endpoint}') as common_etl:
         header = {'x-fantasy-filter': common_headers[endpoint]}
 
-        raw_data = extract_from_espn_api(-1, common_endpoints[endpoint], header)
+        raw_data = extract_from_espn_api(default_league_info, common_endpoints[endpoint], header)
         df = transform_raw_to_df(endpoint, raw_data)
         insert_data_into_rds_tables(-1, endpoint, df)
 
@@ -107,32 +113,17 @@ with DAG(
     'draftRecap': ['mDraftDetail']
   }
 
-  league_ids = Variable.get(
+  all_league_info = Variable.get(
     'league_ids',
-    default_var={
-      'leagueId': ['48375511'],
-      'leagueYear': ['2022'],
-      'lastYear': ['2020']
-    },
+    default_var=[default_league_info],
     deserialize_json=True
   )
 
   league_groups = []
   
   # Creating taskgroups dynamically for each league
-  for i in range(len(league_ids['leagueId'])):
-    league_id = league_ids['leagueId'][i]
-    league_year = league_ids['leagueYear'][i]
-    last_year = league_ids['lastYear'][i]
-    all_years = range(int(last_year), int(league_year) + 1)
-    all_years = list(map(str, all_years))
-
-    # Initializing all league data
-    league_data = {
-      'leagueId': league_id,
-      'leagueYear': league_year,
-      'allYears': all_years
-    }
+  for league_data in all_league_info:
+    league_id = league_data['leagueId']
 
     with TaskGroup(group_id=f'etl_league_{league_id}') as etl_league:
       endpoint_groups = []
@@ -142,9 +133,9 @@ with DAG(
 
         with TaskGroup(group_id=f'etl_endpoint_{endpoint}') as etl_endpoint:
           # Extract and Transform data from ESPN
-          raw_data = extract_from_espn_api(i, api_endpoint)
+          raw_data = extract_from_espn_api(league_data, api_endpoint)
           df = transform_raw_to_df(endpoint, raw_data)
-          insert_data_into_rds_tables(i, endpoint, df)
+          #insert_data_into_rds_tables(i, endpoint, df)
 
           # Saving to data dict
           league_data[endpoint] = df
@@ -153,17 +144,17 @@ with DAG(
 
       # All endpoints extracted and transformed
       # Performing queries
-      with TaskGroup(group_id=f'queries') as queries_tg:
-        draft_query = rds_run_query_task(i, 'rds/join_draft_and_ratings.sql')
+      # with TaskGroup(group_id=f'queries') as queries_tg:
+      #   draft_query = rds_run_query_task(i, 'rds/join_draft_and_ratings.sql')
 
-        league_data['draftRecap'] = draft_query
+      #   league_data['draftRecap'] = draft_query
 
 
       # Uploading to DynamoDB after all endpoints processed
-      upload_dynamo = upload_league_data_to_dynamo(league_data)
-      last_updated = rds_run_query_task(i, 'rds/update_leagues_table.sql')
+      # upload_dynamo = upload_league_data_to_dynamo(league_data)
+      # last_updated = rds_run_query_task(i, 'rds/update_leagues_table.sql')
 
-      endpoint_groups >> queries_tg >> upload_dynamo >> last_updated
+      # endpoint_groups >> queries_tg >> upload_dynamo >> last_updated
 
     league_groups.append(etl_league)
 

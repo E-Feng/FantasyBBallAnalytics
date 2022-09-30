@@ -10,7 +10,7 @@ from airflow.operators.python import get_current_context
 from airflow.exceptions import AirflowException
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 
-from util import authed_session
+from util_cloud import authed_session
 
 
 CONN_ID = 'google_cloud_created'
