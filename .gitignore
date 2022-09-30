@@ -8,7 +8,8 @@ __pycache__/
 .gitattributes
 .htaccess
 .env
-config/.env
+config/*.env
+config/*.cfg
 dags/keys/.env
 dags/keys/*.json
 client/src/utils/config.js
