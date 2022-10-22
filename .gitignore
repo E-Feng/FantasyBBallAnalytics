@@ -17,6 +17,7 @@ browserconfig.xml
 humans.txt
 robots.txt
 
+logs/
 doc/
 node_modules/
 venv/
