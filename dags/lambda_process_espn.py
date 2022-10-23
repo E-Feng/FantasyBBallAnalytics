@@ -25,7 +25,7 @@ headers = {
   'ratings': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
 }
 
-def lambda_handler(event, context):
+def process_espn_league(event, context):
   league_id = event["queryStringParameters"]['leagueId']
   cookie_espn = event["queryStringParameters"]['cookieEspnS2']
   cookie_swid = event["queryStringParameters"]['cookieSwid']
