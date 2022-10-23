@@ -2,6 +2,7 @@ import boto3
 import psycopg2
 import pandas as pd
 from datetime import datetime
+from aws_lambda_powertools.utilities import parameters
 
 import consts
 from extract_espn import (
@@ -105,10 +106,15 @@ def process_espn_league(event, context):
   }
 
 
+lambda_client = boto3.client('lambda', region_name='us-east-1')
+
 host = 'ec2-34-230-153-41.compute-1.amazonaws.com'
 port = '5432'
 user = 'tepamoxyceuxbu'
-password = ''
+password = lambda_client.invoke(
+  FunctionName = 'get_heroku_password', 
+  InvocationType = 'RequestResponse'
+)['body']
 database = 'd4aje3kk0gnc05'
 
 conn = psycopg2.connect(
@@ -120,8 +126,8 @@ conn = psycopg2.connect(
     sslmode='require'
 )
 
-lambda_client = boto3.client('lambda', region_name='us-east-1')
 def update_espn_leagues(event, context):
+  print(password)
   cursor = conn.cursor()
 
   cursor.execute(
