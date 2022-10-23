@@ -2,7 +2,6 @@ import boto3
 import psycopg2
 import pandas as pd
 from datetime import datetime
-from aws_lambda_powertools.utilities import parameters
 
 import consts
 from extract_espn import (
