@@ -1,3 +1,4 @@
+import json
 import boto3
 import psycopg2
 import pandas as pd
@@ -107,26 +108,21 @@ def process_espn_league(event, context):
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
-host = 'ec2-34-230-153-41.compute-1.amazonaws.com'
-port = '5432'
-user = 'tepamoxyceuxbu'
-password = lambda_client.invoke(
-  FunctionName = 'get_heroku_password', 
-  InvocationType = 'RequestResponse'
-)['body']
-database = 'd4aje3kk0gnc05'
-
-conn = psycopg2.connect(
-    host=host,
-    port=port,
-    database=database,
-    user=user,
-    password=password,
-    sslmode='require'
-)
-
 def update_espn_leagues(event, context):
-  print(password)
+  password_res = lambda_client.invoke(
+    FunctionName = 'get_heroku_password', 
+    InvocationType = 'RequestResponse'
+  )
+  
+  conn = psycopg2.connect(
+    host='ec2-34-230-153-41.compute-1.amazonaws.com',
+    port='5432',
+    database='d4aje3kk0gnc05',
+    user='tepamoxyceuxbu',
+    password=json.loads(password_res['Payload'].read())['body'],
+    sslmode='require'
+  )
+
   cursor = conn.cursor()
 
   cursor.execute(
