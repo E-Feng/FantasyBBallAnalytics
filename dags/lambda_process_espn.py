@@ -108,7 +108,7 @@ def process_espn_league(event, context):
 host = 'ec2-34-230-153-41.compute-1.amazonaws.com'
 port = '5432'
 user = 'tepamoxyceuxbu'
-password = '918cf3f71d4b906162db904fadb4a7dc9ccb0ba2a1a39fab1b792d2f323cb3ea'
+password = ''
 database = 'd4aje3kk0gnc05'
 
 conn = psycopg2.connect(
