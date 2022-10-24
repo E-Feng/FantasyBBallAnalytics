@@ -35,18 +35,19 @@ def process_espn_league(event, context):
   
   league_year = event["queryStringParameters"].get('leagueYear')
 
+  league_info = {
+    "leagueId": league_id,
+    "cookieEspn": cookie_espn,
+    "cookieSwid": cookie_swid 
+  }
+
   if league_year:
     league_years = [league_year]
   else:
     league_years = []
     league_year_start = datetime.now().year + 1
 
-    league_info = {
-      "leagueId": league_id,
-      "leagueYear": str(league_year_start),
-      "cookieEspn": cookie_espn,
-      "cookieSwid": cookie_swid 
-    }
+    league_info["leagueYear"] = str(league_year_start)
 
     year_check_failures = 0
     max_check_failures = 4
@@ -152,7 +153,7 @@ def update_espn_leagues(event, context):
     process_res = lambda_client.invoke(
       FunctionName='process_espn_league', 
       InvocationType='RequestResponse',
-      payload=payload
+      Payload=json.dumps(payload)
     )
 
     print(process_res)
