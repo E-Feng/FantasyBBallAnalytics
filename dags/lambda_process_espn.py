@@ -158,8 +158,11 @@ def update_espn_leagues(event, context):
       Payload=json.dumps(payload)
     )
 
-    print(process_res)
-    print(f"League {league_info[0]} processed")
+    league_id = league_info[0]
+    lambda_error = process_res.get('FunctionError', False)
+    status = process_res['StatusCode']
+
+    print(f"League {league_id} processed, code: {status}, error: {lambda_error}")
 
   return {
     'statusCode': 200,
