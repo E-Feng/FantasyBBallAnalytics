@@ -29,33 +29,38 @@ headers = {
 }
 
 def process_espn_league(event, context):
-  league_id = event["queryStringParameters"]['leagueId']
-  cookie_espn = event["queryStringParameters"]['cookieEspnS2']
-  cookie_swid = event["queryStringParameters"]['cookieSwid']
+  league_id = event["queryStringParameters"].get('leagueId')
+  cookie_espn = event["queryStringParameters"].get('cookieEspnS2')
+  cookie_swid = event["queryStringParameters"].get('cookieSwid')
+  
+  league_year = event["queryStringParameters"].get('leagueYear')
 
-  league_years = []
-  league_year_start = datetime.now().year + 1
+  if league_year:
+    league_years = [league_year]
+  else:
+    league_years = []
+    league_year_start = datetime.now().year + 1
 
-  league_info = {
-    "leagueId": league_id,
-    "leagueYear": str(league_year_start),
-    "cookieEspn": cookie_espn,
-    "cookieSwid": cookie_swid 
-  }
+    league_info = {
+      "leagueId": league_id,
+      "leagueYear": str(league_year_start),
+      "cookieEspn": cookie_espn,
+      "cookieSwid": cookie_swid 
+    }
 
-  year_check_failures = 0
-  max_check_failures = 4
-  while year_check_failures < max_check_failures:
-    league_info['leagueYear'] = str(league_year_start)
+    year_check_failures = 0
+    max_check_failures = 4
+    while year_check_failures < max_check_failures:
+      league_info['leagueYear'] = str(league_year_start)
 
-    try:
-      extract_from_espn_api(league_info, [''])
-    except:
-      year_check_failures += 1
-    else:
-      league_years.append(league_year_start)
-    finally:
-      league_year_start = league_year_start - 1
+      try:
+        extract_from_espn_api(league_info, [''])
+      except:
+        year_check_failures += 1
+      else:
+        league_years.append(league_year_start)
+      finally:
+        league_year_start = league_year_start - 1
 
 
   for league_year in league_years:
@@ -110,8 +115,8 @@ lambda_client = boto3.client('lambda', region_name='us-east-1')
 
 def update_espn_leagues(event, context):
   password_res = lambda_client.invoke(
-    FunctionName = 'get_heroku_password', 
-    InvocationType = 'RequestResponse'
+    FunctionName='get_heroku_password', 
+    InvocationType='RequestResponse'
   )
   
   conn = psycopg2.connect(
@@ -134,7 +139,24 @@ def update_espn_leagues(event, context):
   )
   res_query = cursor.fetchall()
 
-  print(res_query)
+  for league_info in res_query:
+    payload = {
+      "queryStringParameters": {
+        "leagueId": league_info[0],
+        "cookieEspnS2": league_info[1],
+        "cookieSwid": league_info[2],
+        "leagueYear": 2023
+      }
+    }
+
+    process_res = lambda_client.invoke(
+      FunctionName='process_espn_league', 
+      InvocationType='RequestResponse',
+      payload=payload
+    )
+
+    print(process_res)
+    print(f"League {league_info[0]} processed")
 
   return {
     'statusCode': 200,
