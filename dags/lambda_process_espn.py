@@ -41,6 +41,8 @@ def process_espn_league(event, context):
     "cookieSwid": cookie_swid 
   }
 
+  print(f"Processing league {league_id}...")
+
   if league_year:
     league_years = [league_year]
   else:
