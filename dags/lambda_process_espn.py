@@ -47,12 +47,12 @@ def process_espn_league(event, context):
     league_years = []
     league_year_start = datetime.now().year + 1
 
-    league_info["leagueYear"] = str(league_year_start)
+    league_info["leagueYear"] = league_year_start
 
     year_check_failures = 0
     max_check_failures = 4
     while year_check_failures < max_check_failures:
-      league_info['leagueYear'] = str(league_year_start)
+      league_info['leagueYear'] = league_year_start
 
       try:
         extract_from_espn_api(league_info, [''])
