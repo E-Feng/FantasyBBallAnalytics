@@ -105,7 +105,7 @@ function LeagueChangeModal(props) {
                 <CookieInput
                   type='text'
                   name='cookieEspnS2'
-                  placeholder='{A1B2C3D4E5F6.........}'
+                  placeholder='A1B2C3D4E5F6G7H8I9J10.........'
                   ref={register()}
                   disabled={formState.isSubmitting}
                 />
@@ -115,7 +115,7 @@ function LeagueChangeModal(props) {
                 <CookieInput
                   type='text'
                   name='cookieSwid'
-                  placeholder='{ACEG123...}'
+                  placeholder='{ACEG12-3K9A-...}'
                   ref={register()}
                   disabled={formState.isSubmitting}
                 />

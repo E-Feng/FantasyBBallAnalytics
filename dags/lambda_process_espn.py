@@ -32,8 +32,9 @@ def process_espn_league(event, context):
   league_id = event["queryStringParameters"].get('leagueId')
   cookie_espn = event["queryStringParameters"].get('cookieEspnS2')
   cookie_swid = event["queryStringParameters"].get('cookieSwid')
-  
   league_year = event["queryStringParameters"].get('leagueYear')
+
+  is_initial_process = True
 
   league_info = {
     "leagueId": league_id,
@@ -44,6 +45,7 @@ def process_espn_league(event, context):
   print(f"Processing league {league_id}...")
 
   if league_year:
+    is_initial_process = False
     league_years = [league_year]
   else:
     league_years = []
@@ -74,8 +76,10 @@ def process_espn_league(event, context):
     league_data = {
       'leagueId': league_id,
       'leagueYear': league_year,
-      'allYears': league_years
     }
+
+    if is_initial_process:
+      league_data['allYears'] = league_years
 
     for endpoint in api_endpoints.keys():
       view = api_endpoints[endpoint]
