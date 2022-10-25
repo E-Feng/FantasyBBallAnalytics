@@ -287,12 +287,16 @@ def transform_settings_to_df(settings: dict):
 
   # Iterate through all category ids
   row = {}
+
   row['categoryIds'] = []
   for category in data['settings']['scoringSettings']['scoringItems']:
     row['categoryIds'].append(category['statId'])
 
+  scoring_type = data['settings']['scoringSettings']['scoringType']
+  row['scoringType'] = scoring_type
+
   # Check if points league, fantasy points will be appended as -1
-  if data['settings']['scoringSettings']['scoringType'] == 'H2H_POINTS':
+  if scoring_type == 'H2H_POINTS':
     row['categoryIds'].append(-1)
 
   data_array.append(row)

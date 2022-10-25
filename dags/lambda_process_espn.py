@@ -168,7 +168,7 @@ def update_espn_leagues(event, context):
     lambda_error = process_res.get('FunctionError', False)
     status = process_res['StatusCode']
 
-    print(f"League {league_id} processed, code: {status}, error: {lambda_error}")
+    print(f"League {league_id:11} processed, code: {status}, error: {lambda_error}")
 
   return {
     'statusCode': 200,
