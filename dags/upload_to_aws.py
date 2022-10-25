@@ -8,7 +8,7 @@ AWS_DDB_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/data'
 AWS_SQS_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/sqs'
 
 
-def upload_league_data_to_dynamo(data: dict):
+def upload_league_data_to_dynamo(data: dict, method: str):
   """
   Post process the league data and upload to dynamodb
   """
@@ -20,7 +20,12 @@ def upload_league_data_to_dynamo(data: dict):
   headers = {'content-type': 'application/json'}
   payload = json.dumps(data)
 
-  r = requests.put(AWS_DDB_URL, data=payload, headers=headers)
+  if method == 'PUT':
+    r = requests.put(AWS_DDB_URL, data=payload, headers=headers)
+  elif method == 'PATCH':
+    r = requests.patch(AWS_DDB_URL, data=payload, headers=headers)
+  else:
+    raise ValueError("Invalid method")
 
   print(r)
 
