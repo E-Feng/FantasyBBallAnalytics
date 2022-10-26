@@ -9,14 +9,13 @@ import TotalsContainer from '../containers/TotalsContainer';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 
-
 function TeamStats(props) {
   const { leagueKey } = useContext(LeagueContext);
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = (data !== undefined && data !== null);
+  const isDataLoaded = data !== undefined && data !== null;
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
@@ -26,8 +25,10 @@ function TeamStats(props) {
   const settingsData = isLoading ? null : data.settings;
 
   let currentWeek = 1;
+  let isRotoLeague = false;
   if (!isLoading) {
     currentWeek = scoreboardData[scoreboardData.length - 1].week;
+    isRotoLeague = settingsData[0].scoringType === 'ROTO';
   }
 
   const totalCategoryInfo = `This table calculates the total category record compared to 
@@ -42,6 +43,10 @@ function TeamStats(props) {
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
+      ) : isRotoLeague ? (
+        <RotoErrorContainer>
+          <RotoError>Team Stats not available for Roto leagues</RotoError>
+        </RotoErrorContainer>
       ) : (
         <Container maxWidth={props.maxWidth}>
           <TooltipHeader
@@ -80,6 +85,19 @@ const Container = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
   }
+`;
+
+const RotoErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+`;
+
+const RotoError = styled.p`
+  font-size: 36px;
 `;
 
 export default TeamStats;
