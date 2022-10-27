@@ -14,7 +14,7 @@ function Compare(props) {
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = (data !== undefined);
+  const isDataLoaded = data !== undefined;
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
@@ -24,8 +24,12 @@ function Compare(props) {
   const settingsData = isLoading ? null : data.settings;
 
   let currentWeek = 1;
+  let isRotoLeague = false;
   if (!isLoading) {
     currentWeek = scoreboardData[scoreboardData.length - 1].week;
+    isRotoLeague =
+      settingsData[0].scoringType === 'ROTO' ||
+      typeof scoreboardData === 'string';
   }
 
   const compareInfo = `Select two teams to compare weekly head to head 
@@ -36,6 +40,10 @@ function Compare(props) {
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
+      ) : isRotoLeague ? (
+        <RotoErrorContainer>
+          <RotoError>Compare not available for Roto leagues</RotoError>
+        </RotoErrorContainer>
       ) : (
         <Container maxWidth={props.maxWidth}>
           <TooltipHeader title='Compare Teams' info={compareInfo} />
@@ -57,6 +65,19 @@ const Container = styled.div`
   width: 100%;
   max-width: ${(props) => props.maxWidth}px;
   margin: 0 auto;
+`;
+
+const RotoErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+`;
+
+const RotoError = styled.p`
+  font-size: 36px;
 `;
 
 export default Compare;

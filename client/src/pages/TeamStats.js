@@ -28,7 +28,9 @@ function TeamStats(props) {
   let isRotoLeague = false;
   if (!isLoading) {
     currentWeek = scoreboardData[scoreboardData.length - 1].week;
-    isRotoLeague = settingsData[0].scoringType === 'ROTO';
+    isRotoLeague =
+      settingsData[0].scoringType === 'ROTO' ||
+      typeof scoreboardData === 'string';
   }
 
   const totalCategoryInfo = `This table calculates the total category record compared to 

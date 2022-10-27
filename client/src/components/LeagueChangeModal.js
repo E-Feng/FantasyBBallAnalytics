@@ -45,7 +45,7 @@ function LeagueChangeModal(props) {
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg(
-          'League is private, please contact for more information.'
+          'League is private, enter in correct cookie information.'
         );
         break;
       case 'GENERAL_NOT_FOUND':
