@@ -123,6 +123,8 @@ def process_espn_league(event, context):
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
 def update_espn_leagues(event, context):
+  print(event)
+
   password_res = lambda_client.invoke(
     FunctionName='get_heroku_password', 
     InvocationType='RequestResponse'
@@ -148,10 +150,15 @@ def update_espn_leagues(event, context):
   )
   res_query = cursor.fetchall()
 
+  num_leagues = len(res_query)
+  num_failed = 0
+
   for league_info in res_query:
-    payload = {
+    league_id = league_info[0]
+
+    process_payload = {
       "queryStringParameters": {
-        "leagueId": league_info[0],
+        "leagueId": league_id,
         "cookieEspnS2": league_info[1],
         "cookieSwid": league_info[2],
         "leagueYear": 2023
@@ -161,16 +168,32 @@ def update_espn_leagues(event, context):
     process_res = lambda_client.invoke(
       FunctionName='process_espn_league', 
       InvocationType='RequestResponse',
-      Payload=json.dumps(payload)
+      Payload=json.dumps(process_payload)
     )
 
-    league_id = league_info[0]
     lambda_error = process_res.get('FunctionError', False)
     status = process_res['StatusCode']
 
-    print(f"League {league_id:11} processed, code: {status}, error: {lambda_error}")
+    if status != 200 or lambda_error:
+      num_failed += 1
+      print(f"League {league_id.ljust(11)} failed, {lambda_error}/{status}")
+    else:
+      update_payload = {
+        "queryStringParameters": {
+          "leagueId": league_id,
+          "method": 'lastUpdated'
+        }
+      }
+
+      update_res = lambda_client.invoke(
+        FunctionName='updateLastViewedLeague', 
+        InvocationType='RequestResponse',
+        Payload=json.dumps(update_payload)
+      )
+
+  print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 
   return {
-    'statusCode': 200,
+    'statusCode': update_res['StatusCode'],
     'body': "Test response"  
   }
