@@ -1,15 +1,29 @@
 import React from 'react';
-import { useTable } from 'react-table';
+import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
 import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
 function TotalsTable(props) {
-  const showPercent = (props) => {
-    const denom = props.value[0] + props.value[1];
-    const percent = denom !== 0 ? (props.value[0] * 100) / denom : 100;
-    return <React.Fragment>{percent.toFixed(0)}</React.Fragment>;
+  const getPercent = (values) => {
+    const denom = values[0] + values[1];
+    const percent = denom !== 0 ? (values[0] * 100) / denom : 100;
+    return percent;
+  };
+
+  const showPercent = (cell) => {
+    const values = cell.value;
+    return <React.Fragment>{getPercent(values).toFixed(0)}</React.Fragment>;
+  };
+
+  const sortPercent = (rowA, rowB, id, desc) => {
+    const percentA = getPercent(rowA.values[id]);
+    const percentB = getPercent(rowB.values[id]);
+
+    if (percentA > percentB) return -1;
+    if (percentB > percentA) return 1;
+    return 0;
   };
 
   const data = props.data;
@@ -51,23 +65,28 @@ function TotalsTable(props) {
         accessor: 'losses',
       },
     ];
-    const catHeaders = cats.map(cat => {
+    const catHeaders = cats.map((cat) => {
       return {
         Header: cat.display,
         accessor: cat.name,
+        sortType: sortPercent,
 
         Cell: showPercent,
-      }
+      };
     });
 
-    return (teamHeaders.concat(catHeaders));
+    return teamHeaders.concat(catHeaders);
     // eslint-disable-next-line
   }, []);
 
-  const tableInstance = useTable({ columns, data });
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+    useTable(
+      {
+        columns,
+        data,
+      },
+      useSortBy
+    );
 
   return (
     <Container>
@@ -85,7 +104,9 @@ function TotalsTable(props) {
                     return (
                       // Apply the header cell props
                       <th
-                        {...column.getHeaderProps()}
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
                         style={{
                           minWidth: isCat ? '25px' : '0px',
                         }}
