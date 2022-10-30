@@ -1,6 +1,7 @@
 import json
 import requests
 import random
+import boto3
 from time import sleep
 
 
@@ -55,3 +56,31 @@ def upload_league_data_to_dynamo_via_sqs(data: dict):
   if r.status_code == 500:
     raise ValueError("Error uploading to dynamodb")
   return
+
+def upload_player_data_to_s3(data: dict, filename: str, bucketname: str):
+
+  s3 = boto3.client('s3')
+  bucket = bucketname
+
+  try:
+        
+    uploadByteStream = bytes(json.dumps(data).encode('UTF-8'))
+    s3.put_object(Bucket=bucket, Key=filename, Body=uploadByteStream)
+
+    print('Upload successful')
+    
+  except:
+    
+    print('Upload failed')
+    
+  return
+
+
+
+
+
+
+
+
+
+
