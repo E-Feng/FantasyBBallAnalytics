@@ -57,22 +57,17 @@ def upload_league_data_to_dynamo_via_sqs(data: dict):
     raise ValueError("Error uploading to dynamodb")
   return
 
-def upload_player_data_to_s3(data: dict, filename: str, bucketname: str):
+def upload_data_to_s3(data: dict, filename: str, bucketname: str):
 
   s3 = boto3.client('s3')
   bucket = bucketname
 
   try:
-        
     uploadByteStream = bytes(json.dumps(data).encode('UTF-8'))
     s3.put_object(Bucket=bucket, Key=filename, Body=uploadByteStream)
-
-    print('Upload successful')
-    
-  except:
-    
-    print('Upload failed')
-    
+    print('Upload successful')    
+  except:    
+    print('Upload failed')    
   return
 
 

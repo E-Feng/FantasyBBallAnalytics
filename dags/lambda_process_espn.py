@@ -2,7 +2,7 @@ import json
 import boto3
 import psycopg2
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 
 import consts
 from extract_espn import (
@@ -12,7 +12,7 @@ from transform_data import (
   transform_raw_to_df
 )
 from upload_to_aws import (
-  upload_league_data_to_dynamo, upload_player_data_to_s3
+  upload_league_data_to_dynamo, upload_data_to_s3
 )
 
 
@@ -29,11 +29,11 @@ league_headers = {
 }
 
 
-player_api_endpoints = {
+common_api_endpoints = {
   'ratings': ['kona_player_info']
 }
 
-player_headers = {
+common_headers = {
   'ratings': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}'''
 }
 
@@ -211,60 +211,40 @@ def update_espn_leagues(event, context):
 
 
 
-def process_espn_common(event, context):
-
-  league_id = event["queryStringParameters"]['leagueId']
-  cookie_espn = event["queryStringParameters"]['cookieEspnS2']
-  cookie_swid = event["queryStringParameters"]['cookieSwid']
-
-  league_years = []
-  league_year_start = datetime.now().year + 1
-  league_years.append(league_year_start)
+def process_espn_common():
 
   league_info = {
-    "leagueId": league_id,
-    "leagueYear": str(league_year_start),
-    "cookieEspn": cookie_espn,
-    "cookieSwid": cookie_swid 
+    "leagueId": '891817951',
+    "leagueYear": 2023
   }
 
+  league_data = {
+    'leagueId': '891817951',
+    'leagueYear': 2023
+  }
 
-  for league_year in league_years:
-    print(f"Starting data extraction for {league_year}...")
+  for endpoint in common_api_endpoints.keys():
+    view = common_api_endpoints[endpoint]
 
-    league_info['leagueYear'] = league_year
+    header = {}
+    if common_headers.get(endpoint):
+      header = {'x-fantasy-filter': common_headers.get(endpoint)}
 
-    league_data = {
-      'leagueId': league_id,
-      'leagueYear': league_year,
-      'allYears': league_years
-    }
-
-    for endpoint in player_api_endpoints.keys():
-      view = player_api_endpoints[endpoint]
-
-      header = {}
-      if player_headers.get(endpoint):
-        header = {'x-fantasy-filter': player_headers.get(endpoint)}
-
-      data_endpoint = extract_from_espn_api(league_info, view, header)
-      
-      league_data[endpoint] = data_endpoint
+    data_endpoint = extract_from_espn_api(league_info, view, header)
+    
+    league_data[endpoint] = data_endpoint
 
 
     # Data serialization and upload data to S3
     for key in league_data.keys():
       if isinstance(league_data[key], pd.DataFrame):
         league_data[key] = league_data[key].to_json(orient='records')
-        
-        
-        
     today = date.today().strftime("%b-%d-%Y")
     
     filename = "nba-player-stats-" + str(today) + '.json'
     
     bucketname = 'nba-player-stats'
-    upload_player_data_to_s3(league_data, filename, bucketname)
+    upload_data_to_s3(league_data, filename, bucketname)
 
   return {
     'statusCode': 200,
