@@ -38,7 +38,7 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
   if r.status_code == 200:
     data = r.json()
 
-    print(f"Successfully fetched {view} from ESPN and pushed to xcom")
+    print(f"Successfully fetched {view} from ESPN API")
     return data
   else:
     print(f"Failed fetching {view} from ESPN")

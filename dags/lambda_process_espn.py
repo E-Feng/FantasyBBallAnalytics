@@ -4,12 +4,14 @@ import psycopg2
 import pandas as pd
 from datetime import datetime
 
-import consts
 from extract_espn import (
   extract_from_espn_api
 )
-from transform_data import (
+from transform_raw_data import (
   transform_raw_to_df
+)
+from transform_data import (
+  transform_draft_recap
 )
 from upload_to_aws import (
   upload_league_data_to_dynamo
@@ -20,7 +22,7 @@ api_endpoints = {
   'settings': ['mSettings'],
   'teams': ['mTeam'],
   'scoreboard': ['mScoreboard'], 
-  'draftRecap': ['mDraftDetail'],
+  'draft': ['mDraftDetail'],
   'ratings': ['kona_player_info', 'mStatRatings']
 }
 
@@ -93,23 +95,17 @@ def process_espn_league(event, context):
       data_endpoint = extract_from_espn_api(league_info, view, header)
       league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
 
-    # Merging draft recap with ratings
-    has_ejections_cat = int(consts.EJS) in league_data['settings'].iloc[0]['categoryIds']
-    columns = ['pickNumber', 'round', 'playerName', 'teamId', 'ratingSeason', 'rankingSeason']
-    if has_ejections_cat:
-      columns.append('ratingEjsSeason')
-      columns.append('rankingEjsSeason')
-
-    full_draft_recap = pd.merge(league_data['draftRecap'], league_data['ratings'], how='left', on='playerId')
-
-    league_data['draftRecap'] = full_draft_recap[columns]
-
+    # Complex transforms
+    league_data['draftRecap'] = transform_draft_recap(league_data['draft'], league_data['ratings'], league_data['settings'])
+  
+    # Removing unneeded league data
     league_data.pop('ratings', None)
 
     # Data serialization and upload data to dynamo
     for key in league_data.keys():
       if isinstance(league_data[key], pd.DataFrame):
         league_data[key] = league_data[key].to_json(orient='records')
+
     upload_league_data_to_dynamo(league_data, method)
 
   print("Complete...")
