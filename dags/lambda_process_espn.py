@@ -126,6 +126,42 @@ def process_espn_league(event, context):
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
 
+def process_espn_common():
+    league_info = {
+        "leagueId": '891817951',
+        "leagueYear": 2023
+    }
+
+    common_data = {}
+
+    for endpoint in common_api_endpoints.keys():
+        view = common_api_endpoints[endpoint]
+
+        header = {}
+        if common_headers.get(endpoint):
+            header = {'x-fantasy-filter': common_headers.get(endpoint)}
+
+        data_endpoint = extract_from_espn_api(league_info, view, header)
+
+        common_data[endpoint] = data_endpoint
+
+        # Data serialization and upload data to S3
+        for key in common_data.keys():
+            if isinstance(common_data[key], pd.DataFrame):
+                common_data[key] = common_data[key].to_json(orient='records')
+        today = date.today().strftime("%b-%d-%Y")
+
+        filename = f"nba-player-stats-{today}.json"
+
+        bucketname = 'nba-player-stats'
+        upload_data_to_s3(common_data, filename, bucketname)
+
+    return {
+        'statusCode': 200,
+        'body': "Test response"
+    }
+
+
 def update_espn_leagues(event, context):
     print(event)
 
@@ -197,43 +233,9 @@ def update_espn_leagues(event, context):
 
     print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 
+    process_espn_common()
+
     return {
         'statusCode': update_res['StatusCode'],
-        'body': "Test response"
-    }
-
-
-def process_espn_common():
-    league_info = {
-        "leagueId": '891817951',
-        "leagueYear": 2023
-    }
-
-    common_data = {}
-
-    for endpoint in common_api_endpoints.keys():
-        view = common_api_endpoints[endpoint]
-
-        header = {}
-        if common_headers.get(endpoint):
-            header = {'x-fantasy-filter': common_headers.get(endpoint)}
-
-        data_endpoint = extract_from_espn_api(league_info, view, header)
-
-        common_data[endpoint] = data_endpoint
-
-        # Data serialization and upload data to S3
-        for key in common_data.keys():
-            if isinstance(common_data[key], pd.DataFrame):
-                common_data[key] = common_data[key].to_json(orient='records')
-        today = date.today().strftime("%b-%d-%Y")
-
-        filename = f"nba-player-stats-{today}.json"
-
-        bucketname = 'nba-player-stats'
-        upload_data_to_s3(common_data, filename, bucketname)
-
-    return {
-        'statusCode': 200,
         'body': "Test response"
     }
