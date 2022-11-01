@@ -2,194 +2,238 @@ import json
 import boto3
 import psycopg2
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 
 from extract_espn import (
-  extract_from_espn_api
+    extract_from_espn_api
 )
 from transform_raw_data import (
-  transform_raw_to_df
+    transform_raw_to_df
 )
 from transform_data import (
-  transform_draft_recap
+    transform_draft_recap
 )
 from upload_to_aws import (
-  upload_league_data_to_dynamo
+    upload_league_data_to_dynamo, upload_data_to_s3
 )
 
-
-api_endpoints = {
-  'settings': ['mSettings'],
-  'teams': ['mTeam'],
-  'scoreboard': ['mScoreboard'], 
-  'draft': ['mDraftDetail'],
-  'ratings': ['kona_player_info', 'mStatRatings']
+league_api_endpoints = {
+    'settings': ['mSettings'],
+    'teams': ['mTeam'],
+    'scoreboard': ['mScoreboard'],
+    'draft': ['mDraftDetail'],
+    'ratings': ['kona_player_info', 'mStatRatings']
 }
 
-headers = {
-  'ratings': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
+league_headers = {
+    'ratings': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
+}
+
+common_api_endpoints = {
+    'ratings': ['kona_player_info']
+}
+
+common_headers = {
+    'ratings': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}'''
 }
 
 def process_espn_league(event, context):
-  league_id = event["queryStringParameters"].get('leagueId')
-  cookie_espn = event["queryStringParameters"].get('cookieEspnS2')
-  cookie_swid = event["queryStringParameters"].get('cookieSwid')
-  league_year = event["queryStringParameters"].get('leagueYear')
+    league_id = event["queryStringParameters"].get('leagueId')
+    cookie_espn = event["queryStringParameters"].get('cookieEspnS2')
+    cookie_swid = event["queryStringParameters"].get('cookieSwid')
+    league_year = event["queryStringParameters"].get('leagueYear')
 
-  is_initial_process = True
-  method = 'PUT'
+    is_initial_process = True
+    method = 'PUT'
 
-  league_info = {
-    "leagueId": league_id,
-    "cookieEspn": cookie_espn,
-    "cookieSwid": cookie_swid 
-  }
-
-  print(f"Processing league {league_id}...")
-
-  if league_year:
-    is_initial_process = False
-    method = 'PATCH'
-    league_years = [league_year]
-  else:
-    league_years = []
-    league_year_start = datetime.now().year + 1
-
-    league_info["leagueYear"] = league_year_start
-
-    year_check_failures = 0
-    max_check_failures = 4
-    while year_check_failures < max_check_failures:
-      league_info['leagueYear'] = league_year_start
-
-      try:
-        extract_from_espn_api(league_info, [''])
-      except:
-        year_check_failures += 1
-      else:
-        league_years.append(league_year_start)
-      finally:
-        league_year_start = league_year_start - 1
-
-
-  for league_year in league_years:
-    print(f"Starting data extraction for {league_year}...")
-
-    league_info['leagueYear'] = league_year
-
-    league_data = {
-      'leagueId': league_id,
-      'leagueYear': league_year,
+    league_info = {
+        "leagueId": league_id,
+        "cookieEspn": cookie_espn,
+        "cookieSwid": cookie_swid
     }
 
-    if is_initial_process:
-      league_data['allYears'] = league_years
+    print(f"Processing league {league_id}...")
 
-    for endpoint in api_endpoints.keys():
-      view = api_endpoints[endpoint]
+    if league_year:
+        is_initial_process = False
+        method = 'PATCH'
+        league_years = [league_year]
+    else:
+        league_years = []
+        league_year_start = datetime.now().year + 1
 
-      header = {}
-      if headers.get(endpoint):
-        header = {'x-fantasy-filter': headers.get(endpoint)}
+        league_info["leagueYear"] = league_year_start
 
-      data_endpoint = extract_from_espn_api(league_info, view, header)
-      league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
+        year_check_failures = 0
+        max_check_failures = 4
+        while year_check_failures < max_check_failures:
+            league_info['leagueYear'] = league_year_start
 
-    # Complex transforms
-    league_data['draftRecap'] = transform_draft_recap(league_data['draft'], league_data['ratings'], league_data['settings'])
-  
-    # Removing unneeded league data
-    league_data.pop('ratings', None)
+            try:
+                extract_from_espn_api(league_info, [''])
+            except:
+                year_check_failures += 1
+            else:
+                league_years.append(league_year_start)
+            finally:
+                league_year_start = league_year_start - 1
 
-    # Data serialization and upload data to dynamo
-    for key in league_data.keys():
-      if isinstance(league_data[key], pd.DataFrame):
-        league_data[key] = league_data[key].to_json(orient='records')
+    for league_year in league_years:
+        print(f"Starting data extraction for {league_year}...")
 
-    upload_league_data_to_dynamo(league_data, method)
+        league_info['leagueYear'] = league_year
 
-  print("Complete...")
+        league_data = {
+            'leagueId': league_id,
+            'leagueYear': league_year,
+        }
 
-  return {
-    'statusCode': 200,
-    'body': "Test response"
-  }
+        if is_initial_process:
+            league_data['allYears'] = league_years
+
+        for endpoint in league_api_endpoints.keys():
+            view = league_api_endpoints[endpoint]
+
+            header = {}
+            if league_headers.get(endpoint):
+                header = {'x-fantasy-filter': league_headers.get(endpoint)}
+
+            data_endpoint = extract_from_espn_api(league_info, view, header)
+            league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
+
+        # Complex transforms
+        league_data['draftRecap'] = transform_draft_recap(league_data['draft'], league_data['ratings'],
+                                                          league_data['settings'])
+
+        # Removing unneeded league data
+        league_data.pop('ratings', None)
+
+        # Data serialization and upload data to dynamo
+        for key in league_data.keys():
+            if isinstance(league_data[key], pd.DataFrame):
+                league_data[key] = league_data[key].to_json(orient='records')
+
+        upload_league_data_to_dynamo(league_data, method)
+
+    print("Complete...")
+
+    return {
+        'statusCode': 200,
+        'body': "Test response"
+    }
 
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
+
 def update_espn_leagues(event, context):
-  print(event)
+    print(event)
 
-  password_res = lambda_client.invoke(
-    FunctionName='get_heroku_password', 
-    InvocationType='RequestResponse'
-  )
-  
-  conn = psycopg2.connect(
-    host='ec2-34-230-153-41.compute-1.amazonaws.com',
-    port='5432',
-    database='d4aje3kk0gnc05',
-    user='tepamoxyceuxbu',
-    password=json.loads(password_res['Payload'].read())['body'],
-    sslmode='require'
-  )
+    password_res = lambda_client.invoke(
+        FunctionName='get_heroku_password',
+        InvocationType='RequestResponse'
+    )
 
-  cursor = conn.cursor()
+    conn = psycopg2.connect(
+        host='ec2-34-230-153-41.compute-1.amazonaws.com',
+        port='5432',
+        database='d4aje3kk0gnc05',
+        user='tepamoxyceuxbu',
+        password=json.loads(password_res['Payload'].read())['body'],
+        sslmode='require'
+    )
 
-  cursor.execute(
-    """
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
     SELECT leagueid, cookieswid, cookieespns2
     FROM leagueids  
     WHERE active
     """
-  )
-  res_query = cursor.fetchall()
+    )
+    res_query = cursor.fetchall()
 
-  num_leagues = len(res_query)
-  num_failed = 0
+    num_leagues = len(res_query)
+    num_failed = 0
 
-  for league_info in res_query:
-    league_id = league_info[0]
+    for league_info in res_query:
+        league_id = league_info[0]
 
-    process_payload = {
-      "queryStringParameters": {
-        "leagueId": league_id,
-        "cookieEspnS2": league_info[1],
-        "cookieSwid": league_info[2],
-        "leagueYear": 2023
-      }
+        process_payload = {
+            "queryStringParameters": {
+                "leagueId": league_id,
+                "cookieEspnS2": league_info[1],
+                "cookieSwid": league_info[2],
+                "leagueYear": 2023
+            }
+        }
+
+        process_res = lambda_client.invoke(
+            FunctionName='process_espn_league',
+            InvocationType='RequestResponse',
+            Payload=json.dumps(process_payload)
+        )
+
+        lambda_error = process_res.get('FunctionError', False)
+        status = process_res['StatusCode']
+
+        if status != 200 or lambda_error:
+            num_failed += 1
+            print(f"League {league_id.ljust(11)} failed, {lambda_error}/{status}")
+        else:
+            update_payload = {
+                "queryStringParameters": {
+                    "leagueId": league_id,
+                    "method": 'lastUpdated'
+                }
+            }
+
+            update_res = lambda_client.invoke(
+                FunctionName='updateLastViewedLeague',
+                InvocationType='RequestResponse',
+                Payload=json.dumps(update_payload)
+            )
+
+    print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
+
+    return {
+        'statusCode': update_res['StatusCode'],
+        'body': "Test response"
     }
 
-    process_res = lambda_client.invoke(
-      FunctionName='process_espn_league', 
-      InvocationType='RequestResponse',
-      Payload=json.dumps(process_payload)
-    )
 
-    lambda_error = process_res.get('FunctionError', False)
-    status = process_res['StatusCode']
+def process_espn_common():
+    league_info = {
+        "leagueId": '891817951',
+        "leagueYear": 2023
+    }
 
-    if status != 200 or lambda_error:
-      num_failed += 1
-      print(f"League {league_id.ljust(11)} failed, {lambda_error}/{status}")
-    else:
-      update_payload = {
-        "queryStringParameters": {
-          "leagueId": league_id,
-          "method": 'lastUpdated'
-        }
-      }
+    common_data = {}
 
-      update_res = lambda_client.invoke(
-        FunctionName='updateLastViewedLeague', 
-        InvocationType='RequestResponse',
-        Payload=json.dumps(update_payload)
-      )
+    for endpoint in common_api_endpoints.keys():
+        view = common_api_endpoints[endpoint]
 
-  print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
+        header = {}
+        if common_headers.get(endpoint):
+            header = {'x-fantasy-filter': common_headers.get(endpoint)}
 
-  return {
-    'statusCode': update_res['StatusCode'],
-    'body': "Test response"  
-  }
+        data_endpoint = extract_from_espn_api(league_info, view, header)
+
+        common_data[endpoint] = data_endpoint
+
+        # Data serialization and upload data to S3
+        for key in common_data.keys():
+            if isinstance(common_data[key], pd.DataFrame):
+                common_data[key] = common_data[key].to_json(orient='records')
+        today = date.today().strftime("%b-%d-%Y")
+
+        filename = f"nba-player-stats-{today}.json"
+
+        bucketname = 'nba-player-stats'
+        upload_data_to_s3(common_data, filename, bucketname)
+
+    return {
+        'statusCode': 200,
+        'body': "Test response"
+    }
