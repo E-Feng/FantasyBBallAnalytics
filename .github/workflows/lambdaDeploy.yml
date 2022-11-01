@@ -4,15 +4,15 @@ name: Deploy Lambda Function #Name of the Workflow
 on:  #Name of the GitHub event that triggers the workflow
   push:   #On Push Event We need to take action
     branches:  #Now we need to specify the branch name
-    - v2
+    - main
 
 jobs:  #Workflow run is made up of one or more jobs
   deploy_lambda:
     runs-on: ubuntu-latest  #Through which Server OS we need to Work (type of machine to run the job on)
     steps:
     #Using versioned actions 
-      - uses: actions/checkout@v2  # --> Reference a specific version
-      - uses: actions/setup-node@v2 # --> To Setup the Server With Node Env
+      - uses: actions/checkout@main  # --> Reference a specific version
+      - uses: actions/setup-node@main # --> To Setup the Server With Node Env
         with:  
           node-version: '14' #--> Specify the Version of the Node 
       - name: Configure AWS Credentials  
