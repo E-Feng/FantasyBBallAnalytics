@@ -57,7 +57,7 @@ def upload_league_data_to_dynamo_via_sqs(data: dict):
     raise ValueError("Error uploading to dynamodb")
   return
 
-def upload_data_to_s3(data: dict, filename: str, bucketname: str):
+def upload_data_to_s3(data: dict, filename: str, bucket_name: str):
   """
   Upload files to S3 bucket
   """
@@ -66,7 +66,7 @@ def upload_data_to_s3(data: dict, filename: str, bucketname: str):
 
   try:
     uploadByteStream = bytes(json.dumps(data).encode('UTF-8'))
-    s3.put_object(Bucket=bucketname, Key=filename, Body=uploadByteStream)
+    s3.put_object(Bucket=bucket_name, Key=filename, Body=uploadByteStream)
     print('Upload successful')
   except:
     print('Upload failed')
