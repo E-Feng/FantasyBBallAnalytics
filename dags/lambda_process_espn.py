@@ -150,7 +150,7 @@ def process_espn_common():
       if isinstance(common_data[key], pd.DataFrame):
         common_data[key] = common_data[key].to_json(orient='records')
 
-    today = date.today().strftime("%b-%d-%Y")
+    today = date.today().strftime("%Y-%m-%d")
     filename = f"nba-player-stats-{today}.json"
 
     bucket_name = 'nba-player-stats'
