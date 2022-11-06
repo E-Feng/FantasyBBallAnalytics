@@ -22,19 +22,19 @@ league_api_endpoints = {
   'teams': ['mTeam'],
   'scoreboard': ['mScoreboard'],
   'draft': ['mDraftDetail'],
-  'ratings': ['kona_player_info', 'mStatRatings']
+  'players': ['kona_player_info', 'mStatRatings']
 }
 
 league_headers = {
-  'ratings': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
+  'players': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
 }
 
 common_api_endpoints = {
-  'ratings': ['kona_player_info']
+  'players': ['kona_player_info']
 }
 
 common_headers = {
-  'ratings': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}'''
+  'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}'''
 }
 
 def process_espn_league(event, context):
@@ -104,12 +104,12 @@ def process_espn_league(event, context):
     # Complex transforms
     league_data['draftRecap'] = transform_draft_recap(
       league_data['draft'], 
-      league_data['ratings'],
+      league_data['players'],
       league_data['settings']
     )
 
     # Removing unneeded league data
-    league_data.pop('ratings', None)
+    league_data.pop('players', None)
 
     # Data serialization and upload data to dynamo
     for key in league_data.keys():

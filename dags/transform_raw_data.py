@@ -17,8 +17,8 @@ def transform_raw_to_df(endpoint: list, raw_data: dict):
     df = transform_scoreboard_to_df(raw_data)
   elif endpoint == 'draft':
     df = transform_draft_to_df(raw_data)
-  elif endpoint == 'ratings':
-    df = transform_ratings_to_df(raw_data)
+  elif endpoint == 'players':
+    df = transform_players_to_df(raw_data)
   elif endpoint == 'settings':
     df = transform_settings_to_df(raw_data)
   elif endpoint == 'daily':
@@ -176,9 +176,9 @@ def transform_draft_to_df(draft_info: dict):
   return df
 
 
-def transform_ratings_to_df(ratings: dict):
+def transform_players_to_df(ratings: dict):
   """
-  Transforms rankings raw json data from ESPN API to pandas dataframe
+  Transforms players raw json data from ESPN API to pandas dataframe
   """
 
   data = ratings  
