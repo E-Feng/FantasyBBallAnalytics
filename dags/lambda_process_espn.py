@@ -167,18 +167,20 @@ lambda_client = boto3.client('lambda', region_name='us-east-1')
 def update_espn_leagues(event, context):
   print(event)
 
+  process_espn_common()
+
   password_res = lambda_client.invoke(
-    FunctionName='get_heroku_password',
-    InvocationType='RequestResponse'
+    FunctionName='get_secret',
+    InvocationType='RequestResponse',
+    Payload=json.dumps({'key': 'supabase_password'})
   )
 
   conn = psycopg2.connect(
-    host='ec2-34-230-153-41.compute-1.amazonaws.com',
+    host='db.lsygyiijbumuybwyuvrn.supabase.co',
     port='5432',
-    database='d4aje3kk0gnc05',
-    user='tepamoxyceuxbu',
-    password=json.loads(password_res['Payload'].read())['body'],
-    sslmode='require'
+    database='postgres',
+    user='postgres',
+    password=json.loads(password_res['Payload'].read())['body']
   )
 
   cursor = conn.cursor()
@@ -234,8 +236,6 @@ def update_espn_leagues(event, context):
       )
 
   print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
-
-  process_espn_common()
 
   return {
     'statusCode': update_res['StatusCode'],
