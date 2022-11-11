@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaHome } from 'react-icons/fa';
+import { SiBuymeacoffee } from "react-icons/si";
+import styled from 'styled-components';
 
 import LeagueSettings from './LeagueSettings';
-
-import styled from 'styled-components';
 
 function NavBar(props) {
   return (
@@ -15,7 +15,7 @@ function NavBar(props) {
             <Link to='/'>Home</Link>
           </li>
           <li>
-            <Link to='/teamstats'>Team Stats</Link>
+            <Link to='/scoreboard'>Scoreboard</Link>
           </li>
           <li>
             <Link to='/compare'>Compare</Link>
@@ -43,6 +43,11 @@ function NavBar(props) {
             <FaLinkedin title='Linkedin'></FaLinkedin>
           </a>
         </li>
+        <li>
+          <a href='https://www.buymeacoffee.com/fantasyef'>
+            <SiBuymeacoffee title='BuyMeACoffee'></SiBuymeacoffee>
+          </a>
+        </li>   
       </Icons>
     </NavContainer>
   );
