@@ -9,7 +9,7 @@ import TotalsContainer from '../containers/TotalsContainer';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 
-function TeamStats(props) {
+function Scoreboard(props) {
   const { leagueKey } = useContext(LeagueContext);
 
   const queryClient = useQueryClient();
@@ -102,4 +102,4 @@ const RotoError = styled.p`
   font-size: 36px;
 `;
 
-export default TeamStats;
+export default Scoreboard;

@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
-import TeamStats from './pages/TeamStats';
+import Scoreboard from './pages/Scoreboard';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
 import Error from './pages/Error';
@@ -89,8 +89,12 @@ function App() {
             render={(props) => <Home {...props} maxWidth={maxWidth} />}
           />
           <Route
+            path='/scoreboard'
+            render={(props) => <Scoreboard {...props} maxWidth={maxWidth} />}
+          />
+          <Route
             path='/teamstats'
-            render={(props) => <TeamStats {...props} maxWidth={maxWidth} />}
+            render={(props) => <Scoreboard {...props} maxWidth={maxWidth} />}
           />
           <Route
             path='/compare'
