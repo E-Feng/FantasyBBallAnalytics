@@ -204,8 +204,8 @@ def update_espn_leagues(event, context):
     process_payload = {
       "queryStringParameters": {
         "leagueId": league_id,
-        "cookieEspnS2": league_info[1],
-        "cookieSwid": league_info[2],
+        "cookieSwid": league_info[1],
+        "cookieEspnS2": league_info[2],
         "leagueYear": 2023
       }
     }
