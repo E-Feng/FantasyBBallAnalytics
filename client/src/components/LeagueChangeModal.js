@@ -26,9 +26,16 @@ function LeagueChangeModal(props) {
   };
 
   const onSubmit = async (data) => {
+    const newLeagueId = data.leagueId;
+
+    if (newLeagueId === '00000001') {
+      props.setShow(false);
+      props.setLeagueId(newLeagueId);
+      return;
+    }
+
     setResponseMsg(requestingMsg);
 
-    const newLeagueId = data.leagueId;
     const reqPayload = {
       leagueId: newLeagueId,
       cookieEspnS2: data.cookieEspnS2,
