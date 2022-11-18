@@ -191,19 +191,37 @@ def transform_players_to_df(ratings: dict):
 
     row['playerId'] = str(player['id'])
     row['playerName'] = player['player']['fullName']
+    row['onTeamId'] = player['onTeamId']
 
     # Check if ratings exist for player
-    if 'ratings' in player:
-      row['ratingEjsSeason'] = player['ratings']['0']['totalRating']
-      row['rankingEjsSeason'] = player['ratings']['0']['totalRanking']
+    if player['ratings']['0']['statRankings']:
+      row['totalRatingSeason'] = player['ratings']['0']['totalRating']
+      row['totalRatingLast7'] = player['ratings']['1']['totalRating']
+      row['totalRatingLast15'] = player['ratings']['2']['totalRating']
+      row['totalRatingLast30'] = player['ratings']['3']['totalRating']
 
-      # Calculating rating without ejections
-      rating = 0
-      for stat in player['ratings']['0']['statRankings']:
-        if stat['forStat'] != int(consts.EJS):
-          rating = rating + stat['rating']
+      row['totalRankingSeason'] = player['ratings']['0']['totalRanking']
+      row['totalRankingLast7'] = player['ratings']['1']['totalRanking']
+      row['totalRankingLast15'] = player['ratings']['2']['totalRanking']
+      row['totalRankingLast30'] = player['ratings']['3']['totalRanking']
 
-      row['ratingSeason'] = rating
+      statRankingsSeason = player['ratings']['0']['statRankings']
+
+      a = [o.pop('rating') for o in statRankingsSeason]
+      print(a)
+
+    # Check if ratings exist for player
+    # if 'ratings' in player:
+    #   row['ratingEjsSeason'] = player['ratings']['0']['totalRating']
+    #   row['rankingEjsSeason'] = player['ratings']['0']['totalRanking']
+
+    #   # Calculating rating without ejections
+    #   rating = 0
+    #   for stat in player['ratings']['0']['statRankings']:
+    #     if stat['forStat'] != int(consts.EJS):
+    #       rating = rating + stat['rating']
+
+    #   row['ratingSeason'] = rating
 
     #print(row)
     data_array.append(row)
