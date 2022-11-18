@@ -190,6 +190,7 @@ def update_espn_leagues(event, context):
     SELECT leagueid, cookieswid, cookieespns2
     FROM leagueids  
     WHERE active
+      AND (NOW() - LastViewed < INTERVAL '7 day')
     """
   )
   res_query = cursor.fetchall()
