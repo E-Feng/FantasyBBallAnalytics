@@ -14,6 +14,14 @@ def calculate_gamescore(player):
     return None
 
 
+def format_stat_ratings(data: list):
+  formatted = {}
+  for stat in data:
+    stat_id = stat['forStat']
+    formatted[stat_id] = round(stat['rating'], 2)
+  return formatted
+
+
 def capitalize_dict_keys(data):
   """
   Capitalizes keys from case-insensitive RDS queries for compatibility

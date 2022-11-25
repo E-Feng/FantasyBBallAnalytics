@@ -11,6 +11,8 @@ from transform_raw_data import (
   transform_raw_to_df
 )
 from transform_data import (
+  transform_players_truncate,
+  transform_players_no_ejections,
   transform_draft_recap
 )
 from upload_to_aws import (
@@ -102,19 +104,31 @@ def process_espn_league(event, context):
       league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
 
     # Complex transforms
+    league_data['players'] = transform_players_no_ejections(
+      league_data['players']
+    )
+
     league_data['draftRecap'] = transform_draft_recap(
       league_data['draft'], 
       league_data['players'],
       league_data['settings']
     )
 
+    league_data['players'] = transform_players_truncate(
+      league_data['players']
+    )
+
     # Removing unneeded league data
-    league_data.pop('players', None)
+    league_data.pop('draft', None)
+    #league_data.pop('players', None)
 
     # Data serialization and upload data to dynamo
     for key in league_data.keys():
         if isinstance(league_data[key], pd.DataFrame):
             league_data[key] = league_data[key].to_json(orient='records')
+
+    with open('data.json', 'w') as f:
+      json.dump(league_data, f)
 
     upload_league_data_to_dynamo(league_data, method)
 
