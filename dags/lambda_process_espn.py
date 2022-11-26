@@ -16,6 +16,9 @@ from transform_data import (
 from upload_to_aws import (
   upload_league_data_to_dynamo, upload_data_to_s3
 )
+from util import (
+  invoke_lambda
+)
 
 league_api_endpoints = {
   'settings': ['mSettings'],
@@ -169,18 +172,14 @@ def update_espn_leagues(event, context):
 
   process_espn_common()
 
-  password_res = lambda_client.invoke(
-    FunctionName='get_secret',
-    InvocationType='RequestResponse',
-    Payload=json.dumps({'key': 'supabase_password'})
-  )
+  db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
 
   conn = psycopg2.connect(
     host='db.lsygyiijbumuybwyuvrn.supabase.co',
     port='5432',
     database='postgres',
     user='postgres',
-    password=json.loads(password_res['Payload'].read())['body']
+    password=db_pass
   )
 
   cursor = conn.cursor()
@@ -210,18 +209,11 @@ def update_espn_leagues(event, context):
       }
     }
 
-    process_res = lambda_client.invoke(
-      FunctionName='process_espn_league',
-      InvocationType='RequestResponse',
-      Payload=json.dumps(process_payload)
-    )
+    process_res = invoke_lambda(lambda_client, 'process_espn_league', process_payload)
 
-    lambda_error = process_res.get('FunctionError', False)
-    status = process_res['StatusCode']
-
-    if status != 200 or lambda_error:
+    if not process_res:
       num_failed += 1
-      print(f"League {league_id.ljust(11)} failed, {lambda_error}/{status}")
+      print(f"League {league_id.ljust(11)} failed")
     else:
       update_payload = {
         "queryStringParameters": {
@@ -230,15 +222,12 @@ def update_espn_leagues(event, context):
         }
       }
 
-      update_res = lambda_client.invoke(
-        FunctionName='updateLastViewedLeague',
-        InvocationType='RequestResponse',
-        Payload=json.dumps(update_payload)
-      )
+      process_res = invoke_lambda(lambda_client, 'updateLastViewedLeague', update_payload)
+
 
   print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 
   return {
-    'statusCode': update_res['StatusCode'],
+    'statusCode': 200,
     'body': "Test response"
   }
