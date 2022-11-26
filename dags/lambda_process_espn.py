@@ -122,7 +122,7 @@ def process_espn_league(event, context):
 
   return {
     'statusCode': 200,
-    'body': json.dumps(league_years)
+    'body': league_years
   }
 
 
