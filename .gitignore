@@ -12,6 +12,7 @@ config/*.env
 config/*.json
 dags/keys/.env
 dags/keys/*.json
+dags/local_test.py
 client/src/utils/config.js
 browserconfig.xml
 humans.txt
