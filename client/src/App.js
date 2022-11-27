@@ -93,12 +93,12 @@ function App() {
             render={(props) => <Scoreboard {...props} maxWidth={maxWidth} />}
           />
           <Route
-            path='/teamstats'
-            render={(props) => <Scoreboard {...props} maxWidth={maxWidth} />}
-          />
-          <Route
             path='/compare'
             render={(props) => <Compare {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/draft'
+            render={(props) => <DraftRecap {...props} maxWidth={maxWidth} />}
           />
           <Route
             path='/draftrecap'

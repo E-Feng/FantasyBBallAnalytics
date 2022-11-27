@@ -1,9 +1,8 @@
 import React from 'react';
 import { useTable } from 'react-table';
+import styled from 'styled-components';
 
 import { getHSLColor } from '../utils/colorsUtil';
-
-import styled from 'styled-components';
 
 function DraftRecapTable(props) {
   const ratingColorRange = [0, 15];
@@ -23,7 +22,12 @@ function DraftRecapTable(props) {
       borderMod = numPicks;
       break;
     case 'ranking':
-      data.sort((a, b) => a.ranking - b.ranking);
+      data.sort((a, b) => {
+        if (a.ranking === null) return 1;
+        if (b.ranking === null) return -1;
+
+        return a.ranking - b.ranking;
+      });
       break;
     case 'difference':
       data.sort((a, b) => b.difference - a.difference);
@@ -144,7 +148,7 @@ function DraftRecapTable(props) {
 
                       const val = cell.value;
                       let color = 'gainsboro';
-                      
+
                       if (val) {
                         if (headerId === 'difference') {
                           color = getHSLColor(
