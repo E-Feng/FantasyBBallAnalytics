@@ -24,14 +24,14 @@ def transform_draft_recap(draft: pd.DataFrame, players: pd.DataFrame, settings: 
       return sum(ratings.values())
     return None
 
-  rating_season = players['statRatingsSeason'].apply(calculate_ratings_no_ejections)
+  players_copy = players.copy()
 
-  ranking_season = rating_season.rank(method='min', na_option='keep', ascending=False)
+  players_copy['ratingSeason'] = players_copy['statRatingsSeason'].apply(calculate_ratings_no_ejections)
 
-  draft_recap_full = pd.merge(draft, players, how='left', on='playerId')
+  players_copy['rankingSeason'] = players_copy['ratingSeason'].rank(method='min', na_option='keep', ascending=False)
 
-  draft_recap_full['ratingSeason'] = rating_season
-  draft_recap_full['rankingSeason'] = ranking_season
+  draft_recap_full = pd.merge(draft, players_copy, how='left', on='playerId')
+
 
   draft_recap_full.rename(columns={
     'totalRatingSeason': 'ratingEjsSeason',
