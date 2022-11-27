@@ -16,7 +16,7 @@ function DraftRecapContainer(props) {
     const team = props.teams.filter((team) => team.teamId === player.teamId);
     const ranking = ejsChecked ? player.rankingEjsSeason : player.rankingSeason;
     const rating = ejsChecked ? player.ratingEjsSeason : player.ratingSeason;
-    const difference = player.pickNumber - ranking;
+    const difference = ranking ? player.pickNumber - ranking : null;
 
     return {
       ...player,

@@ -21,7 +21,7 @@ function NavBar(props) {
             <Link to='/compare'>Compare</Link>
           </li>
           <li>
-            <Link to='/draftrecap'>Draft Recap</Link>
+            <Link to='/draft'>Draft</Link>
           </li>
         </LinksList>
       </LinksContainer>
