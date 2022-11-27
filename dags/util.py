@@ -38,7 +38,7 @@ def calculate_gamescore(player):
 def format_stat_ratings(data: list):
   formatted = {}
   for stat in data:
-    stat_id = stat['forStat']
+    stat_id = str(stat['forStat'])
     formatted[stat_id] = round(stat['rating'], 2)
   return formatted
 

@@ -127,7 +127,7 @@ def process_espn_league(event, context):
 
     with open('C:\\Users\\Elvin\\Desktop\\data.json', 'w') as f:
       json.dump(league_data, f)
-
+      
     upload_league_data_to_dynamo(league_data, method)
 
   print("Complete...")

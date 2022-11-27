@@ -19,7 +19,7 @@ def transform_draft_recap(draft: pd.DataFrame, players: pd.DataFrame, settings: 
     columns.append('rankingEjsSeason')
 
   def calculate_ratings_no_ejections(ratings: dict):
-    if pd.notnull(ratings):
+    if isinstance(ratings, dict):
       ratings.pop(consts.EJS, None)
       return sum(ratings.values())
     return None
