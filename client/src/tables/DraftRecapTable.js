@@ -2,14 +2,24 @@ import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
 
+import { filterNaN } from '../utils/arrayMath';
 import { getHSLColor } from '../utils/colorsUtil';
 
 function DraftRecapTable(props) {
-  const ratingColorRange = [0, 15];
-  const diffColorRange = [-100, 100];
-
   const data = props.data;
   data.sort((a, b) => a.pickNumber - b.pickNumber);
+
+  const dataRatings = filterNaN(data.map((o) => o.rating)).sort(
+    (a, b) => a - b
+  );
+  const minRatingsIndex = Math.floor(dataRatings.length * 0.05);
+  const maxRatingsIndex = Math.ceil(dataRatings.length * 0.95);
+
+  const ratingColorRange = [
+    dataRatings[minRatingsIndex],
+    dataRatings[maxRatingsIndex],
+  ];
+  const diffColorRange = [-100, 100];
 
   const numTeams = data.filter((player) => player.round === 1).length;
   const numPicks = data.length / numTeams;
@@ -149,7 +159,7 @@ function DraftRecapTable(props) {
                       const val = cell.value;
                       let color = 'gainsboro';
 
-                      if (val) {
+                      if (val !== null) {
                         if (headerId === 'difference') {
                           color = getHSLColor(
                             val,
