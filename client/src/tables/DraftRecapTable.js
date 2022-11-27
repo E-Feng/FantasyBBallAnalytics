@@ -6,8 +6,8 @@ import { getHSLColor } from '../utils/colorsUtil';
 import styled from 'styled-components';
 
 function DraftRecapTable(props) {
-  const ratingColorRange = [0, 15]
-  const diffColorRange = [-100, 100]
+  const ratingColorRange = [0, 15];
+  const diffColorRange = [-100, 100];
 
   const data = props.data;
   data.sort((a, b) => a.pickNumber - b.pickNumber);
@@ -23,10 +23,10 @@ function DraftRecapTable(props) {
       borderMod = numPicks;
       break;
     case 'ranking':
-      data.sort((a, b) => a.ranking - b.ranking)
+      data.sort((a, b) => a.ranking - b.ranking);
       break;
     case 'difference':
-      data.sort((a, b) => b.difference - a.difference)
+      data.sort((a, b) => b.difference - a.difference);
       break;
     default:
       break;
@@ -63,7 +63,9 @@ function DraftRecapTable(props) {
         accessor: 'rating',
 
         Cell: (props) => (
-          <React.Fragment>{props.value.toFixed(2)}</React.Fragment>
+          <React.Fragment>
+            {props.value ? props.value.toFixed(2) : ''}
+          </React.Fragment>
         ),
       },
       {
@@ -142,11 +144,21 @@ function DraftRecapTable(props) {
 
                       const val = cell.value;
                       let color = 'gainsboro';
-
-                      if (headerId === 'difference') {
-                        color = getHSLColor(val, diffColorRange[0], diffColorRange[1]);
-                      } else if (headerId === 'rating') {
-                        color = getHSLColor(val, ratingColorRange[0], ratingColorRange[1]);                        
+                      
+                      if (val) {
+                        if (headerId === 'difference') {
+                          color = getHSLColor(
+                            val,
+                            diffColorRange[0],
+                            diffColorRange[1]
+                          );
+                        } else if (headerId === 'rating') {
+                          color = getHSLColor(
+                            val,
+                            ratingColorRange[0],
+                            ratingColorRange[1]
+                          );
+                        }
                       }
 
                       return (
