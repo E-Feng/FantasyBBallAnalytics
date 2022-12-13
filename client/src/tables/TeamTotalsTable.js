@@ -5,34 +5,23 @@ import styled from 'styled-components';
 import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
-function TotalsTable(props) {
-  const getPercent = (values) => {
-    const denom = values[0] + values[1];
-    const percent = denom !== 0 ? (values[0] * 100) / denom : 100;
-    return percent;
-  };
-
-  const showPercent = (cell) => {
-    const values = cell.value;
-    return <React.Fragment>{getPercent(values).toFixed(0)}</React.Fragment>;
-  };
-
-  const sortPercent = (rowA, rowB, id, desc) => {
-    const percentA = getPercent(rowA.values[id]);
-    const percentB = getPercent(rowB.values[id]);
-
-    if (percentA > percentB) return -1;
-    if (percentB > percentA) return 1;
-    return 0;
-  };
-
+function TeamTotalsTable(props) {
   const data = props.data;
   data.sort((a, b) => a.seed - b.seed);
 
   // Getting cats for the league
-  const cats = categoryDetails.filter((cat) => {
+  const catArray = categoryDetails.filter((cat) => {
     return Object.keys(data[0]).includes(cat.name);
   });
+  const catNamesArray = catArray.map((cat) => cat.name);
+
+  // Calculating ranges for color
+  const catColorRange = {}
+  catNamesArray.forEach(catName => {
+    const dataset = data.map(row => row[catName])
+
+    catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)]
+  })
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
@@ -65,13 +54,13 @@ function TotalsTable(props) {
         accessor: 'losses',
       },
     ];
-    const catHeaders = cats.map((cat) => {
+    const catHeaders = catArray.map((cat) => {
       return {
         Header: cat.display,
         accessor: cat.name,
-        sortType: sortPercent,
+        // sortType: sortPercent,
 
-        Cell: showPercent,
+        Cell: (props) => props.value.toFixed(2),
       };
     });
 
@@ -134,11 +123,14 @@ function TotalsTable(props) {
                     row.cells.map((cell) => {
                       // Conditional background color rendering
                       const val = cell.value;
+                      const catName = cell.column.id;
+
+                      const range = catColorRange[catName];
+
                       let color = 'gainsboro';
 
-                      if (Array.isArray(cell.value)) {
-                        const denom = val[0] + val[1];
-                        color = getHSLColor(val[0], 0, denom);
+                      if (catNamesArray.includes(catName)) {
+                        color = getHSLColor(val, range[0], range[1]);
                       }
 
                       return (
@@ -209,4 +201,4 @@ const Table = styled.table`
   }
 `;
 
-export default TotalsTable;
+export default TeamTotalsTable;
