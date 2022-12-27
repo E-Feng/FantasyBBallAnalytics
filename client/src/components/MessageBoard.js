@@ -5,11 +5,11 @@ import styled from 'styled-components';
 
 import LeagueContext from '../components/LeagueContext';
 import LoadingIcon from './LoadingIcon';
-
+import { hasProfanity } from '../utils/chatUtil';
 
 function MessageBoard() {
   const { leagueKey } = useContext(LeagueContext);
-  const leagueYear = leagueKey[1]
+  const leagueYear = leagueKey[1];
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData([leagueYear, 'common']);
@@ -25,8 +25,17 @@ function MessageBoard() {
 
   const { register, handleSubmit, reset, errors } = useForm();
 
-  const onSubmit = (data) => {
-    reset({ name: data.name });
+  const onSubmit = async (data) => {
+    const name = data.name;
+    const msg = data.msg;
+
+    // Sanitizing inputs
+    const isProfanity = (await hasProfanity(name)) || (await hasProfanity(msg));
+    const isReserved = ['BOT', 'ADMIN'].includes(name.toUpperCase());
+
+    if (isProfanity || isReserved) {
+      return;
+    }
 
     const tzOffset = new Date().getTimezoneOffset() * 60000;
 
@@ -35,23 +44,19 @@ function MessageBoard() {
     const time = dateString.slice(11).replace('.', '-');
 
     const payload = {
-      user: data.name,
-      msg: data.msg,
+      user: name,
+      msg: msg,
       date: date,
       time: time,
       type: 'chat',
     };
 
-    // Return error if username is same as reserved BOT
-    if (data.name === 'BOT') {
-      return;
-    }
-
     // Updating messageData
     messageData[date] = messageData[date] ? messageData[date] : [];
 
     messageData[date][time] = payload;
-    queryClient.setQueryData('messageboard.json', messageData);
+
+    reset({ name: name, msg: '' });
 
     // Sending request to server
     const pre =
@@ -66,6 +71,7 @@ function MessageBoard() {
       body: JSON.stringify(payload),
     }).then((res) => {
       console.log('Post status ', res.status);
+
       return res.status;
     });
   };

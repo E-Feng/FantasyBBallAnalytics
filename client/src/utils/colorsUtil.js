@@ -6,6 +6,10 @@
  * @param {*} end
  */
 export const getHSLColor = (val, start, end, inverse) => {
+  if (val == null) {
+    return null;
+  }
+
   const hueA = 10;
   const hueB = 110;
 

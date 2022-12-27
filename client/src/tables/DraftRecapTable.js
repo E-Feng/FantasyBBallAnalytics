@@ -1,16 +1,25 @@
 import React from 'react';
 import { useTable } from 'react-table';
-
-import { getHSLColor } from '../utils/colorsUtil';
-
 import styled from 'styled-components';
 
-function DraftRecapTable(props) {
-  const ratingColorRange = [0, 15]
-  const diffColorRange = [-100, 100]
+import { filterNaN } from '../utils/arrayMath';
+import { getHSLColor } from '../utils/colorsUtil';
 
+function DraftRecapTable(props) {
   const data = props.data;
   data.sort((a, b) => a.pickNumber - b.pickNumber);
+
+  const dataRatings = filterNaN(data.map((o) => o.rating)).sort(
+    (a, b) => a - b
+  );
+  const minRatingsIndex = Math.floor(dataRatings.length * 0.05);
+  const maxRatingsIndex = Math.ceil(dataRatings.length * 0.95);
+
+  const ratingColorRange = [
+    dataRatings[minRatingsIndex],
+    dataRatings[maxRatingsIndex],
+  ];
+  const diffColorRange = [-100, 100];
 
   const numTeams = data.filter((player) => player.round === 1).length;
   const numPicks = data.length / numTeams;
@@ -23,10 +32,15 @@ function DraftRecapTable(props) {
       borderMod = numPicks;
       break;
     case 'ranking':
-      data.sort((a, b) => a.ranking - b.ranking)
+      data.sort((a, b) => {
+        if (a.ranking === null) return 1;
+        if (b.ranking === null) return -1;
+
+        return a.ranking - b.ranking;
+      });
       break;
     case 'difference':
-      data.sort((a, b) => b.difference - a.difference)
+      data.sort((a, b) => b.difference - a.difference);
       break;
     default:
       break;
@@ -63,7 +77,9 @@ function DraftRecapTable(props) {
         accessor: 'rating',
 
         Cell: (props) => (
-          <React.Fragment>{props.value.toFixed(2)}</React.Fragment>
+          <React.Fragment>
+            {props.value ? props.value.toFixed(2) : ''}
+          </React.Fragment>
         ),
       },
       {
@@ -143,10 +159,20 @@ function DraftRecapTable(props) {
                       const val = cell.value;
                       let color = 'gainsboro';
 
-                      if (headerId === 'difference') {
-                        color = getHSLColor(val, diffColorRange[0], diffColorRange[1]);
-                      } else if (headerId === 'rating') {
-                        color = getHSLColor(val, ratingColorRange[0], ratingColorRange[1]);                        
+                      if (val !== null) {
+                        if (headerId === 'difference') {
+                          color = getHSLColor(
+                            val,
+                            diffColorRange[0],
+                            diffColorRange[1]
+                          );
+                        } else if (headerId === 'rating') {
+                          color = getHSLColor(
+                            val,
+                            ratingColorRange[0],
+                            ratingColorRange[1]
+                          );
+                        }
                       }
 
                       return (
