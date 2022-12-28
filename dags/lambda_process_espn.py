@@ -190,23 +190,30 @@ def process_espn_common():
 
       top_studs_list  = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).head().to_json(orient='records'))
       top_scrubs_list = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).tail().to_json(orient='records'))
+      ejections       = json.loads(df[df['ejs'] > 0].to_json(orient='records'))
       
-      top_lists = {}
-      top_lists['studs'] = top_studs_list
-      top_lists['scrubs'] = top_scrubs_list
+      player_daily_alerts = {}
+      player_daily_alerts['studs'] = top_studs_list
+      player_daily_alerts['scrubs'] = top_scrubs_list
+      player_daily_alerts['ejections'] = ejections
 
       alert_data = {}
       alert_data[today] = {}
 
-      for top_list in top_lists.keys():
-        for i, gamescore in enumerate(top_lists[top_list]):
+      for alert_type in player_daily_alerts.keys():
+        for i, scoreline in enumerate(player_daily_alerts[alert_type]):
 
-          gamescore['type'] = 'stat'
-          gamescore['user'] = 'BOT'
-          gamescore['time'] = str(datetime.now().time())
-          alert_data[today][f'!{top_list}_stat{i}'] = gamescore
+          scoreline['user'] = 'BOT'
+          scoreline['time'] = str(datetime.now().time())
 
-          upload_to_firebase('alert', json.dumps(alert_data))
+          if alert_type == ejections:
+            scoreline['type'] = 'ejection'
+          else:
+            scoreline['type'] = 'stat'
+          
+          alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
+
+          upload_to_firebase('alert', json.dumps(alert_data))      
 
 
   return {
