@@ -171,13 +171,10 @@ def process_espn_common():
   # Data serialization
   for k, v in common_data.items():
 
-    # if isinstance(common_data[key], pd.DataFrame):
-    #   common_data[key] = common_data[key].to_json(orient='records')
-
     # Upload player data to S3
     if k == 'players':
 
-      player_data_dict = common_data
+      player_data_dict = common_data.copy()
       player_data_dict.pop('daily', '')
 
       filename = f"nba-player-stats-{today}.json"
@@ -191,11 +188,26 @@ def process_espn_common():
       df = transform_raw_to_df(k, v)
       game_minutes_minimum = 20
 
-      top_studs  = df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).head().to_json(orient='records')
-      top_scrubs = df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).tail().to_json(orient='records')
+      top_studs_list  = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).head().to_json(orient='records'))
+      top_scrubs_list = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).tail().to_json(orient='records'))
+      
+      top_lists = {}
+      top_lists['studs'] = top_studs_list
+      top_lists['scrubs'] = top_scrubs_list
 
-      upload_to_firebase(top_studs, 'alert')
-      upload_to_firebase(top_scrubs, 'alert')
+      alert_data = {}
+      alert_data[today] = {}
+
+      for top_list in top_lists.keys():
+        for i, gamescore in enumerate(top_lists[top_list]):
+
+          gamescore['type'] = 'stat'
+          gamescore['user'] = 'BOT'
+          gamescore['time'] = str(datetime.now().time())
+          alert_data[today][f'!{top_list}_stat{i}'] = gamescore
+
+          upload_to_firebase('alert', json.dumps(alert_data))
+
 
   return {
     'statusCode': 200,
