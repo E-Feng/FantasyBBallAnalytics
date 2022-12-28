@@ -20,6 +20,21 @@ from util import (
   invoke_lambda
 )
 
+from load_settings import (
+  get_scoring_period_id
+)
+
+from upload_to_cloud import (
+  upload_to_firebase
+)
+
+default_league_info = {
+  'leagueId': '1978554631',
+  'leagueYear': '2023',
+}
+
+scoring_period = get_scoring_period_id(default_league_info)
+
 league_api_endpoints = {
   'settings': ['mSettings'],
   'teams': ['mTeam'],
@@ -33,11 +48,14 @@ league_headers = {
 }
 
 common_api_endpoints = {
-  'players': ['kona_player_info']
+  'players': ['kona_player_info'],
+  'daily': ['kona_playercard']
+
 }
 
 common_headers = {
-  'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}'''
+  'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}''',
+  'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
 }
 
 def process_espn_league(event, context):
@@ -131,9 +149,11 @@ def process_espn_league(event, context):
 
 def process_espn_common():
   league_info = {
-    "leagueId": '891817951',
+    "leagueId": '1978554631',
     "leagueYear": 2023
   }
+
+  today = date.today().strftime("%Y-%m-%d")
 
   common_data = {}
 
@@ -148,22 +168,39 @@ def process_espn_common():
 
     common_data[endpoint] = data_endpoint
 
-    # Data serialization and upload data to S3
-    for key in common_data.keys():
-      if isinstance(common_data[key], pd.DataFrame):
-        common_data[key] = common_data[key].to_json(orient='records')
+  # Data serialization
+  for key in common_data.keys():
 
-    today = date.today().strftime("%Y-%m-%d")
-    filename = f"nba-player-stats-{today}.json"
+    # if isinstance(common_data[key], pd.DataFrame):
+    #   common_data[key] = common_data[key].to_json(orient='records')
 
-    bucket_name = 'nba-player-stats'
-    upload_data_to_s3(common_data, filename, bucket_name)
+    # Upload player data to S3
+    if endpoint == 'players':
+
+      player_data_dict = common_data
+      player_data_dict.pop('daily', '')
+
+      filename = f"nba-player-stats-{today}.json"
+
+      bucket_name = 'nba-player-stats'
+      upload_data_to_s3(player_data_dict, filename, bucket_name)
+
+    # Upload daily data to firebase
+    elif endpoint == 'daily':
+
+      df = transform_raw_to_df(endpoint, common_data['daily'])
+      game_minutes_minimum = 20
+
+      top_studs  = df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).head().to_json(orient='records')
+      top_scrubs = df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).tail().to_json(orient='records')
+
+      upload_to_firebase(top_studs, 'alert')
+      upload_to_firebase(top_scrubs, 'alert')
 
   return {
     'statusCode': 200,
     'body': "Test response"
   }
-
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
