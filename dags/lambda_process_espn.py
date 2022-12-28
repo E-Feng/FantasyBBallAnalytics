@@ -169,13 +169,13 @@ def process_espn_common():
     common_data[endpoint] = data_endpoint
 
   # Data serialization
-  for key in common_data.keys():
+  for k, v in common_data.items():
 
     # if isinstance(common_data[key], pd.DataFrame):
     #   common_data[key] = common_data[key].to_json(orient='records')
 
     # Upload player data to S3
-    if endpoint == 'players':
+    if k == 'players':
 
       player_data_dict = common_data
       player_data_dict.pop('daily', '')
@@ -186,9 +186,9 @@ def process_espn_common():
       upload_data_to_s3(player_data_dict, filename, bucket_name)
 
     # Upload daily data to firebase
-    elif endpoint == 'daily':
+    elif k == 'daily':
 
-      df = transform_raw_to_df(endpoint, common_data['daily'])
+      df = transform_raw_to_df(k, v)
       game_minutes_minimum = 20
 
       top_studs  = df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).head().to_json(orient='records')
