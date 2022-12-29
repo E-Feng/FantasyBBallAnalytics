@@ -19,11 +19,9 @@ from upload_to_aws import (
 from util import (
   invoke_lambda
 )
-
 from load_settings import (
   get_scoring_period_id
 )
-
 from upload_to_cloud import (
   upload_to_firebase
 )
