@@ -188,8 +188,8 @@ def process_espn_common():
       df = transform_raw_to_df(k, v)
       game_minutes_minimum = 20
 
-      top_studs_list  = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).head().to_json(orient='records'))
-      top_scrubs_list = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by=['gs', 'pts'], ascending=False).tail().to_json(orient='records'))
+      top_studs_list  = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by = ['gs', 'pts'], ascending=False).head().to_json(orient = 'records'))
+      top_scrubs_list = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by = ['gs', 'pts'], ascending=False).tail().to_json(orient = 'records'))
       ejections       = json.loads(df[df['ejs'] > 0].to_json(orient='records'))
       
       player_daily_alerts = {}
@@ -206,7 +206,7 @@ def process_espn_common():
           scoreline['user'] = 'BOT'
           scoreline['time'] = str(datetime.now().time())
 
-          if alert_type == ejections:
+          if alert_type == "ejections":
             scoreline['type'] = 'ejection'
           else:
             scoreline['type'] = 'stat'
