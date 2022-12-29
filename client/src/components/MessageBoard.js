@@ -124,11 +124,16 @@ function MessageBoard() {
     // Formatting chat messages from json data
     Object.keys(messageData).forEach((date) => {
       messageArray.push({ type: 'date', date: date });
+
+      const unsortedMessages = [];
       Object.keys(messageData[date]).forEach((key) => {
-        messageArray.push(messageData[date][key]);
+        unsortedMessages.push(messageData[date][key]);
       });
+
+      // Sort by time and re-add to message array
+      unsortedMessages.sort((a, b) => (b.time > a.time ? -1 : 1));
+      unsortedMessages.forEach((o) => messageArray.push(o));
     });
-    //console.log(messageArray)
   }
 
   return (
