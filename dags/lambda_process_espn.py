@@ -186,9 +186,9 @@ def process_espn_common():
       df = transform_raw_to_df(k, v)
       game_minutes_minimum = 20
 
-      top_studs_list  = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by = ['gs', 'pts'], ascending=False).head().to_json(orient = 'records'))
-      top_scrubs_list = json.loads(df[df['mins'] > game_minutes_minimum].sort_values(by = ['gs', 'pts'], ascending=False).tail().to_json(orient = 'records'))
-      ejections       = json.loads(df[df['ejs'] > 0].to_json(orient = 'records'))
+      top_studs_list  = df[df['mins'] > game_minutes_minimum].head().to_dict(orient = 'records')
+      top_scrubs_list = df[df['mins'] > game_minutes_minimum].tail().to_dict(orient = 'records')
+      ejections       = df[df['ejs'] > 0].to_dict(orient = 'records')
       
       player_daily_alerts = {}
       player_daily_alerts['studs'] = top_studs_list
@@ -211,7 +211,7 @@ def process_espn_common():
           
           alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
 
-          upload_to_firebase('alert', json.dumps(alert_data))      
+      upload_to_firebase('alert', alert_data)     
 
 
   return {
