@@ -204,12 +204,17 @@ def transform_players_to_df(ratings: dict):
     row['proTeamId'] = player['player']['proTeamId']
 
     for period, key in period_mapping.items():
-    # Check if ratings exist for player
+      # Check if ratings exist for player
       if player['ratings'][key]['statRankings']:
         row['totalRating' + period] = player['ratings'][key]['totalRating']
         row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
         row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
+
+      # Stats
+      stats_period = next(d for d in player['player']['stats'] if d['id'] == f'0{key}2023')
+      if stats_period.get('averageStats'):
+        row['stats' + period] = stats_period['averageStats']
 
     data_array.append(row)
 
