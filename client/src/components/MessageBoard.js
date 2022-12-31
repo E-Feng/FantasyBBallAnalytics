@@ -85,7 +85,7 @@ function MessageBoard() {
         const shootingStats = `(${msg.fgMade}/${msg.fgAtt},
                                   ${msg.threes}/${msg.threesAtt},   
                                   ${msg.ftMade}/${msg.ftAtt})`;
-        content = `[${Math.round(msg.gs * 10) / 10}] ${msg.fullName} with ${mainStats} on ${shootingStats} shooting in ${msg.mins} minutes`;
+        content = `[${msg.gs.toFixed(1)}] ${msg.fullName} with ${mainStats} on ${shootingStats} shooting in ${msg.mins} minutes`;
         break;
       case 'date':
         // Formatting new date break lines
