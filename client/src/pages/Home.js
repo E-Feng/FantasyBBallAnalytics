@@ -10,7 +10,7 @@ function Home(props) {
   const leagueBoardInfo = `League board for messages and daily alerts. Nightly notable 
     statlines are posted according to high gamescore with best free agent game in 
     the format:
-    PTS/REBS/ASTS/STLS/BLKS/TOS (FGs, 3s, FTs)`;
+    [GS] PTS/REBS/ASTS/STLS/BLKS/TOS (FGs, 3s, FTs)`;
 
   return (
     <Layout maxWidth={props.maxWidth}>
