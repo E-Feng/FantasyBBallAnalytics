@@ -9,7 +9,6 @@ FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{LEAGUE_YE
 
 
 def upload_to_firebase(type: str, payload: dict):
-
   auth_file_path = '/tmp/auth.json'
 
   auth_json = json.loads(os.environ['google_auth_json'])
@@ -28,7 +27,7 @@ def upload_to_firebase(type: str, payload: dict):
   if type == 'alert':
     url = FIREBASE_URL + 'messageboard.json'
 
-  r = authed_session.patch(url, data=payload)
+  r = authed_session.patch(url, data=json.dumps(payload))
 
   if r.status_code == 200:
     print("Data successfully sent to firebase")
