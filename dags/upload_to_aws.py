@@ -13,10 +13,10 @@ def upload_league_data_to_dynamo(data: dict, method: str):
   """
   Post process the league data and upload to dynamodb
   """
-  for key in data.keys():
-    value = data[key]
-    if isinstance(value, str) and '{' in value:
-      data[key] = json.loads(data[key])
+  # for key in data.keys():
+  #   value = data[key]
+  #   if isinstance(value, str) and '{' in value:
+  #     data[key] = json.loads(data[key])
 
   headers = {'content-type': 'application/json'}
   payload = json.dumps(data)

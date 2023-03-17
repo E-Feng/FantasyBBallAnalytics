@@ -129,18 +129,17 @@ def process_espn_league(event, context):
     )
 
     league_data['players'] = transform_players_truncate(
-      league_data['players'],
-      league_data['settings']
+      league_data['players']
     )
 
     # Removing unneeded league data
     #league_data.pop('draft', None)
-    #league_data.pop('players', None)
+    league_data.pop('players', None)
 
     # Data serialization and upload data to dynamo
     for key in league_data.keys():
         if isinstance(league_data[key], pd.DataFrame):
-            league_data[key] = league_data[key].to_json(orient='records')
+            league_data[key] = league_data[key].to_dict(orient='records')
 
     with open('C:\\Users\\Elvin\\Desktop\\data.json', 'w') as f:
       json.dump(league_data, f)
