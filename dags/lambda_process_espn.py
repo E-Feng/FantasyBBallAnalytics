@@ -64,7 +64,6 @@ def process_espn_league(event, context):
   league_year = event["queryStringParameters"].get('leagueYear')
 
   is_initial_process = True
-  method = 'PUT'
 
   league_info = {
     "leagueId": league_id,
@@ -76,7 +75,6 @@ def process_espn_league(event, context):
 
   if league_year:
     is_initial_process = False
-    method = 'PATCH'
     league_years = [league_year]
   else:
     league_years = []
@@ -144,7 +142,7 @@ def process_espn_league(event, context):
     with open('C:\\Users\\Elvin\\Desktop\\data.json', 'w') as f:
       json.dump(league_data, f)
       
-    upload_league_data_to_dynamo(league_data, method)
+    upload_league_data_to_dynamo(league_data)
 
   print("Complete...")
 
