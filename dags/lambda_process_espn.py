@@ -63,7 +63,6 @@ def process_espn_league(event, context):
   league_year = event["queryStringParameters"].get('leagueYear')
 
   is_initial_process = True
-  method = 'PUT'
 
   league_info = {
     "leagueId": league_id,
@@ -75,7 +74,6 @@ def process_espn_league(event, context):
 
   if league_year:
     is_initial_process = False
-    method = 'PATCH'
     league_years = [league_year]
   else:
     league_years = []
@@ -133,9 +131,9 @@ def process_espn_league(event, context):
     # Data serialization and upload data to dynamo
     for key in league_data.keys():
         if isinstance(league_data[key], pd.DataFrame):
-            league_data[key] = league_data[key].to_json(orient='records')
+            league_data[key] = league_data[key].to_dict(orient='records')
 
-    upload_league_data_to_dynamo(league_data, method)
+    upload_league_data_to_dynamo(league_data)
 
   print("Complete...")
 
