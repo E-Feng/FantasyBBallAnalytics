@@ -35,6 +35,10 @@ export const fetchDynamo = async ({ queryKey }) => {
   });
   const data = await res.json();
 
+  if (leagueId === '00000001') {
+    anonymizeTeams(data);
+  }
+
   return data;
 };
 
@@ -47,4 +51,32 @@ export const requestLeagueId = async (payload) => {
   const data = await res.json();
 
   return data;
+};
+
+const anonymizeTeams = (data) => {
+  const anonTeams = [
+    ['AAAA', 'One', 'Albert'],
+    ['BBBB', 'Two', 'Beth'],
+    ['CCCC', 'Three', 'Charlie'],
+    ['DDDD', 'Four', 'Delilah'],
+    ['EEEE', 'Five', 'Evan'],
+    ['FFFF', 'Six', 'Faith'],
+    ['GGGG', 'Seven', 'Greg'],
+    ['HHHH', 'Eight', 'Hailey'],
+    ['IIII', 'Nine', 'Ian'],
+    ['JJJJ', 'Ten', 'Jennifer'],
+    ['KKKK', 'Eleven', 'Kevin'],
+    ['LLLL', 'Twelve', 'Layla'],
+    ['MMMM', 'Thirteen', 'Mike'],
+    ['NNNN', 'Fourteen', 'Nina'],
+  ];
+  
+  data.teams.forEach((team, i) => {
+    team.abbrev = anonTeams[i][0];
+    team.location = 'Team';
+    team.teamName = anonTeams[i][1];
+    team.fullTeamName = `${team.location} ${team.teamName}`;
+    team.firstName = anonTeams[i][2];
+    team.lastName = anonTeams[i][2];
+  })
 };
