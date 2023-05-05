@@ -200,8 +200,9 @@ def transform_players_to_df(ratings: dict):
     row['playerName'] = player['player']['fullName']
     row['onTeamId'] = player['onTeamId']
     row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
-    row['percentOwned'] = player['player']['ownership']['percentOwned']
     row['proTeamId'] = player['player']['proTeamId']
+
+    row['percentOwned'] = player['player'].get('ownership', {}).get('percentOwned', 0.0)
 
     for period, key in period_mapping.items():
       # Check if ratings exist for player

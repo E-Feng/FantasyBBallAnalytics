@@ -10,6 +10,7 @@ def transform_players_truncate(players: pd.DataFrame):
 
   return players[all_cond]
 
+
 def transform_draft_recap(draft: pd.DataFrame, players: pd.DataFrame, settings: pd.DataFrame):
   has_ejections_cat = int(consts.EJS) in settings.iloc[0]['categoryIds']
 

@@ -104,6 +104,7 @@ def process_espn_league(event, context):
     league_data = {
       'leagueId': league_id,
       'leagueYear': league_year,
+      'updatedAt': datetime.now().timestamp()
     }
 
     if is_initial_process:
@@ -120,11 +121,11 @@ def process_espn_league(event, context):
       league_data[endpoint] = transform_raw_to_df(endpoint, data_endpoint)
 
     # Complex transforms
-    league_data['draftRecap'] = transform_draft_recap(
-      league_data['draft'], 
-      league_data['players'],
-      league_data['settings']
-    )
+    # league_data['draftRecap'] = transform_draft_recap(
+    #   league_data['draft'], 
+    #   league_data['players'],
+    #   league_data['settings']
+    # )
 
     league_data['players'] = transform_players_truncate(
       league_data['players']
@@ -132,15 +133,15 @@ def process_espn_league(event, context):
 
     # Removing unneeded league data
     #league_data.pop('draft', None)
-    league_data.pop('players', None)
+    #league_data.pop('players', None)
 
-    # Data serialization and upload data to dynamo
+    # Data serialization and upload data to dynamo, cleaning nan values
     for key in league_data.keys():
-        if isinstance(league_data[key], pd.DataFrame):
-            league_data[key] = league_data[key].to_dict(orient='records')
-
-    with open('C:\\Users\\Elvin\\Desktop\\data.json', 'w') as f:
-      json.dump(league_data, f)
+      if isinstance(league_data[key], pd.DataFrame):
+        dict_raw = league_data[key].to_dict(orient='records')
+        dict_clean = [{k:v for k, v in x.items() if v == v } for x in dict_raw]
+        
+        league_data[key] = dict_clean
       
     upload_league_data_to_dynamo(league_data)
 

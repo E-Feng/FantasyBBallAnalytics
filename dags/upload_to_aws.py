@@ -24,6 +24,7 @@ def upload_league_data_to_dynamo(data: dict):
     raise ValueError("Error uploading to dynamodb")
   return
 
+
 def upload_league_data_to_dynamo_via_sqs(data: dict):
   """
   Post process the league data and upload to dynamodb via SQS
@@ -46,6 +47,7 @@ def upload_league_data_to_dynamo_via_sqs(data: dict):
   if r.status_code == 500:
     raise ValueError("Error uploading to dynamodb")
   return
+
 
 def upload_data_to_s3(data: dict, filename: str, bucket_name: str):
   """
