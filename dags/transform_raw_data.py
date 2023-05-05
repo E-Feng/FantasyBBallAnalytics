@@ -3,7 +3,7 @@ import math
 import pandas as pd
 
 import consts
-from util import calculate_gamescore
+from util import calculate_gamescore, format_stat_ratings
 
 
 def transform_raw_to_df(endpoint: list, raw_data: dict):
@@ -181,6 +181,13 @@ def transform_players_to_df(ratings: dict):
   Transforms players raw json data from ESPN API to pandas dataframe
   """
 
+  period_mapping = {
+    "Season": consts.SEASON,
+    "Last7": consts.LAST7,
+    "Last15": consts.LAST15,
+    "Last30": consts.LAST30
+  }
+
   data = ratings  
 
   data_array = []
@@ -191,31 +198,32 @@ def transform_players_to_df(ratings: dict):
 
     row['playerId'] = str(player['id'])
     row['playerName'] = player['player']['fullName']
+    row['onTeamId'] = player['onTeamId']
+    row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
+    row['proTeamId'] = player['player']['proTeamId']
 
-    # Check if ratings exist for player
-    if 'ratings' in player:
-      row['ratingEjsSeason'] = player['ratings']['0']['totalRating']
-      row['rankingEjsSeason'] = player['ratings']['0']['totalRanking']
+    row['percentOwned'] = player['player'].get('ownership', {}).get('percentOwned', 0.0)
 
-      # Calculating rating without ejections
-      rating = 0
-      for stat in player['ratings']['0']['statRankings']:
-        if stat['forStat'] != int(consts.EJS):
-          rating = rating + stat['rating']
+    for period, key in period_mapping.items():
+      # Check if ratings exist for player
+      if player['ratings'][key]['statRankings']:
+        row['totalRating' + period] = player['ratings'][key]['totalRating']
+        row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
-      row['ratingSeason'] = rating
+        row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
 
-    #print(row)
+      # Stats
+      stats_period = next(d for d in player['player']['stats'] if d['id'] == f'0{key}2023')
+      if stats_period.get('averageStats'):
+        row['stats' + period] = stats_period['averageStats']
+
     data_array.append(row)
 
 
   df = pd.DataFrame.from_records(data_array) 
-
-  # Creating rank column for derived ratings column
-  df['rankingSeason'] = df['ratingSeason'].rank(method='min', na_option='top', ascending=False)
  
-  #print(df.head(2))
-  #print(df.tail(2))
+  # print(df.head(2))
+  # print(df.tail(2))
 
   return df
 
