@@ -103,8 +103,7 @@ def process_espn_league(event, context):
 
     league_data = {
       'leagueId': league_id,
-      'leagueYear': league_year,
-      'updatedAt': datetime.now().timestamp()
+      'leagueYear': league_year
     }
 
     if is_initial_process:
