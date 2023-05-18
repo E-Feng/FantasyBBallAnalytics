@@ -25,8 +25,10 @@ function TeamTotalsContainer(props) {
 
         return a + idRating;
       }, 0);
+      const avgRating = totalRating/teamPlayers.length;
+      console.log(avgRating, teamPlayers.length)
 
-      teamCats[catName] = totalRating;
+      teamCats[catName] = avgRating;
     });
     const all = Object.values(teamCats).reduce((a, b) => a + b);
 
@@ -37,7 +39,7 @@ function TeamTotalsContainer(props) {
     };
   });
 
-  console.log(data);
+  //console.log(data);
 
   return (
     <Container>
