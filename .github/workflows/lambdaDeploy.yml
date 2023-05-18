@@ -16,7 +16,7 @@ jobs:  #Workflow run is made up of one or more jobs
         with:  
           node-version: '14' #--> Specify the Version of the Node 
       - name: Configure AWS Credentials  
-        uses: aws-actions/configure-aws-credentials@v1 #--> Setup the Credential for the AWS cli
+        uses: aws-actions/configure-aws-credentials@v2 #--> Setup the Credential for the AWS cli
         with:
         # Created the Secrets Under the Repo only with These Variables
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
@@ -29,7 +29,7 @@ jobs:  #Workflow run is made up of one or more jobs
           npm ci 
       - name: deploy
         run: |
-          zip -j deploy.zip ./dags/*.py #--> Zip the Code As we know lambda function accept the zip file.
+          zip -j deploy.zip ./dags/*.py 
           aws lambda update-function-code --function-name=process_espn_league --zip-file=fileb://deploy.zip 
           aws lambda update-function-code --function-name=update_espn_leagues --zip-file=fileb://deploy.zip 
 # At last the AWS CLI command to Update the Zip file with existing One (With Correct Function Name)
