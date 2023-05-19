@@ -31,4 +31,4 @@ jobs:  #Workflow run is made up of one or more jobs
         run: |
           zip -j deploy.zip ./dags/*.py 
           aws lambda update-function-code --function-name=process_espn_league --zip-file=fileb://deploy.zip 
-          aws lambda update-function-code --function-name=update_espn_leagues --zip-file=fileb://deploy.zip 
+          aws lambda update-function-code --function-name=process_all_espn_leagues --zip-file=fileb://deploy.zip 
