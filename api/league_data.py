@@ -1,7 +1,8 @@
 import json
 import boto3
+from decimal import Decimal
 
-dynamodbTableName = 'fantasyLeagueData'
+dynamodb_table_name = 'fantasyLeagueData'
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
@@ -16,7 +17,7 @@ def get_league_data_from_ddb(event, context):
   
   dynamodb = boto3.resource('dynamodb')
   
-  table = dynamodb.Table(dynamodbTableName)
+  table = dynamodb.Table(dynamodb_table_name)
 
   
   # Getting item from dynamoDB
@@ -44,3 +45,39 @@ def get_league_data_from_ddb(event, context):
     )
       
   return body
+
+def put_league_data_to_ddb(event, context):
+  print(event)
+    
+  # Obtaining payload to write to dynamodb
+  payload = json.loads(event['body'], parse_float=Decimal)
+  
+  print(payload)
+
+  # Verifying data
+  if not 'leagueId' in payload.keys():
+    return {
+      'body': 'Invalid post request',
+      'statusCode': 500
+    }
+      
+  league_id = payload['leagueId']
+  league_year = payload['leagueYear']
+
+      
+  # Updating data
+  dynamodb = boto3.resource('dynamodb')
+  table = dynamodb.Table(dynamodb_table_name)
+  
+  # Grab all_years if not present
+  if 'allYears' not in payload:
+    item = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
+    body = item['Item']
+    
+    payload['allYears'] = body['allYears']
+
+  response = table.put_item(
+    Item=payload
+  )
+  
+  return response

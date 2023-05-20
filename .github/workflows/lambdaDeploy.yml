@@ -31,4 +31,5 @@ jobs:  #Workflow run is made up of one or more jobs
           aws lambda update-function-code --function-name=process_all_espn_leagues --zip-file=fileb://dags.zip 
 
           zip api.zip ./api/*
-          aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip 
+          aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip
+          aws lambda update-function-code --function-name=put_league_data_to_ddb --zip-file=fileb://api.zip 
