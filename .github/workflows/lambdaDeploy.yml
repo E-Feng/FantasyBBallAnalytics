@@ -11,10 +11,7 @@ jobs:  #Workflow run is made up of one or more jobs
     runs-on: ubuntu-latest  #Through which Server OS we need to Work (type of machine to run the job on)
     steps:
     #Using versioned actions 
-      - uses: actions/checkout@main  # --> Reference a specific version
-      - uses: actions/setup-node@main # --> To Setup the Server With Node Env
-        with:  
-          node-version: '14' #--> Specify the Version of the Node 
+      - uses: actions/checkout@v3  # --> Reference a specific version
       - name: Configure AWS Credentials  
         uses: aws-actions/configure-aws-credentials@v2 #--> Setup the Credential for the AWS cli
         with:
@@ -33,5 +30,5 @@ jobs:  #Workflow run is made up of one or more jobs
           aws lambda update-function-code --function-name=process_espn_league --zip-file=fileb://dags.zip 
           aws lambda update-function-code --function-name=process_all_espn_leagues --zip-file=fileb://dags.zip 
 
-          zip -j api.zip ./api/*
+          zip -j api.zip ./api/
           aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip 
