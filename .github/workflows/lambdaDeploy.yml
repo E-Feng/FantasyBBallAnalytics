@@ -34,3 +34,4 @@ jobs:  #Workflow run is made up of one or more jobs
           aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip
           aws lambda update-function-code --function-name=put_league_data_to_ddb --zip-file=fileb://api.zip
           aws lambda update-function-code --function-name=get_league_id_status --zip-file=fileb://api.zip 
+          aws lambda update-function-code --function-name=update_league_info --zip-file=fileb://api.zip 

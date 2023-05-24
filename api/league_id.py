@@ -121,3 +121,51 @@ def get_league_id_status(event, context):
             'statusCode': 500,
             'body': json.dumps('ERROR')
         }
+    
+
+
+sql_last_viewed = """
+    UPDATE public.leagueids
+    SET lastViewed = NOW(), viewCount = viewCount + 1
+    WHERE leagueid = %s
+"""
+
+sql_last_updated = """
+    UPDATE public.leagueids
+    SET lastUpdated = NOW()
+    WHERE leagueid = %s
+"""
+
+def update_league_info(event, context):
+    print(event)
+    league_id = event['queryStringParameters'].get('leagueId')
+    method = event['queryStringParameters'].get('method')
+    
+    cursor = conn.cursor()
+    
+    if method == 'lastViewed':
+        params = (league_id,)
+        
+        cursor.execute(sql_last_viewed, params)
+        
+    elif method == 'lastUpdated':
+        params = (league_id,)
+        
+        cursor.execute(sql_last_updated, params)
+        
+        
+    rows_updated = cursor.rowcount
+    
+    if rows_updated > 0:
+        conn.commit()
+    else:
+        return {
+            'statusCode': 500,
+            'body': json.dumps('Updated failed') 
+        }
+            
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Updated successfully')
+    }
