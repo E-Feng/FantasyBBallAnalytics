@@ -26,11 +26,13 @@ jobs:  #Workflow run is made up of one or more jobs
           npm ci 
       - name: deploy
         run: |
-          zip -j dags.zip ./dags/*.py 
+          pwd
+          cd dags && zip -r dags.zip ./*.py
           aws lambda update-function-code --function-name=process_espn_league --zip-file=fileb://dags.zip 
           aws lambda update-function-code --function-name=process_all_espn_leagues --zip-file=fileb://dags.zip 
 
-          zip api.zip ./api/*
+          pwd
+          cd api && zip -r api.zip ./*
           aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip
           aws lambda update-function-code --function-name=put_league_data_to_ddb --zip-file=fileb://api.zip
           aws lambda update-function-code --function-name=get_league_id_status --zip-file=fileb://api.zip 
