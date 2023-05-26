@@ -75,6 +75,9 @@ def get_league_id_status(event, context):
         # Reset cookie info for event payload
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espns2
         event["queryStringParameters"]['cookieSwid'] = cookie_swid
+
+    if league_exists:
+        event["queryStringParameters"]["leagueYear"] = 2023
         
     print("Final Cookies: ", cookie_espns2, cookie_swid)
             
