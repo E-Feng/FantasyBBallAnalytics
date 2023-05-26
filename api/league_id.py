@@ -61,8 +61,8 @@ def get_league_id_status(event, context):
         if res[0]: # League is updated
             return body_active
 
-    cookie_swid_db = res[1]
-    cookie_espns2_db = res[2]
+    cookie_swid_db = res[1] if res else None
+    cookie_espns2_db = res[2] if res else None
 
     # Preparing cookie information
     cookie_swid = cookie_swid_qsp or cookie_swid_db
