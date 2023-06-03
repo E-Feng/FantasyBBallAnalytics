@@ -12,7 +12,7 @@ function LeagueChangeModal(props) {
 
   const requestingMsg = 'Obtaining league data...';
 
-  const responseColor = responseMsg === requestingMsg ? 'yelloww' : 'red';
+  const responseColor = responseMsg === requestingMsg ? 'yellow' : 'red';
 
   const closeModal = (e) => {
     const isClosedFromButton = e.target instanceof HTMLButtonElement;
@@ -38,6 +38,7 @@ function LeagueChangeModal(props) {
 
     const reqPayload = {
       leagueId: newLeagueId,
+      platform: 'espn',
       cookieEspnS2: data.cookieEspnS2,
       cookieSwid: data.cookieSwid,
     };
