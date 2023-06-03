@@ -20,6 +20,7 @@ conn = psycopg2.connect(
 
 def get_league_id_status(event, context):
     league_id = event["queryStringParameters"]['leagueId']
+    platform = event["queryStringParameters"]["platform"]
     
     cookie_swid_qsp = event["queryStringParameters"].get('cookieSwid', None)
     cookie_espns2_qsp = event["queryStringParameters"].get('cookieEspnS2', None)
@@ -104,8 +105,8 @@ def get_league_id_status(event, context):
     if res['StatusCode'] == 200:
         sql = """
             INSERT INTO leagueids(
-                leagueid, created, lastupdated, lastviewed, viewcount, active, allyears, cookieswid, cookieespns2)
-            VALUES (%s, CURRENT_DATE, CURRENT_DATE, CURRENT_DATE, 1, TRUE, %s, %s, %s)
+                leagueid, created, lastupdated, lastviewed, platform, viewcount, active, allyears, cookieswid, cookieespns2)
+            VALUES (%s, CURRENT_DATE, CURRENT_DATE, CURRENT_DATE, %s, 1, TRUE, %s, %s, %s)
             ON CONFLICT (leagueid) DO UPDATE SET
                 lastupdated = NOW(), 
                 viewCount = leagueids.viewCount + 1,
@@ -113,7 +114,7 @@ def get_league_id_status(event, context):
                 cookieswid = %s,
                 cookieespns2 = %s
         """
-        params = (league_id, all_years, cookie_swid, cookie_espns2, cookie_swid, cookie_espns2)
+        params = (league_id, platform, all_years, cookie_swid, cookie_espns2, cookie_swid, cookie_espns2)
         
         cursor.execute(sql, params)
         conn.commit() 
