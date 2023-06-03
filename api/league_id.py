@@ -98,8 +98,8 @@ def get_league_id_status(event, context):
         }
         
     # Call league analysis lambda
-    res = lambda_client.invoke(FunctionName = 'process_espn_league', InvocationType = 'RequestResponse', Payload = json.dumps(event))
-    
+    res = invoke_lambda("process_espn_league", event)
+
     all_years = json.loads(res['Payload'].read().decode())['body']
 
     if res['StatusCode'] == 200:
