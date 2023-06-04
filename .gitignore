@@ -8,6 +8,7 @@ __pycache__/
 .gitattributes
 .htaccess
 .env
+local_test.py
 config/*.env
 config/*.json
 dags/keys/.env
