@@ -1,8 +1,10 @@
+import os
 import json
 import boto3
-import requests
 import psycopg2
+
 from util import invoke_lambda
+from espn_helper import get_espn_league_status
 
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
@@ -19,114 +21,58 @@ conn = psycopg2.connect(
 
 
 def get_league_id_status(event, context):
+    cursor = conn.cursor()
+
     league_id = event["queryStringParameters"]['leagueId']
     platform = event["queryStringParameters"]["platform"]
-    
-    cookie_swid_qsp = event["queryStringParameters"].get('cookieSwid', None)
-    cookie_espns2_qsp = event["queryStringParameters"].get('cookieEspnS2', None)
 
-    if cookie_swid_qsp == 'undefined': cookie_swid_qsp = None
-    if cookie_espns2_qsp == 'undefined': cookie_espns2_qsp = None
-    
-    print(f"League id {league_id}")
-    print("Query Cookies: ", cookie_espns2_qsp, cookie_swid_qsp)
-    
-    # Just in case, this sneaks through
-    body_active = {
-        'statusCode': 200,
-        'body': json.dumps('ACTIVE')
-    }
-    
-    if league_id == '00000001':
-        return body_active
-    
-    league_exists = False
+    print(f"League id {league_id} on {platform}")
 
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT
-            (NOW() - lastupdated) < INTERVAL '1 day',
-            cookieswid,
-            cookieespns2
-        FROM leagueids  
-        WHERE leagueid = %s
-        """
-    , (league_id,))
+    get_query = open(os.path.join("./sql", "get_league_info.sql"), "r").read()
+    get_params = {"league_id": league_id, "platform": platform}
+
+    cursor.execute(get_query, get_params)
+
     res = cursor.fetchone()
+
+    league_exists = bool(res)
+    league_updated = league_exists and res[0]
+    league_key = league_exists and res [1]
+
+    if league_updated:
+        return {"body": json.dumps("ACTIVE")}
     
-    if res:
-        league_exists = True
-        #event["queryStringParameters"]['league'] = cookie_espns2
+    if platform == "espn":
+        cookie_espn_qsp = event["queryStringParameters"].get('cookieEspnS2', None)
+        cookie_espn = cookie_espn_qsp or league_key
 
-        if res[0]: # League is updated
-            return body_active
+        cookies = {"espn_s2": cookie_espn}
 
-    cookie_swid_db = res[1] if res else None
-    cookie_espns2_db = res[2] if res else None
+        status = get_espn_league_status(league_id, cookies)
 
-    # Preparing cookie information
-    cookie_swid = cookie_swid_qsp or cookie_swid_db
-    cookie_espns2 = cookie_espns2_qsp or cookie_espns2_db
-    
-    cookies = {}
-    if cookie_swid or cookie_espns2:
-        cookies = {"espn_s2": cookie_espns2, "swid": cookie_swid}
+        if status != "VALID":
+            return {"body": json.dumps(status)}
+
+        event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
         
-        # Reset cookie info for event payload
-        event["queryStringParameters"]['cookieEspnS2'] = cookie_espns2
-        event["queryStringParameters"]['cookieSwid'] = cookie_swid
+        # Call league analysis lambda
+        all_years = invoke_lambda(lambda_client, "process_espn_league", event)
 
-    if league_exists:
-        event["queryStringParameters"]["leagueYear"] = 2023
-        
-    print("Final Cookies: ", cookie_espns2, cookie_swid)
-            
-    # League id is not in table, quickly verify
-    url = f'https://fantasy.espn.com/apis/v3/games/fba/seasons/2023/segments/0/leagues/{league_id}?view=mSettings'
-    
-    r = requests.get(url, cookies=cookies)
-    
-    if r.status_code != 200:
-        # Errors querying league id
-        data = r.json()
-        status = data['details'][0]['type']
-        
-        return {
-            'statusCode': 200,
-            'body': json.dumps(status)
+        update_query = open("sql/update_espn_league_after_process.sql", "r").read()
+        update_params = {
+            "league_id": league_id,
+            "platform": platform,
+            "all_years": all_years,
+            "cookie_espn": cookie_espn
         }
-        
-    # Call league analysis lambda
-    res = invoke_lambda("process_espn_league", event)
 
-    all_years = json.loads(res['Payload'].read().decode())['body']
-
-    if res['StatusCode'] == 200:
-        sql = """
-            INSERT INTO leagueids(
-                leagueid, created, lastupdated, lastviewed, platform, viewcount, active, allyears, cookieswid, cookieespns2)
-            VALUES (%s, CURRENT_DATE, CURRENT_DATE, CURRENT_DATE, %s, 1, TRUE, %s, %s, %s)
-            ON CONFLICT (leagueid) DO UPDATE SET
-                lastupdated = NOW(), 
-                viewCount = leagueids.viewCount + 1,
-                allyears = EXCLUDED.allyears,
-                cookieswid = %s,
-                cookieespns2 = %s
-        """
-        params = (league_id, platform, all_years, cookie_swid, cookie_espns2, cookie_swid, cookie_espns2)
-        
-        cursor.execute(sql, params)
-        conn.commit() 
+        cursor.execute(update_query, update_params)
+        conn.commit()
     
-        return body_active
-    else:
-        return {
-            'statusCode': 500,
-            'body': json.dumps('ERROR')
-        }
-    
+        return {"body": json.dumps("ACTIVE")}
 
+    return {'body': json.dumps('ERROR')}
+    
 
 sql_last_viewed = """
     UPDATE public.leagueids
