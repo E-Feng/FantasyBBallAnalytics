@@ -1,4 +1,3 @@
-import os
 import json
 import boto3
 import psycopg2
@@ -28,7 +27,7 @@ def get_league_id_status(event, context):
 
     print(f"League id {league_id} on {platform}")
 
-    get_query = open(os.path.join("./sql", "get_league_info.sql"), "r").read()
+    get_query = open("sql/get_league_info.sql", "r").read()
     get_params = {"league_id": league_id, "platform": platform}
 
     cursor.execute(get_query, get_params)
