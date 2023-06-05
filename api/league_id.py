@@ -39,7 +39,7 @@ def get_league_id_status(event, context):
     league_key = league_exists and res [1]
 
     if league_updated:
-        return {"body": "ACTIVE"}
+        return {"statusCode": 200, "body": "ACTIVE"}
     
     if platform == "espn":
         cookie_espn_qsp = event["queryStringParameters"].get('cookieEspnS2', None)
@@ -50,7 +50,7 @@ def get_league_id_status(event, context):
         status = get_espn_league_status(league_id, cookies)
 
         if status != "VALID":
-            return {"body": status}
+            return {"statusCode": 200, "body": status}
 
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
         
@@ -68,9 +68,9 @@ def get_league_id_status(event, context):
         cursor.execute(update_query, update_params)
         conn.commit()
     
-        return {"body": "ACTIVE"}
+        return {"statusCode": 200, "body": "ACTIVE"}
 
-    return {"body": "ERROR"}
+    return {"statusCode": 200, "body": "ERROR"}
     
 
 sql_last_viewed = """
