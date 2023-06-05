@@ -56,7 +56,7 @@ def get_league_id_status(event, context):
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
         
         # Call league analysis lambda
-        all_years = invoke_lambda("process_espn_league", event)
+        all_years = invoke_lambda(lambda_client, "process_espn_league", event)
 
         update_query = open("sql/update_espn_league_after_process.sql", "r").read()
         update_params = {
@@ -119,17 +119,3 @@ def update_league_info(event, context):
         'statusCode': 200,
         'body': json.dumps('Updated successfully')
     }
-
-
-process_payload = {
-  "queryStringParameters": {
-    "leagueId": "48375511",
-    "platform": "espn",
-    # "leagueYear": 2023,
-    # "allYears": [2023],
-    "cookieEspnS2": "{AEANBh%2BD2CyE%2BH%2FBEYL2sJ%2B4nV9%2FOklCUoyYPiegbqwlFqzfE%2BnViiqW87jner2OdiFYVXKnHjjaSSx%2FJDbZWgyrFSCnaU8AxPJtsGXuMpDzFZw7B8YgcpTmCkSasag97Sd%2Fl1r6igCZh%2F1YyquO0H%2FyMVIXq8%2FUAarrXIFzeSx%2BBiB0ywQn6Iz6Smkiv63RWoJeNrzojIXfuoTbFw%2BVzXSnF6TH5MF4X7ooRKw%2FImPagScBbqIMjrq0EfPf6%2Bcm9XE%3D}",
-    "cookieSwid": "{A746C402-08B1-42F4-86C4-0208B142F42A}"
-  }
-}
-
-get_league_id_status(process_payload, "")
