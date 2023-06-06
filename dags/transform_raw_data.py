@@ -213,9 +213,10 @@ def transform_players_to_df(ratings: dict):
         row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
 
       # Stats, dynamic filtering out right dict that matches id field
-      stats_period = next((d for d in player['player']['stats'] if d['id'] == f'0{key}2023'), {})
-      if stats_period.get('averageStats'):
-        row['stats' + period] = stats_period['averageStats']
+      if player["player"].get("stats"):
+        stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}2023'), {})
+        if stats_period.get('averageStats'):
+          row['stats' + period] = stats_period['averageStats']
 
     data_array.append(row)
 
