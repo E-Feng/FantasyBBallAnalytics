@@ -4,6 +4,7 @@ import psycopg2
 
 from util import invoke_lambda
 from espn_helper import get_espn_league_status
+from yahoo_auth import get_yahoo_access_token
 
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
@@ -36,7 +37,10 @@ def get_league_id_status(event, context):
 
     league_exists = bool(res)
     league_updated = league_exists and res[0]
-    league_key = league_exists and res [1]
+    league_key = league_exists and res[1]
+
+    cookie_espn = None
+    yahoo_access_token = None
 
     if league_updated:
         return {"statusCode": 200, "body": json.dumps("ACTIVE")}
@@ -48,29 +52,44 @@ def get_league_id_status(event, context):
         cookies = {"espn_s2": cookie_espn}
 
         status = get_espn_league_status(league_id, cookies)
-
         if status != "VALID":
             return {"statusCode": 200, "body": json.dumps(status)}
 
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
         
-        # Call league analysis lambda
         all_years = invoke_lambda(lambda_client, "process_espn_league", event)
 
-        update_query = open("sql/update_espn_league_after_process.sql", "r").read()
-        update_params = {
-            "league_id": league_id,
-            "platform": platform,
-            "all_years": all_years,
-            "cookie_espn": cookie_espn
-        }
-
-        cursor.execute(update_query, update_params)
-        conn.commit()
+        sql_file = "sql/update_espn_league_after_process.sql"
     
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+    elif platform == "yahoo":
+        event["queryStringParameters"]["yahooRefreshToken"] = league_key
 
-    return {"statusCode": 200, "body": json.dumps("ERROR")}
+        tokens = get_yahoo_access_token(event, context)
+        if tokens.get("error"):
+            return {"statusCode": 200, "body": json.dumps(tokens["error"])}
+        
+        yahoo_access_token = tokens["yahoo_access_token"]
+        yahoo_refresh_token = tokens["yahoo_refresh_token"]
+        event["queryStringParameters"]["yahooAccessToken"] = yahoo_access_token
+        
+        # TODO function
+        all_years = invoke_lambda(lambda_client, "process_yahoo_league", event)
+
+        sql_file = "sql/update_yahoo_league_after_process.sql"
+
+    update_query = open(sql_file, "r").read()
+    update_params = {
+        "league_id": league_id,
+        "platform": platform,
+        "all_years": all_years,
+        "cookie_espn": cookie_espn,
+        "yahoo_refresh_token": yahoo_refresh_token
+    }
+
+    cursor.execute(update_query, update_params)
+    conn.commit()
+
+    return {"statusCode": 200, "body": json.dumps("ACTIVE")}
     
 
 sql_last_viewed = """

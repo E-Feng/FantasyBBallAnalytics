@@ -17,7 +17,9 @@ def get_yahoo_access_token(event, context):
     yahoo_auth_code = event["queryStringParameters"].get("yahooAuthCode")
     yahoo_refresh_token = event["queryStringParameters"].get("yahooRefreshToken")
 
-    if not yahoo_refresh_token:
+    tokens = {}
+
+    if yahoo_auth_code:
         get_payload = f"client_id={yahoo_key}&grant_type=authorization_code&code={yahoo_auth_code}&redirect_uri=oob&client_secret={yahoo_secret}"
 
         res = requests.request("POST", url, headers=headers, data=get_payload)
@@ -27,10 +29,13 @@ def get_yahoo_access_token(event, context):
 
         res = requests.request("POST", url, headers=headers, data=refresh_payload)
 
+    data = res.json()
     if res.status_code == 200:
-        yahoo_access_token = res.json()["access_token"]
-        yahoo_refresh_token = res.json()["refresh_token"]
+        tokens["yahoo_access_token"] = data["access_token"]
+        tokens["yahoo_refresh_token"] = data["refresh_token"]
 
-        return [yahoo_access_token, yahoo_refresh_token]
+        return tokens
     
-    return res.json()
+    tokens["error"] = data["error"]
+    
+    return tokens
