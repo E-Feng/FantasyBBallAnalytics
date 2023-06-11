@@ -55,20 +55,20 @@ def get_league_id_status(event, context):
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
         
         # Call league analysis lambda
-        all_years = invoke_lambda(lambda_client, "process_espn_league", event)
+        res = invoke_lambda(lambda_client, "process_espn_league", event)
 
-        update_query = open("sql/update_espn_league_after_process.sql", "r").read()
-        update_params = {
-            "league_id": league_id,
-            "platform": platform,
-            "all_years": all_years,
-            "cookie_espn": cookie_espn
-        }
+        if res['statusCode'] == 200:
+            update_query = open("sql/update_espn_league_after_process.sql", "r").read()
+            update_params = {
+                "league_id": league_id,
+                "platform": platform,
+                "cookie_espn": cookie_espn
+            }
 
-        cursor.execute(update_query, update_params)
-        conn.commit()
-    
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+            cursor.execute(update_query, update_params)
+            conn.commit()
+        
+            return {"statusCode": 200, "body": json.dumps("ACTIVE")}
 
     return {"statusCode": 200, "body": json.dumps("ERROR")}
     
