@@ -74,23 +74,26 @@ def get_league_id_status(event, context):
         event["queryStringParameters"]["yahooAccessToken"] = yahoo_access_token
         
         # TODO function
-        all_years = invoke_lambda(lambda_client, "process_yahoo_league", event)
+        res = invoke_lambda(lambda_client, "process_yahoo_league", event)
 
         sql_file = "sql/update_yahoo_league_after_process.sql"
 
-    update_query = open(sql_file, "r").read()
-    update_params = {
-        "league_id": league_id,
-        "platform": platform,
-        "all_years": all_years,
-        "cookie_espn": cookie_espn,
-        "yahoo_refresh_token": yahoo_refresh_token
-    }
+    if res["statusCode"] == 200:
+        update_query = open(sql_file, "r").read()
+        update_params = {
+            "league_id": league_id,
+            "platform": platform,
+            "cookie_espn": cookie_espn,
+            "yahoo_refresh_token": yahoo_refresh_token
+        }
 
-    cursor.execute(update_query, update_params)
-    conn.commit()
+        cursor.execute(update_query, update_params)
+        conn.commit()
 
-    return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+    
+    return {"statusCode": 200, "body": json.dumps("ERROR")}
+
     
 
 sql_last_viewed = """
