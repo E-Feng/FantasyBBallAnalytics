@@ -57,7 +57,8 @@ def get_league_id_status(event, context):
 
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
         
-        all_years = invoke_lambda(lambda_client, "process_espn_league", event)
+        # Call league analysis lambda
+        res = invoke_lambda(lambda_client, "process_espn_league", event)
 
         sql_file = "sql/update_espn_league_after_process.sql"
     
