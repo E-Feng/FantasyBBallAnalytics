@@ -11,8 +11,6 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
   """
   Extracts data from ESPN API endpoint with specific view and any headers
   """
-  #league_ids = Variable.get("league_ids", deserialize_json=True)
-
   league_id = league_info.get('leagueId', None)
   league_year = league_info.get('leagueYear', None)
 
@@ -20,11 +18,8 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
     raise ValueError(f"No league id or year provided")  
 
   cookie_espn = league_info.get('cookieEspn', None)
-  cookie_swid = league_info.get('cookieSwid', None)
 
-  cookies = {}
-  if cookie_espn or cookie_swid:
-    cookies = {"espn_s2": cookie_espn, "swid": cookie_swid}
+  cookies = {"espn_s2": cookie_espn}
 
   league_url = base_url.format(league_year, league_id)
 

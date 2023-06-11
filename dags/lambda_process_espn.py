@@ -18,7 +18,8 @@ from upload_to_aws import (
   upload_league_data_to_dynamo, upload_data_to_s3
 )
 from util import (
-  invoke_lambda
+  invoke_lambda,
+  get_current_espn_league_year
 )
 from load_settings import (
   get_scoring_period_id
@@ -27,9 +28,10 @@ from upload_to_cloud import (
   upload_to_firebase
 )
 
+current_year = get_current_espn_league_year()
 default_league_info = {
   'leagueId': '1978554631',
-  'leagueYear': '2023',
+  'leagueYear': current_year,
 }
 
 scoring_period = get_scoring_period_id(default_league_info)
@@ -41,7 +43,6 @@ league_api_endpoints = {
   'draft': ['mDraftDetail'],
   'players': ['kona_player_info', 'mStatRatings']
 }
-
 league_headers = {
   'players': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
 }
@@ -49,65 +50,52 @@ league_headers = {
 common_api_endpoints = {
   'players': ['kona_player_info'],
   'daily': ['kona_playercard']
-
 }
-
 common_headers = {
   'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}''',
   'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
 }
 
 def process_espn_league(event, context):
-  league_id = event["queryStringParameters"].get('leagueId')
-  cookie_espn = event["queryStringParameters"].get('cookieEspnS2')
-  cookie_swid = event["queryStringParameters"].get('cookieSwid')
-  league_year = event["queryStringParameters"].get('leagueYear')
+  params = event["queryStringParameters"]
 
-  is_initial_process = True
+  league_id = params.get('leagueId')
+  cookie_espn = params.get('cookieEspnS2')
+  process_only_current = params.get('processOnlyCurrent')
 
   league_info = {
     "leagueId": league_id,
+    "leagueYear": current_year,
     "cookieEspn": cookie_espn,
-    "cookieSwid": cookie_swid
   }
 
   print(f"Processing league {league_id}...")
+  
+  league_settings = extract_from_espn_api(league_info, ['mSettings'])
+  previous_years = sorted(league_settings["status"]["previousSeasons"], reverse=True)
 
-  if league_year:
-    is_initial_process = False
-    league_years = [league_year]
-  else:
-    league_years = []
-    league_year_start = datetime.now().year + 1
+  # Quickly check valid years
+  valid_all_years = [current_year]
+  for test_year in previous_years:
+    league_info['leagueYear'] = test_year
+    try: 
+      extract_from_espn_api(league_info, ['mSettings'])
+      valid_all_years.append(test_year)
+    except:
+      continue
 
-    league_info["leagueYear"] = league_year_start
+  process_years = [current_year] if process_only_current else valid_all_years
 
-    year_check_failures = 0
-    max_check_failures = 4
-    while year_check_failures < max_check_failures:
-      league_info['leagueYear'] = league_year_start
-
-      try:
-        extract_from_espn_api(league_info, [''])
-      except:
-        year_check_failures += 1
-      else:
-        league_years.append(league_year_start)
-      finally:
-        league_year_start = league_year_start - 1
-
-  for league_year in league_years:
+  for league_year in process_years:
     print(f"Starting data extraction for {league_year}...")
 
     league_info['leagueYear'] = league_year
 
     league_data = {
       'leagueId': league_id,
-      'leagueYear': league_year
+      'leagueYear': league_year,
+      'allYears': valid_all_years
     }
-
-    if is_initial_process:
-      league_data['allYears'] = league_years
 
     for endpoint in league_api_endpoints.keys():
       view = league_api_endpoints[endpoint]
@@ -148,15 +136,11 @@ def process_espn_league(event, context):
 
   return {
     'statusCode': 200,
-    'body': league_years
   }
 
 
 def process_espn_common():
-  league_info = {
-    "leagueId": '1978554631',
-    "leagueYear": 2023
-  }
+  league_info = default_league_info
 
   today = date.today().strftime("%Y-%m-%d")
 
@@ -220,11 +204,11 @@ def process_espn_common():
 
       upload_to_firebase('alert', alert_data)     
 
-
   return {
     'statusCode': 200,
     'body': "Test response"
   }
+
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
@@ -266,7 +250,7 @@ def update_espn_leagues(event, context):
         "leagueId": league_id,
         "cookieSwid": league_info[1],
         "cookieEspnS2": league_info[2],
-        "leagueYear": 2023
+        "processOnlyCurrent": True
       }
     }
 
@@ -284,7 +268,6 @@ def update_espn_leagues(event, context):
       }
 
       process_res = invoke_lambda(lambda_client, 'updateLastViewedLeague', update_payload)
-
 
   print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 
