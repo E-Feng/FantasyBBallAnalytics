@@ -25,8 +25,6 @@ def get_league_id_status(event, context):
     league_id = event["queryStringParameters"]['leagueId']
     platform = event["queryStringParameters"]["platform"]
 
-    print(f"League id {league_id} on {platform}")
-
     get_query = open("sql/get_league_info.sql", "r").read()
     get_params = {"league_id": league_id, "platform": platform}
 
@@ -37,6 +35,8 @@ def get_league_id_status(event, context):
     league_exists = bool(res)
     league_updated = league_exists and res[0]
     league_key = league_exists and res [1]
+
+    print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
     if league_updated:
         return {"statusCode": 200, "body": json.dumps("ACTIVE")}
@@ -57,7 +57,7 @@ def get_league_id_status(event, context):
         # Call league analysis lambda
         res = invoke_lambda(lambda_client, "process_espn_league", event)
 
-        if res['statusCode'] == 200:
+        if res:
             update_query = open("sql/update_espn_league_after_process.sql", "r").read()
             update_params = {
                 "league_id": league_id,
