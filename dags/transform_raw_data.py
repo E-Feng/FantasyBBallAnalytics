@@ -206,7 +206,7 @@ def transform_players_to_df(ratings: dict):
 
     for period, key in period_mapping.items():
       # Check if ratings exist for player
-      if player['ratings'][key]['statRankings']:
+      if player['ratings'].get(key, {}).get('statRankings', {}):
         row['totalRating' + period] = player['ratings'][key]['totalRating']
         row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
