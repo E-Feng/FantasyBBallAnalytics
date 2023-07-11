@@ -110,7 +110,7 @@ function LeagueChangeModal(props) {
               <CookieField>
                 <FormLabel>Espn S2</FormLabel>
                 <CookieInput
-                  type='textarea'
+                  type='text'
                   name='cookieEspnS2'
                   placeholder='AEA1B2C3D4E5F6G7H8I9J10.........'
                   ref={register()}
