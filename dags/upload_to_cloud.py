@@ -4,7 +4,10 @@ import requests
 from google.oauth2 import service_account
 from google.auth.transport.requests import AuthorizedSession
 
-LEAGUE_YEAR = '2023'
+from util import get_current_espn_league_year
+
+
+LEAGUE_YEAR = get_current_espn_league_year()
 FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{LEAGUE_YEAR}/common/'
 
 

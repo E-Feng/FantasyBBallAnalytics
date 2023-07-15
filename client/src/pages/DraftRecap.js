@@ -20,7 +20,7 @@ function DraftRecap(props) {
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const draftData = isLoading ? null : data.draftRecap;
+  const draftData = isLoading ? null : data.draft;
   const teamData = isLoading ? null : data.teams;
   const settingsData = isLoading ? null : data.settings;
 

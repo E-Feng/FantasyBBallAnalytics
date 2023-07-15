@@ -21,7 +21,7 @@ function LeagueSettings() {
   const isLoading = !isDataLoaded || isFetching;
 
   const yearList =
-    isLoading || data['allYears'] === undefined ? ['2023'] : data['allYears'];
+    isLoading || data['allYears'] === undefined ? ['2024'] : data['allYears'];
 
   yearList.sort((a, b) => parseInt(b) - parseInt(a));
 

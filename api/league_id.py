@@ -34,11 +34,12 @@ def get_league_id_status(event, context):
 
     league_exists = bool(res)
     league_updated = league_exists and res[0]
-    league_key = league_exists and res [1]
+    league_key = league_exists and res[1]
 
     print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
     if league_updated:
+        print("League already updated, returning active")
         return {"statusCode": 200, "body": json.dumps("ACTIVE")}
     
     if platform == "espn":
@@ -50,6 +51,7 @@ def get_league_id_status(event, context):
         status = get_espn_league_status(league_id, cookies)
 
         if status != "VALID":
+            print(f"Invalid league, status: {status}")
             return {"statusCode": 200, "body": json.dumps(status)}
 
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
@@ -68,8 +70,10 @@ def get_league_id_status(event, context):
             cursor.execute(update_query, update_params)
             conn.commit()
         
+            print("League processed, returning active")
             return {"statusCode": 200, "body": json.dumps("ACTIVE")}
 
+    print("Uncommon process error, returning error")
     return {"statusCode": 200, "body": json.dumps("ERROR")}
     
 

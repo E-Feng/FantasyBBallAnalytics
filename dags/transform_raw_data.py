@@ -3,7 +3,11 @@ import math
 import pandas as pd
 
 import consts
-from util import calculate_gamescore, format_stat_ratings
+from util import (
+  get_current_espn_league_year,
+  calculate_gamescore, 
+  format_stat_ratings
+)
 
 
 def transform_raw_to_df(endpoint: list, raw_data: dict):
@@ -191,7 +195,6 @@ def transform_players_to_df(ratings: dict):
   data = ratings  
 
   data_array = []
-
   # Iterate through all players
   for player in data['players']:
     row = {}
@@ -214,7 +217,9 @@ def transform_players_to_df(ratings: dict):
 
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
-        stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}2023'), {})
+        year = player["player"]["stats"][0]["seasonId"]
+
+        stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}'), {})
         if stats_period.get('averageStats'):
           row['stats' + period] = stats_period['averageStats']
 
@@ -296,6 +301,8 @@ def transform_settings_to_df(settings: dict):
 
   # Iterate through all category ids
   row = {}
+
+  row['isActive'] = data["status"]["isActive"]
 
   row['categoryIds'] = []
   for category in data['settings']['scoringSettings']['scoringItems']:
