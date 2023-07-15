@@ -20,6 +20,8 @@ conn = psycopg2.connect(
 
 
 def get_league_id_status(event, context):
+    print(event)
+    
     cursor = conn.cursor()
 
     league_id = event["queryStringParameters"]['leagueId']
