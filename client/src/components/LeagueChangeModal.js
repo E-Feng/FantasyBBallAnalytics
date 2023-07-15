@@ -39,7 +39,7 @@ function LeagueChangeModal(props) {
     const reqPayload = {
       leagueId: newLeagueId,
       platform: 'espn',
-      cookieEspnS2: data.cookieEspnS2,
+      cookieEspnS2: data.cookieEspnS2 || "",
     };
 
     const leagueStatus = await requestLeagueId(reqPayload);
