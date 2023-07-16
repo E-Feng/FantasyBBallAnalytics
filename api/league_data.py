@@ -2,6 +2,9 @@ import json
 import boto3
 from decimal import Decimal
 
+from util import invoke_lambda
+
+
 dynamodb_table_name = 'fantasyLeagueData'
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
@@ -36,12 +39,8 @@ def get_league_data_from_ddb(event, context):
         "method": 'lastViewed'  
       }
     }
-      
-    update_res = lambda_client.invoke(
-      FunctionName='updateLastViewedLeague', 
-      InvocationType='RequestResponse',
-      Payload=json.dumps(payload)
-    )
+
+    invoke_lambda(lambda_client, "update_league_info", payload)
       
   return body
 

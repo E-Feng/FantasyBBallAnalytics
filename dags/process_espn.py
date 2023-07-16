@@ -136,6 +136,7 @@ def process_espn_league(event, context):
 
   return {
     'statusCode': 200,
+    'body': 'Success'
   }
 
 
@@ -267,7 +268,7 @@ def update_espn_leagues(event, context):
         }
       }
 
-      process_res = invoke_lambda(lambda_client, 'updateLastViewedLeague', update_payload)
+    invoke_lambda(lambda_client, "update_league_info", update_payload)
 
   print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 

@@ -39,8 +39,7 @@ function LeagueChangeModal(props) {
     const reqPayload = {
       leagueId: newLeagueId,
       platform: 'espn',
-      cookieEspnS2: data.cookieEspnS2,
-      cookieSwid: data.cookieSwid,
+      cookieEspnS2: data.cookieEspnS2 || "",
     };
 
     const leagueStatus = await requestLeagueId(reqPayload);
@@ -113,17 +112,7 @@ function LeagueChangeModal(props) {
                 <CookieInput
                   type='text'
                   name='cookieEspnS2'
-                  placeholder='A1B2C3D4E5F6G7H8I9J10.........'
-                  ref={register()}
-                  disabled={formState.isSubmitting}
-                />
-              </CookieField>
-              <CookieField>
-                <FormLabel>Swid</FormLabel>
-                <CookieInput
-                  type='text'
-                  name='cookieSwid'
-                  placeholder='{ACEG12-3K9A-...}'
+                  placeholder='AEA1B2C3D4E5F6G7H8I9J10.........'
                   ref={register()}
                   disabled={formState.isSubmitting}
                 />
@@ -210,7 +199,8 @@ const CookieField = styled.div`
   margin: 0.15rem 0;
 `;
 
-const CookieInput = styled.input``;
+const CookieInput = styled.input`
+`;
 
 const ErrorMsg = styled.p`
   color: red;

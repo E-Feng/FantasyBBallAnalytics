@@ -21,12 +21,12 @@ conn = psycopg2.connect(
 
 
 def get_league_id_status(event, context):
+    print(event)
+    
     cursor = conn.cursor()
 
     league_id = event["queryStringParameters"]['leagueId']
     platform = event["queryStringParameters"]["platform"]
-
-    print(f"League id {league_id} on {platform}")
 
     get_query = open("sql/get_league_info.sql", "r").read()
     get_params = {"league_id": league_id, "platform": platform}
@@ -39,10 +39,10 @@ def get_league_id_status(event, context):
     league_updated = league_exists and res[0]
     league_key = league_exists and res[1]
 
-    cookie_espn = None
-    yahoo_access_token = None
+    print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
     if league_updated:
+        print("League already updated, returning active")
         return {"statusCode": 200, "body": json.dumps("ACTIVE")}
     
     if platform == "espn":
@@ -53,6 +53,7 @@ def get_league_id_status(event, context):
 
         status = get_espn_league_status(league_id, cookies)
         if status != "VALID":
+            print(f"Invalid league, status: {status}")
             return {"statusCode": 200, "body": json.dumps(status)}
 
         event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
@@ -89,9 +90,11 @@ def get_league_id_status(event, context):
 
         cursor.execute(update_query, update_params)
         conn.commit()
-
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
     
+        print("League processed, returning active")
+        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+
+    print("Uncommon process error, returning error")
     return {"statusCode": 200, "body": json.dumps("ERROR")}
 
     
