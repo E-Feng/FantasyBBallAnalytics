@@ -51,6 +51,11 @@ def get_league_id_status(event, context):
         print("League already updated, returning active")
         return {"statusCode": 200, "body": json.dumps("ACTIVE")}
     
+    update_params = {
+        "league_id": league_id,
+        "platform": platform,
+    }
+    
     if platform == "espn":
         cookies = {"espn_s2": league_key}
 
@@ -65,6 +70,7 @@ def get_league_id_status(event, context):
         res = invoke_lambda(lambda_client, "process_espn_league", event)
 
         sql_file = "sql/update_espn_league_after_process.sql"
+        update_params["cookie_espn"] = league_key
     
     elif platform == "yahoo":
         event["queryStringParameters"]["yahooRefreshToken"] = league_key
@@ -81,15 +87,10 @@ def get_league_id_status(event, context):
         res = invoke_lambda(lambda_client, "process_yahoo_league", event)
 
         sql_file = "sql/update_yahoo_league_after_process.sql"
+        update_params["yahoo_refresh_token"] = yahoo_refresh_token
 
     if res:
         update_query = open(sql_file, "r").read()
-        update_params = {
-            "league_id": league_id,
-            "platform": platform,
-            "cookie_espn": league_key,
-            "yahoo_refresh_token": yahoo_refresh_token
-        }
 
         cursor.execute(update_query, update_params)
         conn.commit()
