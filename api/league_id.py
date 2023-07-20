@@ -82,7 +82,7 @@ def get_league_id_status(event, context):
 
         sql_file = "sql/update_yahoo_league_after_process.sql"
 
-    if res["statusCode"] == 200:
+    if res:
         update_query = open(sql_file, "r").read()
         update_params = {
             "league_id": league_id,
