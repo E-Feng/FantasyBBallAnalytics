@@ -4,6 +4,7 @@ import psycopg2
 
 from util import invoke_lambda
 from espn_helper import get_espn_league_status
+from yahoo_auth import get_yahoo_access_token
 
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
@@ -26,17 +27,23 @@ def get_league_id_status(event, context):
 
     league_id = event["queryStringParameters"]['leagueId']
     platform = event["queryStringParameters"]["platform"]
+    league_key = event["queryStringParameters"]["leagueKey"]
 
     get_query = open("sql/get_league_info.sql", "r").read()
-    get_params = {"league_id": league_id, "platform": platform}
+    get_params = {"league_id": league_id}
 
     cursor.execute(get_query, get_params)
 
-    res = cursor.fetchone()
+    res = cursor.fetchall()
 
+    if len(res) > 1:
+        print("Yahoo and ESPN league found")
+        return {"statusCode": 200, "body": json.dumps("AMBIGUOUS")}
+    
     league_exists = bool(res)
-    league_updated = league_exists and res[0]
-    league_key = league_exists and res[1]
+    league_updated = league_exists and res[0][0]
+    league_key = res[0][1] if not league_key and league_exists else league_key
+    platform = res[0][2] if not platform and league_exists else "espn"
 
     print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
@@ -45,38 +52,54 @@ def get_league_id_status(event, context):
         return {"statusCode": 200, "body": json.dumps("ACTIVE")}
     
     if platform == "espn":
-        cookie_espn_qsp = event["queryStringParameters"].get('cookieEspnS2', None)
-        cookie_espn = cookie_espn_qsp or league_key
-
-        cookies = {"espn_s2": cookie_espn}
+        cookies = {"espn_s2": league_key}
 
         status = get_espn_league_status(league_id, cookies)
-
         if status != "VALID":
             print(f"Invalid league, status: {status}")
             return {"statusCode": 200, "body": json.dumps(status)}
 
-        event["queryStringParameters"]['cookieEspnS2'] = cookie_espn
+        event["queryStringParameters"]['cookieEspnS2'] = league_key
         
         # Call league analysis lambda
         res = invoke_lambda(lambda_client, "process_espn_league", event)
 
-        if res:
-            update_query = open("sql/update_espn_league_after_process.sql", "r").read()
-            update_params = {
-                "league_id": league_id,
-                "platform": platform,
-                "cookie_espn": cookie_espn
-            }
+        sql_file = "sql/update_espn_league_after_process.sql"
+    
+    elif platform == "yahoo":
+        event["queryStringParameters"]["yahooRefreshToken"] = league_key
 
-            cursor.execute(update_query, update_params)
-            conn.commit()
+        tokens = get_yahoo_access_token(event, context)
+        if tokens.get("error"):
+            return {"statusCode": 200, "body": json.dumps(tokens["error"])}
         
-            print("League processed, returning active")
-            return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+        yahoo_access_token = tokens["yahoo_access_token"]
+        yahoo_refresh_token = tokens["yahoo_refresh_token"]
+        event["queryStringParameters"]["yahooAccessToken"] = yahoo_access_token
+        
+        # TODO function
+        res = invoke_lambda(lambda_client, "process_yahoo_league", event)
+
+        sql_file = "sql/update_yahoo_league_after_process.sql"
+
+    if res["statusCode"] == 200:
+        update_query = open(sql_file, "r").read()
+        update_params = {
+            "league_id": league_id,
+            "platform": platform,
+            "cookie_espn": league_key,
+            "yahoo_refresh_token": yahoo_refresh_token
+        }
+
+        cursor.execute(update_query, update_params)
+        conn.commit()
+    
+        print("League processed, returning active")
+        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
 
     print("Uncommon process error, returning error")
     return {"statusCode": 200, "body": json.dumps("ERROR")}
+
     
 
 sql_last_viewed = """
