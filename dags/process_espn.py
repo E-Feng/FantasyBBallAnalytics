@@ -115,7 +115,8 @@ def process_espn_league(event, context):
     # )
 
     league_data['players'] = transform_players_truncate(
-      league_data['players']
+      league_data['players'],
+      league_data["draft"]
     )
 
     # Removing unneeded league data

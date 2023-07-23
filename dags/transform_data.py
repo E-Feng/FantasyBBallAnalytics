@@ -3,10 +3,11 @@ import pandas as pd
 import consts
 
 
-def transform_players_truncate(players: pd.DataFrame):
+def transform_players_truncate(players: pd.DataFrame, draft: pd.DataFrame):
   is_owned = players['onTeamId'] > 0
+  is_drafted = players["playerId"].isin(draft["playerId"])
 
-  all_cond = is_owned
+  all_cond = is_owned | is_drafted
 
   return players[all_cond]
 
