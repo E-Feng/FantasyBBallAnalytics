@@ -27,7 +27,7 @@ def get_league_id_status(event, context):
 
     league_id = event["queryStringParameters"]['leagueId']
     platform = event["queryStringParameters"]["platform"]
-    league_key = event["queryStringParameters"]["leagueKey"]
+    league_auth_code = event["queryStringParameters"]["leagueAuthCode"]
 
     get_query = open("sql/get_league_info.sql", "r").read()
     get_params = {"league_id": league_id}
@@ -42,8 +42,8 @@ def get_league_id_status(event, context):
     
     league_exists = bool(res)
     league_updated = league_exists and res[0][0]
-    league_key = res[0][1] if not league_key and league_exists else league_key
-    platform = res[0][2] if not platform and league_exists else "espn"
+    league_auth_code = res[0][1] if not league_auth_code and league_exists else league_auth_code
+    platform = res[0][2] if league_exists else (platform or "espn")
 
     print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
@@ -57,33 +57,33 @@ def get_league_id_status(event, context):
     }
     
     if platform == "espn":
-        cookies = {"espn_s2": league_key}
+        cookies = {"espn_s2": league_auth_code}
 
         status = get_espn_league_status(league_id, cookies)
         if status != "VALID":
             print(f"Invalid league, status: {status}")
             return {"statusCode": 200, "body": json.dumps(status)}
 
-        event["queryStringParameters"]['cookieEspnS2'] = league_key
+        event["queryStringParameters"]['cookieEspnS2'] = league_auth_code
         
-        # Call league analysis lambda
         res = invoke_lambda(lambda_client, "process_espn_league", event)
 
         sql_file = "sql/update_espn_league_after_process.sql"
-        update_params["cookie_espn"] = league_key
+        update_params["cookie_espn"] = league_auth_code
     
     elif platform == "yahoo":
-        event["queryStringParameters"]["yahooRefreshToken"] = league_key
+        event["queryStringParameters"]["leagueAuthCode"] = league_auth_code
 
-        tokens = get_yahoo_access_token(event, context)
+        tokens = get_yahoo_access_token(league_auth_code)
         if tokens.get("error"):
-            return {"statusCode": 200, "body": json.dumps(tokens["error"])}
+            error = tokens.get("error")
+            print(f"Error auth with yahoo: {error}")
+            return {"statusCode": 200, "body": json.dumps(error)}
         
         yahoo_access_token = tokens["yahoo_access_token"]
         yahoo_refresh_token = tokens["yahoo_refresh_token"]
         event["queryStringParameters"]["yahooAccessToken"] = yahoo_access_token
         
-        # TODO function
         res = invoke_lambda(lambda_client, "process_yahoo_league", event)
 
         sql_file = "sql/update_yahoo_league_after_process.sql"
@@ -148,3 +148,13 @@ def update_league_info(event, context):
         'statusCode': 200,
         'body': json.dumps('Updated successfully')
     }
+
+process_payload = {
+  "queryStringParameters": {
+    "leagueId": "57390",
+    "platform": "yahoo",
+    'leagueAuthCode': '',
+    # "cookieEspnS2": "{AEAOzsH5%2B5XiKuX5BO0%2Fwy0zmxlWV%2FfHxbETlKIQrCOTRA7ZdHk0IWgyDuJjkk7HUNb%2ByLP6X1nL8x5eph1TDHELcJJi1KTGPdrtAsmXrWigw35%2F2KBWmPtwdnXwX31TrpqlCPuPJ4zfgo8cxT26vss42m3FLBdY0Bphte8bYHUPgmFk3SZ4lIMkvFEWxXrRtiGGqB5ozn3JNhc4lJWddUCdfks8Lkba19t3csjvPYoTAUlGIFz243%2F%2FYoM2KGKL4Jw%3D}",
+  }
+}
+get_league_id_status(process_payload, "")

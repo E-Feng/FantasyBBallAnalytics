@@ -13,19 +13,18 @@ url = "https://api.login.yahoo.com/oauth2/get_token"
 headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
 
-def get_yahoo_access_token(event, context):
-    yahoo_auth_code = event["queryStringParameters"].get("yahooAuthCode")
-    yahoo_refresh_token = event["queryStringParameters"].get("yahooRefreshToken")
+def get_yahoo_access_token(league_auth_code):
+    is_initial_auth_code = len(league_auth_code) < 10
 
     tokens = {}
 
-    if yahoo_auth_code:
-        get_payload = f"client_id={yahoo_key}&grant_type=authorization_code&code={yahoo_auth_code}&redirect_uri=oob&client_secret={yahoo_secret}"
+    if is_initial_auth_code:
+        get_payload = f"client_id={yahoo_key}&grant_type=authorization_code&code={league_auth_code}&redirect_uri=oob&client_secret={yahoo_secret}"
 
         res = requests.request("POST", url, headers=headers, data=get_payload)
 
     else:
-        refresh_payload = f"client_id={yahoo_key}&grant_type=refresh_token&redirect_uri=oob&refresh_token={yahoo_refresh_token}&client_secret={yahoo_secret}"
+        refresh_payload = f"client_id={yahoo_key}&grant_type=refresh_token&redirect_uri=oob&refresh_token={league_auth_code}&client_secret={yahoo_secret}"
 
         res = requests.request("POST", url, headers=headers, data=refresh_payload)
 
