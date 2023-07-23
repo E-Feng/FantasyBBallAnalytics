@@ -37,7 +37,7 @@ function LeagueChangeModal(props) {
       return;
     }
 
-    const leagueKey = data.cookieEspnS2 || data.yahooAuthCode || '';
+    const leagueAuthCode = data.cookieEspnS2 || data.yahooAuthCode || '';
     const platform = data.cookieEspnS2
       ? 'espn'
       : data.yahooAuthCode
@@ -47,7 +47,8 @@ function LeagueChangeModal(props) {
     const reqPayload = {
       leagueId: newLeagueId,
       platform: platform,
-      leagueKey: leagueKey,
+      leagueAuthCode: leagueAuthCode,
+      leagueKey: leagueAuthCode
     };
 
     setResponseMsg(requestingMsg);
