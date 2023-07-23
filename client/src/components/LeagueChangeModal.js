@@ -48,7 +48,6 @@ function LeagueChangeModal(props) {
       leagueId: newLeagueId,
       platform: platform,
       leagueAuthCode: leagueAuthCode,
-      leagueKey: leagueAuthCode
     };
 
     setResponseMsg(requestingMsg);
