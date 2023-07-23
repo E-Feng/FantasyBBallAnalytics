@@ -23,6 +23,7 @@ function DraftRecap(props) {
   const draftData = isLoading ? null : data.draft;
   const teamData = isLoading ? null : data.teams;
   const settingsData = isLoading ? null : data.settings;
+  const playersData = isLoading ? null : data.players;
 
   const draftRecapInfo = `This table shows a recap of the draft with the end of
     season stats rating and overall ranking. The pick number to ranking difference 
@@ -39,9 +40,10 @@ function DraftRecap(props) {
         <Container>
           <TooltipHeader title='Draft Recap' info={draftRecapInfo} />
           <DraftRecapContainer
-            data={draftData}
+            draft={draftData}
             teams={teamData}
             settings={settingsData}
+            players={playersData}
           />
         </Container>
       )}
