@@ -122,10 +122,11 @@ def transform_draft_to_df(data: dict):
 
     for pick in data['fantasy_content']["league"]["draft_results"]:
         row = {}
+        pick = pick["draft_result"]
 
         row['pickNumber'] = pick['pick']
         row['round'] = pick['round']
-        row['teamId'] = pick['team_key'][-1]
+        row['teamId'] = int(pick['team_key'][-1])
         row['playerId'] = pick['player_key'].split('.')[-1]
 
         data_array.append(row)
