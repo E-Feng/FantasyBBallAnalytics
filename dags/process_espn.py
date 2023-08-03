@@ -38,7 +38,7 @@ scoring_period = get_scoring_period_id(default_league_info)
 
 league_api_endpoints = {
   'settings': ['mSettings'],
-  'teams': ['mTeam'],
+  'teams': ['mTeam', 'mRoster'],
   'scoreboard': ['mScoreboard'],
   'draft': ['mDraftDetail'],
   'players': ['kona_player_info', 'mStatRatings']
