@@ -3,7 +3,11 @@ import math
 import pandas as pd
 
 import consts
-from util import calculate_gamescore
+from util import (
+  get_current_espn_league_year,
+  calculate_gamescore, 
+  format_stat_ratings
+)
 
 
 def transform_raw_to_df(endpoint: list, raw_data: dict):
@@ -59,6 +63,14 @@ def transform_team_to_df(team_info: dict):
       if member['id'] == team.get('primaryOwner'):
         row['firstName'] = member['firstName']
         row['lastName'] = member['lastName']
+
+    # Roster information
+    row['roster'] = {}
+    for entry in team['roster']['entries']:
+      playerId = entry['playerId']
+      row['roster'][playerId] = {}
+      row['roster'][playerId]['lineupSlotId'] = entry['lineupSlotId']
+      row['roster'][playerId]['acquisitionType'] = entry['acquisitionType']
 
     #print(row)
     data_array.append(row)
@@ -181,41 +193,51 @@ def transform_players_to_df(ratings: dict):
   Transforms players raw json data from ESPN API to pandas dataframe
   """
 
+  period_mapping = {
+    "Season": consts.SEASON,
+    "Last7": consts.LAST7,
+    "Last15": consts.LAST15,
+    "Last30": consts.LAST30
+  }
+
   data = ratings  
 
   data_array = []
-
   # Iterate through all players
   for player in data['players']:
     row = {}
 
     row['playerId'] = str(player['id'])
     row['playerName'] = player['player']['fullName']
+    row['onTeamId'] = player['onTeamId']
+    row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
+    row['proTeamId'] = player['player']['proTeamId']
 
-    # Check if ratings exist for player
-    if 'ratings' in player:
-      row['ratingEjsSeason'] = player['ratings']['0']['totalRating']
-      row['rankingEjsSeason'] = player['ratings']['0']['totalRanking']
+    row['percentOwned'] = player['player'].get('ownership', {}).get('percentOwned', 0.0)
 
-      # Calculating rating without ejections
-      rating = 0
-      for stat in player['ratings']['0']['statRankings']:
-        if stat['forStat'] != int(consts.EJS):
-          rating = rating + stat['rating']
+    for period, key in period_mapping.items():
+      # Check if ratings exist for player
+      if player['ratings'].get(key, {}).get('statRankings', {}):
+        row['totalRating' + period] = player['ratings'][key]['totalRating']
+        row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
-      row['ratingSeason'] = rating
+        row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
 
-    #print(row)
+      # Stats, dynamic filtering out right dict that matches id field
+      if player["player"].get("stats"):
+        year = player["player"]["stats"][0]["seasonId"]
+
+        stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}'), {})
+        if stats_period.get('averageStats'):
+          row['stats' + period] = stats_period['averageStats']
+
     data_array.append(row)
 
 
   df = pd.DataFrame.from_records(data_array) 
-
-  # Creating rank column for derived ratings column
-  df['rankingSeason'] = df['ratingSeason'].rank(method='min', na_option='top', ascending=False)
  
-  #print(df.head(2))
-  #print(df.tail(2))
+  # print(df.head(2))
+  # print(df.tail(2))
 
   return df
 
@@ -287,6 +309,8 @@ def transform_settings_to_df(settings: dict):
 
   # Iterate through all category ids
   row = {}
+
+  row['isActive'] = data["status"]["isActive"]
 
   row['categoryIds'] = []
   for category in data['settings']['scoringSettings']['scoringItems']:

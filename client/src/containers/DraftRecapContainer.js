@@ -9,30 +9,41 @@ function DraftRecapContainer(props) {
   const [sortMode, setSortMode] = useState('round');
   const [ejsChecked, setChecked] = useState(false);
 
-  const hasEjections = checkLeagueHasEjections(props.settings[0]['categoryIds']);
+  const sortList = ['round', 'team', 'ranking', 'difference'];
+
+  // const hasEjections = checkLeagueHasEjections(
+  //   props.settings[0]['categoryIds']
+  // );
+  const hasEjections = false;
 
   // Adjusting raw data, calculating difference
-  const data = props.data.map((player) => {
-    const team = props.teams.filter((team) => team.teamId === player.teamId);
-    const ranking = ejsChecked ? player.rankingEjsSeason : player.rankingSeason;
-    const rating = ejsChecked ? player.ratingEjsSeason : player.ratingSeason;
-    const difference = ranking ? player.pickNumber - ranking : null;
+  const data = props.draft.map((pick) => {
+    const team = props.teams.filter((team) => team.teamId === pick.teamId);
+    const player = props.players.filter(
+      (player) => player.playerId === pick.playerId
+    )[0];
+
+    const ranking = ejsChecked
+      ? player.totalRankingSeason
+      : player.totalRankingSeason;
+    const rating = ejsChecked
+      ? player.totalRatingSeason
+      : player.totalRatingSeason;
+    const difference = ranking ? pick.pickNumber - ranking : null;
 
     return {
-      ...player,
+      ...pick,
       fullTeamName: team[0].fullTeamName,
+      playerName: player.playerName,
       ranking: ranking,
       rating: rating,
       difference: difference,
     };
   });
 
-  const sortList = ['round', 'team', 'ranking', 'difference'];
-
   const handleSortChange = (e) => {
     setSortMode(e.target.value);
   };
-
   const handleCheckbox = (e) => {
     setChecked(!ejsChecked);
   };

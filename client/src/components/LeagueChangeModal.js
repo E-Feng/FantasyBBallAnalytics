@@ -6,13 +6,12 @@ import styled from 'styled-components';
 import { requestLeagueId } from '../utils/webAPI';
 
 function LeagueChangeModal(props) {
-  const { register, handleSubmit, errors, formState } = useForm();
+  const { register, handleSubmit, errors, getValues, formState } = useForm();
   const [responseMsg, setResponseMsg] = useState('');
-  const [showCookieForm, setShowCookieForm] = useState(false);
 
   const requestingMsg = 'Obtaining league data...';
 
-  const responseColor = responseMsg === requestingMsg ? 'yelloww' : 'red';
+  const responseColor = responseMsg === requestingMsg ? 'yellow' : 'red';
 
   const closeModal = (e) => {
     const isClosedFromButton = e.target instanceof HTMLButtonElement;
@@ -21,8 +20,12 @@ function LeagueChangeModal(props) {
     }
   };
 
-  const toggleCookieForm = () => {
-    setShowCookieForm(!showCookieForm);
+  const isOnlyOnePlatform = () => {
+    const espnVal = getValues('cookieEspnS2');
+    const yahooVal = getValues('yahooAuthCode');
+
+    const onlyOneFilled = !(espnVal.length * yahooVal.length);
+    return onlyOneFilled;
   };
 
   const onSubmit = async (data) => {
@@ -34,13 +37,20 @@ function LeagueChangeModal(props) {
       return;
     }
 
-    setResponseMsg(requestingMsg);
+    const leagueAuthCode = data.cookieEspnS2 || data.yahooAuthCode || '';
+    const platform = data.cookieEspnS2
+      ? 'espn'
+      : data.yahooAuthCode
+      ? 'yahoo'
+      : '';
 
     const reqPayload = {
       leagueId: newLeagueId,
-      cookieEspnS2: data.cookieEspnS2,
-      cookieSwid: data.cookieSwid,
+      platform: platform,
+      leagueAuthCode: leagueAuthCode,
     };
+
+    setResponseMsg(requestingMsg);
 
     const leagueStatus = await requestLeagueId(reqPayload);
     console.log(leagueStatus);
@@ -58,76 +68,101 @@ function LeagueChangeModal(props) {
       case 'GENERAL_NOT_FOUND':
         setResponseMsg('League id not found or deleted.');
         break;
+      case 'AMBIGUOUS':
+        setResponseMsg(`Enter ${newLeagueId}e or ${newLeagueId}y`);
+        break;
       default:
         setResponseMsg('Error obtaining league information.');
     }
   };
 
-  const description1 = `View league id or have league processed 
-    and analyzed, please allow a minute (1) to process. Public 
-    ESPN leagues are seamlessly supported, private leagues require 
-    cookie information [`;
-  const description2 = `]. Yahoo leagues not currently planned.`;
+  const description = `View or process league info, allow one minute.
+    Private ESPN leagues will require cookie information. 
+    Yahoo leagues will require authorization. Cookie/Auth only 
+    needs to be provided once unless errors present.`;
 
   const cookieInfoLink =
     'https://chrome.google.com/webstore/detail/espn-cookie-finder/oapfffhnckhffnpiophbcmjnpomjkfcj';
+  const yahooAuthLink =
+    'https://api.login.yahoo.com/oauth2/request_auth?client_id=dj0yJmk9Y0NLbVduVG0wTFdBJmQ9WVdrOWJYVkJSbG8wYTNjbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTYz&redirect_uri=oob&response_type=code&language=en-us';
 
   return ReactDOM.createPortal(
     <>
-      <Modal extra={showCookieForm}>
+      <Modal>
         <Header>View/Process League Id</Header>
-        <h4>ESPN Leagues Only</h4>
-        <Text>
-          {description1}
-          <a href={cookieInfoLink}>info</a>
-          {description2}
-        </Text>
+        <Text>{description}</Text>
         <URLExample>
           https://fantasy.espn.com/basketball/league?leagueId=
-          <Underline>890123456</Underline>
+          <Underline>123456789</Underline>
+        </URLExample>
+        <URLExample>
+          https://basketball.fantasysports.yahoo.com/f1/
+          <Underline>123456</Underline>
         </URLExample>
         <LeagueForm onSubmit={handleSubmit(onSubmit)}>
-          <FormLabel>League Id </FormLabel>
-          <LeagueInput
-            type='text'
-            name='leagueId'
-            placeholder='eg. 890123456'
-            ref={register({ required: true })}
-            disabled={formState.isSubmitting}
-          />
-          <input
+          <LabelInput>
+            <label>League Id</label>
+            <input
+              type='text'
+              name='leagueId'
+              placeholder='123456789'
+              ref={register({ required: true })}
+              disabled={formState.isSubmitting}
+            />
+          </LabelInput>
+          <PlatformContainer>
+            <Platform>
+              <h3>ESPN</h3>
+              <p>Chrome Extension</p>
+              <InfoLink
+                target='_blank'
+                rel='noopener noreferrer'
+                href={cookieInfoLink}
+              >
+                ESPN Cookie Finder
+              </InfoLink>
+              <LabelInput>
+                <label>ESPN_S2 Cookie</label>
+                <input
+                  type='text'
+                  name='cookieEspnS2'
+                  placeholder='AEA1B2C3D4E5F6G7H8I9J10.........'
+                  ref={register({ validate: isOnlyOnePlatform })}
+                  disabled={formState.isSubmitting}
+                />
+              </LabelInput>
+            </Platform>
+            <Border />
+            <Platform>
+              <h3>Yahoo</h3>
+              <p>Yahoo.com Authorization</p>
+              <InfoLink
+                target='_blank'
+                rel='noopener noreferrer'
+                href={yahooAuthLink}
+              >
+                Authorize
+              </InfoLink>
+              <LabelInput>
+                <label>Auth Code</label>
+                <input
+                  type='text'
+                  name='yahooAuthCode'
+                  placeholder='1a2b3c4'
+                  ref={register({ validate: isOnlyOnePlatform })}
+                  disabled={formState.isSubmitting}
+                />
+              </LabelInput>
+            </Platform>
+          </PlatformContainer>
+          <SubmitButton
             type='submit'
             value='Submit'
             disabled={formState.isSubmitting}
           />
           {errors.leagueId && <ErrorMsg>League Id Field Required</ErrorMsg>}
-          <CookieToggle onClick={toggleCookieForm}>
-            Cookie Info For Private Leagues Only{' '}
-            {showCookieForm ? <span>&#9650;</span> : <span>&#9660;</span>}
-          </CookieToggle>
-          {showCookieForm && (
-            <CookieFormContainer>
-              <CookieField>
-                <FormLabel>Espn S2</FormLabel>
-                <CookieInput
-                  type='text'
-                  name='cookieEspnS2'
-                  placeholder='A1B2C3D4E5F6G7H8I9J10.........'
-                  ref={register()}
-                  disabled={formState.isSubmitting}
-                />
-              </CookieField>
-              <CookieField>
-                <FormLabel>Swid</FormLabel>
-                <CookieInput
-                  type='text'
-                  name='cookieSwid'
-                  placeholder='{ACEG12-3K9A-...}'
-                  ref={register()}
-                  disabled={formState.isSubmitting}
-                />
-              </CookieField>
-            </CookieFormContainer>
+          {errors.cookieEspnS2 && errors.yahooAuthCode && (
+            <ErrorMsg>Fill Only One Platform</ErrorMsg>
           )}
           <ResponseMsg color={responseColor}>{responseMsg}</ResponseMsg>
         </LeagueForm>
@@ -146,7 +181,7 @@ const Modal = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  max-height: ${(props) => (props.extra ? '410px' : '360px')};
+  max-height: 480px;
   width: 600px;
   max-width: 95%;
   background-color: black;
@@ -157,7 +192,7 @@ const Modal = styled.div`
   align-items: center;
 
   @media (max-width: 450px) {
-    height: 450px;
+    height: 600px;
   }
 `;
 
@@ -166,10 +201,18 @@ const Header = styled.h1`
   margin-top: 1rem;
 `;
 
+const LeagueForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+`;
+
 const Text = styled.p`
   text-align: center;
   max-width: 85%;
-  margin: 1.25rem auto;
+  margin: 1rem auto;
 `;
 
 const URLExample = styled.p`
@@ -177,39 +220,63 @@ const URLExample = styled.p`
   font-size: 14px;
 `;
 
+const PlatformContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+
+  width: 100%;
+  margin: 0.5rem auto;
+`;
+
+const Platform = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  width: 225px;
+  max-width: 225px;
+
+  h3 {
+    align-self: center;
+  }
+`;
+
+const InfoLink = styled.a`
+  color: white;
+  border: 2px white solid;
+  text-decoration: none;
+
+  margin: 4px auto;
+  padding: 3px 5px;
+
+  :hover {
+    background-color: gray;
+  }
+`;
+
+const Border = styled.div`
+  width: 2px;
+  background-color: white;
+`;
+
 const Underline = styled.span`
   text-decoration: underline;
 `;
 
-const LeagueForm = styled.form``;
-
-const FormLabel = styled.label`
-  width: 73px;
-`;
-
-const LeagueInput = styled.input`
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-`;
-
-const CookieToggle = styled.p`
-  text-align: center;
-  margin-bottom: 0.25rem;
-`;
-
-const CookieFormContainer = styled.div`
+const LabelInput = styled.div`
   display: flex;
   flex-direction: column;
+
+  label {
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0.3rem 0 0.1rem 0;
+  }
 `;
 
-const CookieField = styled.div`
-  display: flex;
-  flex-direction: row;
-
-  margin: 0.15rem 0;
+const SubmitButton = styled.input`
+  margin: 0.3rem auto 0 auto;
 `;
-
-const CookieInput = styled.input``;
 
 const ErrorMsg = styled.p`
   color: red;

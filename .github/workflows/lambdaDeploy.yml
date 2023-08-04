@@ -11,12 +11,9 @@ jobs:  #Workflow run is made up of one or more jobs
     runs-on: ubuntu-latest  #Through which Server OS we need to Work (type of machine to run the job on)
     steps:
     #Using versioned actions 
-      - uses: actions/checkout@main  # --> Reference a specific version
-      - uses: actions/setup-node@main # --> To Setup the Server With Node Env
-        with:  
-          node-version: '14' #--> Specify the Version of the Node 
+      - uses: actions/checkout@v3  # --> Reference a specific version
       - name: Configure AWS Credentials  
-        uses: aws-actions/configure-aws-credentials@v1 #--> Setup the Credential for the AWS cli
+        uses: aws-actions/configure-aws-credentials@v2 #--> Setup the Credential for the AWS cli
         with:
         # Created the Secrets Under the Repo only with These Variables
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
@@ -29,7 +26,13 @@ jobs:  #Workflow run is made up of one or more jobs
           npm ci 
       - name: deploy
         run: |
-          zip -j deploy.zip ./dags/*.py #--> Zip the Code As we know lambda function accept the zip file.
-          aws lambda update-function-code --function-name=process_espn_league --zip-file=fileb://deploy.zip 
-          aws lambda update-function-code --function-name=update_espn_leagues --zip-file=fileb://deploy.zip 
-# At last the AWS CLI command to Update the Zip file with existing One (With Correct Function Name)
+          cd dags && zip -r dags.zip ./*.py
+          aws lambda update-function-code --function-name=process_espn_league --zip-file=fileb://dags.zip 
+          aws lambda update-function-code --function-name=process_all_espn_leagues --zip-file=fileb://dags.zip 
+          aws lambda update-function-code --function-name=process_yahoo_league --zip-file=fileb://dags.zip 
+
+          cd ../api && zip -r api.zip ./*
+          aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip
+          aws lambda update-function-code --function-name=put_league_data_to_ddb --zip-file=fileb://api.zip
+          aws lambda update-function-code --function-name=get_league_id_status --zip-file=fileb://api.zip 
+          aws lambda update-function-code --function-name=update_league_info --zip-file=fileb://api.zip 

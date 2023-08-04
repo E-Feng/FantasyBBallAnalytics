@@ -1,0 +1,22 @@
+name: Deploy Frontend Client
+
+on:
+  push:  
+    branches: 
+    - main
+
+jobs:
+  deply_client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+      
+      - name: Build docker image
+        run: cd client && docker build . -t elvinfeng/fantasy:client && docker push elvinfeng/fantasy:client

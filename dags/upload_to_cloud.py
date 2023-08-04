@@ -1,77 +1,40 @@
 import os
 import json
-import tempfile
 import requests
-import pandas as pd
+from google.oauth2 import service_account
+from google.auth.transport.requests import AuthorizedSession
 
-from airflow.decorators import task
-from airflow.models import Variable
-from airflow.operators.python import get_current_context
-from airflow.exceptions import AirflowException
-from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
-
-from util_cloud import authed_session
+from util import get_current_espn_league_year
 
 
-CONN_ID = 'google_cloud_created'
-FIREBASE_URL = 'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{}/common/messageboard/{}.json'
+LEAGUE_YEAR = get_current_espn_league_year()
+FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{LEAGUE_YEAR}/common/'
 
 
-@task
-def upload_to_firebase(data: dict, data_type: str):
-  """
-  Uploads data to firebase with different types
-  """
-  league_year = Variable.get("league_year")
+def upload_to_firebase(type: str, payload: dict):
+  auth_file_path = '/tmp/auth.json'
 
-  if data_type is 'alert':
-    date = list(data)[0]
+  auth_json = json.loads(os.environ['google_auth_json'])
+  
+  with open(auth_file_path, 'w') as outfile:
+      json.dump(auth_json, outfile)
 
-    url = FIREBASE_URL.format(league_year, date)
+  scopes = [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/firebase.database"
+  ]
+  credentials = service_account.Credentials.from_service_account_file(
+      auth_file_path, scopes=scopes)
+  authed_session = AuthorizedSession(credentials)
 
-    print(url)
-    print(data)
+  if type == 'alert':
+    url = FIREBASE_URL + 'messageboard.json'
 
-    data_json = json.dumps(data[date])
-    
-    r = authed_session.patch(url, data=data_json)
+  r = authed_session.patch(url, data=json.dumps(payload))
 
-    if r.status_code == 200:
-      print("Data successfully sent to firebase")
-      return
-    else:
-      print(r.status_code, r.text)
-      raise AirflowException("Error uploading to firebase")
+  if r.status_code == 200:
+    print("Data successfully sent to firebase")
+  else:
+    print(r.status_code, r.text)
 
-
-@task
-def upload_to_gcs(data: str, file_path: str):
-  """
-  Convert string json dataframe to temp file then upload to gcs
-  """
-  context = get_current_context()
-
-  data = json.loads(data)
-
-  print("Data preview: ", type(data))
-  print(data)
-
-  with tempfile.NamedTemporaryFile() as fp:
-    # do stuff with temp file
-    full_path = fp.name
-
-    for line in data:
-      newline = json.dumps(line) + '\n'
-      fp.write(newline.encode())
-
-    print(full_path)
-    fp.read()
-
-    upload = LocalFilesystemToGCSOperator(
-      task_id = f'gcs_upload_{file_path}',
-      src = full_path,
-      dst = file_path,
-      bucket = 'fantasy-cc6ec.appspot.com',
-      gcp_conn_id = CONN_ID
-    )
-    upload.execute(context)
+  return

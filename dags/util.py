@@ -1,4 +1,5 @@
 import json
+import requests
 
 
 def invoke_lambda(client, function_name, payload):
@@ -19,6 +20,17 @@ def invoke_lambda(client, function_name, payload):
   return data
 
 
+def get_current_espn_league_year():
+    year_url = "https://fantasy.espn.com/apis/v3/games/fba/seasons/"
+
+    res = requests.get(year_url)
+
+    data = res.json()
+    league_year = int(data[0]["id"])
+
+    return league_year
+
+
 def calculate_gamescore(player):
   """
   Calculates fantasy gamescore, differing from the real gamescore by omitting
@@ -33,6 +45,14 @@ def calculate_gamescore(player):
     return score
   except:
     return None
+
+
+def format_stat_ratings(data: list):
+  formatted = {}
+  for stat in data:
+    stat_id = str(stat['forStat'])
+    formatted[stat_id] = round(stat['rating'], 2)
+  return formatted
 
 
 def capitalize_dict_keys(data):
