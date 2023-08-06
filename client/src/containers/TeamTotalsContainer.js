@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { categoryDetails } from '../utils/categoryUtils';
 import TeamTotalsTable from '../tables/TeamTotalsTable';
+import { LINEUP_SLOT_IDS } from '../utils/consts';
 
 function TeamTotalsContainer(props) {
   const [period, setPeriod] = useState('Last15');
@@ -16,9 +17,13 @@ function TeamTotalsContainer(props) {
   const data = teams.map((team) => {
     const ratingsKey = `statRatings${period}`;
 
-    const teamPlayers = players.filter((p) => p.onTeamId === team.teamId);
-    // const teamPlayersIds = Object.keys(teams.roster)
-
+    const injuredId = team.roster.filter(
+      (r) => r.lineupSlotId === LINEUP_SLOT_IDS.IR
+    )?.[0]?.['playerId'];
+    const teamPlayers = players.filter(
+      (p) => p.onTeamId === team.teamId && p.playerId != injuredId
+    );
+    console.log(injuredId, teamPlayers.length);
 
     const teamCats = {};
     catIds.forEach((id) => {
