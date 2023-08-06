@@ -1,0 +1,1 @@
+export const BENCH_SLOT_ID = 12;
