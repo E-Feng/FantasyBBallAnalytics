@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
-function TeamTotalsTable(props) {
+function TeamRankingsTable(props) {
   const data = props.data;
-  data.sort((a, b) => a.seed - b.seed);
+  data.sort((a, b) => b.all - a.all);
 
   // Getting cats for the league
   const catArray = categoryDetails.filter((cat) => {
@@ -58,7 +58,7 @@ function TeamTotalsTable(props) {
       return {
         Header: cat.display,
         accessor: cat.name,
-        // sortType: sortPercent,
+        sortType: 'basic',
 
         Cell: (props) => props.value.toFixed(2),
       };
@@ -201,4 +201,4 @@ const Table = styled.table`
   }
 `;
 
-export default TeamTotalsTable;
+export default TeamRankingsTable;

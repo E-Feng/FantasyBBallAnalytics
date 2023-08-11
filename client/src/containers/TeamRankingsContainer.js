@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { categoryDetails } from '../utils/categoryUtils';
-import TeamTotalsTable from '../tables/TeamTotalsTable';
+import TeamRankingsTable from '../tables/TeamRankingsTable';
 import { LINEUP_SLOT_IDS } from '../utils/consts';
 
-function TeamTotalsContainer(props) {
+function TeamRankingsContainer(props) {
   const [period, setPeriod] = useState('Last15');
 
   const players = props.players;
@@ -17,13 +17,15 @@ function TeamTotalsContainer(props) {
   const data = teams.map((team) => {
     const ratingsKey = `statRatings${period}`;
 
-    const injuredId = team.roster.filter(
-      (r) => r.lineupSlotId === LINEUP_SLOT_IDS.IR
-    )?.[0]?.['playerId'];
+    const injuredIds = team.roster.flatMap((r) => {
+      if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
+        return r.playerId;
+      }
+      return [];
+    });
     const teamPlayers = players.filter(
-      (p) => p.onTeamId === team.teamId && p.playerId != injuredId
+      (p) => p.onTeamId === team.teamId && !injuredIds.includes(p.playerId)
     );
-    console.log(injuredId, teamPlayers.length);
 
     const teamCats = {};
     catIds.forEach((id) => {
@@ -35,7 +37,6 @@ function TeamTotalsContainer(props) {
         return a + idRating;
       }, 0);
       const avgRating = totalRating / teamPlayers.length;
-      console.log(avgRating, teamPlayers.length);
 
       teamCats[catName] = avgRating;
     });
@@ -48,7 +49,6 @@ function TeamTotalsContainer(props) {
     };
   });
 
-  //console.log(data);
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
   };
@@ -64,7 +64,7 @@ function TeamTotalsContainer(props) {
           );
         })}
       </DropDown>
-      <TeamTotalsTable data={data} />
+      <TeamRankingsTable data={data} />
     </Container>
   );
 }
@@ -78,4 +78,4 @@ const DropDown = styled.select`
   margin: 0.5rem auto;
 `;
 
-export default TeamTotalsContainer;
+export default TeamRankingsContainer;

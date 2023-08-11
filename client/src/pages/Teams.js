@@ -6,7 +6,7 @@ import Layout from '../components/Layout';
 import LeagueContext from '../components/LeagueContext';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
-import TeamTotalsContainer from '../containers/TeamTotalsContainer';
+import TeamRankingsContainer from '../containers/TeamRankingsContainer';
 
 function Teams(props) {
   const { leagueKey } = useContext(LeagueContext);
@@ -23,7 +23,10 @@ function Teams(props) {
   const playerData = isLoading ? null : data.players;
   const settingsData = isLoading ? null : data.settings;
 
-  const teamTotalsInfo = ``;
+  const teamRankingsInfo = `This table shows the average ratings of
+    each team for each category and totals for each. Ratings are available
+    for different time ranges with 'Last 15' as default. Players in IR 
+    slots are excluded from the ratings.`;
 
   return (
     <Layout maxWidth={props.maxWidth}>
@@ -33,13 +36,13 @@ function Teams(props) {
         <Container maxWidth={props.maxWidth}>
           <TooltipHeader
             title='Team Power Rankings'
-            info={teamTotalsInfo}
+            info={teamRankingsInfo}
           />
-          <TeamTotalsContainer
+          <TeamRankingsContainer
             players={playerData}
             teams={teamData}
             settings={settingsData}
-          ></TeamTotalsContainer>
+          ></TeamRankingsContainer>
         </Container>
       )}
     </Layout>
