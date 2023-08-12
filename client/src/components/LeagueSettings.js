@@ -20,12 +20,11 @@ function LeagueSettings() {
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const yearList =
-    isLoading || data['allYears'] === undefined ? ['2024'] : data['allYears'];
+  const leagueKeysList = isLoading ? [leagueKey] : data['allLeagueKeys'];
+  const yearList = leagueKeysList.map(o => o[1]);
 
   yearList.sort((a, b) => parseInt(b) - parseInt(a));
 
-  
   const leagueDropdownValues = [leagueId, 'Change'];
 
   // Functions to handle dropdown changes

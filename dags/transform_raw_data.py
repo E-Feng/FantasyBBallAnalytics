@@ -64,6 +64,15 @@ def transform_team_to_df(team_info: dict):
         row['firstName'] = member['firstName']
         row['lastName'] = member['lastName']
 
+    # Roster information
+    row['roster'] = []
+    for entry in team['roster']['entries']:
+      modified_entry = {}
+      modified_entry['playerId'] = str(entry['playerId'])
+      modified_entry['lineupSlotId'] = entry['lineupSlotId']
+      modified_entry['acquisitionType'] = entry['acquisitionType']
+      row['roster'].append(modified_entry)
+
     #print(row)
     data_array.append(row)
   
