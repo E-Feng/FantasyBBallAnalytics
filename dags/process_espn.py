@@ -75,26 +75,27 @@ def process_espn_league(event, context):
   previous_years = sorted(league_settings["status"]["previousSeasons"], reverse=True)
 
   # Quickly check valid years
-  valid_all_years = [current_year]
+  all_league_keys = [[league_id, current_year]]
   for test_year in previous_years:
     league_info['leagueYear'] = test_year
     try: 
       extract_from_espn_api(league_info, ['mSettings'])
-      valid_all_years.append(test_year)
+      all_league_keys.append([league_id, test_year])
     except:
       continue
 
-  process_years = [current_year] if process_only_current else valid_all_years
+  process_keys = [[league_id, current_year]] if process_only_current else all_league_keys
 
-  for league_year in process_years:
-    print(f"Starting data extraction for {league_year}...")
+  for league_key in process_keys:
+    print(f"Starting data extraction for {league_key}...")
+    league_year = league_key[1]
 
     league_info['leagueYear'] = league_year
 
     league_data = {
       'leagueId': league_id,
       'leagueYear': league_year,
-      'allYears': valid_all_years
+      'allLeagueKeys': all_league_keys
     }
 
     for endpoint in league_api_endpoints.keys():
