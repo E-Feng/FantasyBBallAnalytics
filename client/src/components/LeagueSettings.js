@@ -7,7 +7,7 @@ import LeagueChangeModal from './LeagueChangeModal';
 import styled from 'styled-components';
 
 function LeagueSettings() {
-  const { leagueState, modalState } = useContext(LeagueContext);
+  const { leagueState, platform, modalState } = useContext(LeagueContext);
   const [leagueKey, setLeagueKey] = leagueState;
   const [showModal, setShowModal] = modalState;
 
@@ -22,19 +22,25 @@ function LeagueSettings() {
   const isLoading = !isDataLoaded || isFetching;
 
   const leagueKeysList = isLoading ? [leagueKey] : data['allLeagueKeys'];
-  const leagueIdList = leagueKeysList.map(o => o[0]);
-  const leagueYearList = leagueKeysList.map(o => o[1]);
+  leagueKeysList.sort((a, b) => parseInt(b[1]) - parseInt(a[1]));
 
-  leagueYearList.sort((a, b) => parseInt(b) - parseInt(a));
+  const leagueIdList = leagueKeysList.map((o) => o[0]);
+  const leagueYearList = leagueKeysList.map((o) => o[1]);
 
-  const leagueDropdownValues = [leagueId, 'Change'];
+  const leagueDropdownValues =
+    data['platform'] === 'yahoo'
+      ? [...leagueIdList, 'Change']
+      : [leagueIdList[0], 'Change'];
 
   // Functions to handle dropdown changes
   const handleLeagueChange = (e) => {
     const value = e.target.value;
+    const index = e.target.selectedIndex;
     if (value === 'Change') {
       setShowModal(true);
+      return;
     }
+    setLeagueKey(leagueKeysList[index]);
   };
 
   const handleSeasonChange = (e) => {

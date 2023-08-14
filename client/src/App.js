@@ -53,13 +53,12 @@ function App() {
   const initialLeagueId = storageId || defaultLeagueId;
   const defaultShowModal = storageId ? false : true;
 
-  // const [leagueId, setLeagueId] = useState(storageId || defaultLeagueId);
-  // const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
-
-  const [leagueKey, setLeagueKey] = useState([initialLeagueId, defaultLeagueYear])
+  const [leagueKey, setLeagueKey] = useState([
+    initialLeagueId,
+    defaultLeagueYear,
+  ]);
   const [showLeagueModal, setShowLeagueModal] = useState(defaultShowModal);
 
-  // const leagueKey = [leagueId, leagueYear];
   const contextValue = {
     defaultLeagueYear: defaultLeagueYear,
     leagueState: [leagueKey, setLeagueKey],
