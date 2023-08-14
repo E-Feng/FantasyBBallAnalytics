@@ -27,10 +27,12 @@ function LeagueSettings() {
   const leagueIdList = leagueKeysList.map((o) => o[0]);
   const leagueYearList = leagueKeysList.map((o) => o[1]);
 
+  const isSameLeagueId = leagueIdList.every(v => v === leagueIdList[0])
+
   const leagueDropdownValues =
-    data['platform'] === 'yahoo'
-      ? [...leagueIdList, 'Change']
-      : [leagueIdList[0], 'Change'];
+    isSameLeagueId
+      ? [leagueIdList[0], 'Change']
+      : [...leagueIdList, 'Change'];
 
   // Functions to handle dropdown changes
   const handleLeagueChange = (e) => {
