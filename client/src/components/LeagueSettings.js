@@ -7,10 +7,11 @@ import LeagueChangeModal from './LeagueChangeModal';
 import styled from 'styled-components';
 
 function LeagueSettings() {
-  const { leagueKey, id, year, modal } = useContext(LeagueContext);
-  const [leagueId, setLeagueId] = id;
-  const [leagueYear, setLeagueYear] = year;
-  const [showModal, setShowModal] = modal;
+  const { leagueState, modalState } = useContext(LeagueContext);
+  const [leagueKey, setLeagueKey] = leagueState;
+  const [showModal, setShowModal] = modalState;
+
+  const [leagueId, leagueYear] = leagueKey;
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
@@ -21,9 +22,10 @@ function LeagueSettings() {
   const isLoading = !isDataLoaded || isFetching;
 
   const leagueKeysList = isLoading ? [leagueKey] : data['allLeagueKeys'];
-  const yearList = leagueKeysList.map(o => o[1]);
+  const leagueIdList = leagueKeysList.map(o => o[0]);
+  const leagueYearList = leagueKeysList.map(o => o[1]);
 
-  yearList.sort((a, b) => parseInt(b) - parseInt(a));
+  leagueYearList.sort((a, b) => parseInt(b) - parseInt(a));
 
   const leagueDropdownValues = [leagueId, 'Change'];
 
@@ -36,7 +38,9 @@ function LeagueSettings() {
   };
 
   const handleSeasonChange = (e) => {
-    setLeagueYear(e.target.value);
+    const index = e.target.selectedIndex;
+    console.log(leagueKeysList[index])
+    setLeagueKey(leagueKeysList[index]);
   };
 
   return (
@@ -53,7 +57,7 @@ function LeagueSettings() {
       </Dropdown>
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
-        {yearList.map((year) => {
+        {leagueYearList.map((year) => {
           return (
             <option value={year} key={year}>
               {year}
@@ -62,7 +66,7 @@ function LeagueSettings() {
         })}
       </Dropdown>
       {showModal && (
-        <LeagueChangeModal setShow={setShowModal} setLeagueId={setLeagueId} />
+        <LeagueChangeModal setShow={setShowModal} setLeagueKey={setLeagueKey} />
       )}
     </Container>
   );

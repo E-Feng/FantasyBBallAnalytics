@@ -8,8 +8,8 @@ import LoadingIcon from './LoadingIcon';
 import { hasProfanity } from '../utils/chatUtil';
 
 function MessageBoard() {
-  const { leagueKey } = useContext(LeagueContext);
-  const leagueYear = leagueKey[1];
+  const { leagueState } = useContext(LeagueContext);
+  const leagueYear = leagueState[0][1];
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData([leagueYear, 'common']);

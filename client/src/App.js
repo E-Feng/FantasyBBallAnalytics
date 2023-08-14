@@ -42,36 +42,28 @@ function App() {
       );
 
       if (dataLeague === null || dataCommon === null) {
-        setLeagueId(defaultLeagueId);
+        setLeagueKey([defaultLeagueId, defaultLeagueYear]);
       }
     }
   };
 
   console.log('Rendering app...');
-  // Determining league id using URL params and localstorage
-  let initialLeagueId;
 
-  const paramId = new URLSearchParams(window.location.search).get('league');
   const storageId = localStorage.getItem('leagueId');
+  const initialLeagueId = storageId || defaultLeagueId;
+  const defaultShowModal = storageId ? false : true;
 
-  initialLeagueId = paramId || storageId;
+  // const [leagueId, setLeagueId] = useState(storageId || defaultLeagueId);
+  // const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
 
-  if (initialLeagueId) {
-    localStorage.setItem('leagueId', initialLeagueId);
-  }
-
-  const defaultShowModal = initialLeagueId ? false : true;
-
-  const [leagueId, setLeagueId] = useState(initialLeagueId || defaultLeagueId);
-  const [leagueYear, setLeagueYear] = useState(defaultLeagueYear);
+  const [leagueKey, setLeagueKey] = useState([initialLeagueId, defaultLeagueYear])
   const [showLeagueModal, setShowLeagueModal] = useState(defaultShowModal);
 
-  const leagueKey = [leagueId, leagueYear];
+  // const leagueKey = [leagueId, leagueYear];
   const contextValue = {
-    leagueKey: [leagueId, leagueYear],
-    id: [leagueId, setLeagueId],
-    year: [leagueYear, setLeagueYear],
-    modal: [showLeagueModal, setShowLeagueModal],
+    defaultLeagueYear: defaultLeagueYear,
+    leagueState: [leagueKey, setLeagueKey],
+    modalState: [showLeagueModal, setShowLeagueModal],
   };
 
   const status = queryClient.getQueryState(leagueKey);

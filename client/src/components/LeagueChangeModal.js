@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
+import LeagueContext from './LeagueContext';
 import { requestLeagueId } from '../utils/webAPI';
 
 function LeagueChangeModal(props) {
   const { register, handleSubmit, errors, getValues, formState } = useForm();
   const [responseMsg, setResponseMsg] = useState('');
+  const { defaultLeagueYear } = useContext(LeagueContext);
 
   const requestingMsg = 'Obtaining league data...';
 
@@ -33,7 +35,7 @@ function LeagueChangeModal(props) {
 
     if (newLeagueId === '00000001') {
       props.setShow(false);
-      props.setLeagueId(newLeagueId);
+      props.setLeagueKey([newLeagueId, defaultLeagueYear]);
       return;
     }
 
@@ -58,7 +60,7 @@ function LeagueChangeModal(props) {
       case 'ACTIVE':
         localStorage.setItem('leagueId', newLeagueId);
         props.setShow(false);
-        props.setLeagueId(newLeagueId);
+        props.setLeagueKey([newLeagueId, defaultLeagueYear]);
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg(
