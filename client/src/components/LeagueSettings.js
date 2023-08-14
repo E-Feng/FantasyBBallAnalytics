@@ -39,7 +39,6 @@ function LeagueSettings() {
 
   const handleSeasonChange = (e) => {
     const index = e.target.selectedIndex;
-    console.log(leagueKeysList[index])
     setLeagueKey(leagueKeysList[index]);
   };
 
