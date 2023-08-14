@@ -10,7 +10,8 @@ import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 
 function Scoreboard(props) {
-  const { leagueKey } = useContext(LeagueContext);
+  const { leagueState } = useContext(LeagueContext);
+  const leagueKey = leagueState[0];
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);

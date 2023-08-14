@@ -10,8 +10,9 @@ import LoadingIcon from '../components/LoadingIcon';
 import styled from 'styled-components';
 
 function DraftRecap(props) {
-  const { leagueKey } = useContext(LeagueContext);
-
+  const { leagueState } = useContext(LeagueContext);
+  const leagueKey = leagueState[0];
+  
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
