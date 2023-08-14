@@ -56,7 +56,8 @@ def process_yahoo_league(event, context):
         league_data = {
             'leagueId': league_id,
             'leagueYear': league_year,
-            'allYears': [x[1] for x in league_games]
+            'allLeagueKeys': [x[1] for x in league_games],
+            'platform': "yahoo"
         }
         for endpoint in league_api_endpoints:
             url_params = league_api_endpoints[endpoint]

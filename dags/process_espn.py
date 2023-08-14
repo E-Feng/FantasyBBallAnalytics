@@ -95,7 +95,8 @@ def process_espn_league(event, context):
     league_data = {
       'leagueId': league_id,
       'leagueYear': league_year,
-      'allLeagueKeys': all_league_keys
+      'allLeagueKeys': all_league_keys,
+      'platform': "espn"
     }
 
     for endpoint in league_api_endpoints.keys():
