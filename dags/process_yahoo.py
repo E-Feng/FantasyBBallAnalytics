@@ -31,12 +31,16 @@ def get_all_league_games(league_id, access_token):
 
     return league_games
 
+week_list = list(range(1, 25))
+week_params = ";week=" + ",".join(map(str, week_list))
+
 league_api_endpoints = {
     'settings': ["league", "settings"],
     'teams': ["league", "teams", "standings"],
-    'scoreboard': ["league", "scoreboard"],
+    'scoreboard': ["league", f"scoreboard{week_params}"],
     'draft': ["league", "draftresults"]
 }
+
 
 def process_yahoo_league(event, context):
     params = event["queryStringParameters"]

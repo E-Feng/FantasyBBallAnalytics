@@ -1,5 +1,7 @@
 import pandas as pd
 
+import consts
+
 
 def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
     """
@@ -89,27 +91,31 @@ def transform_scoreboard_to_df(data: dict):
             row["awayId"] = team_id_1 if team_id == team_id_2 else team_id_2
             row["won"] = team["win_probability"] > 0.5
 
-            row['fgMade'] = int(team["team_points"]["week"])
-            row['fgAtt'] = int(team["team_points"]["week"])
-            row['fgPer'] = int(team["team_points"]["week"])
-            row['ftMade'] = int(team["team_points"]["week"])
-            row['ftAtt'] = int(team["team_points"]["week"])
-            row['ftPer'] = int(team["team_points"]["week"])
-            row['threes'] = int(team["team_points"]["week"])
-            row['orebs'] = int(team["team_points"]["week"])
-            row['drebs'] = int(team["team_points"]["week"])
-            row['rebs'] = int(team["team_points"]["week"])
-            row['asts'] = int(team["team_points"]["week"])
-            row['stls'] = int(team["team_points"]["week"])
-            row['blks'] = int(team["team_points"]["week"])
-            row['tos'] = int(team["team_points"]["week"])
-            row['dqs'] = int(team["team_points"]["week"])
-            row['ejs'] = int(team["team_points"]["week"])
-            row['flags'] = int(team["team_points"]["week"])
-            row['pfs'] = int(team["team_points"]["week"])
-            row['techs'] = int(team["team_points"]["week"])
-            row['pts'] = int(team["team_points"]["week"])
-            row['fpts'] = int(team["team_points"]["week"])
+            # Formatting list of dicts to dict for easier extraction
+            stats = team["team_stats"]["stats"]
+            stats_dict = {cat_id: val for stat in stats for cat_id, val in stat.items()}
+
+            row['fgMade'] = int(stats_dict.get(consts.FG_MADE_Y, 0))
+            row['fgAtt'] = int(stats_dict.get(consts.FG_ATT_Y, 0))
+            row['fgPer'] = float(stats_dict.get(consts.FG_PER_Y, 0))
+            row['ftMade'] = int(stats_dict.get(consts.FT_MADE_Y, 0))
+            row['ftAtt'] = int(stats_dict.get(consts.FT_ATT_Y, 0))
+            row['ftPer'] = float(stats_dict.get(consts.FT_PER_Y, 0))
+            row['threes'] = int(stats_dict.get(consts.THREES_Y, 0))
+            row['orebs'] = int(stats_dict.get(consts.OREBS_Y, 0))
+            row['drebs'] = int(stats_dict.get(consts.DREBS_Y, 0))
+            row['rebs'] = int(stats_dict.get(consts.REBS_Y, 0))
+            row['asts'] = int(stats_dict.get(consts.ASTS_Y, 0))
+            row['stls'] = int(stats_dict.get(consts.STLS_Y, 0))
+            row['blks'] = int(stats_dict.get(consts.BLKS_Y, 0))
+            row['tos'] = int(stats_dict.get(consts.TOS_Y, 0))
+            row['dqs'] = int(stats_dict.get(consts.FG_MADE_Y, 0))
+            row['ejs'] = int(stats_dict.get(consts.FG_MADE_Y, 0))
+            row['flags'] = int(stats_dict.get(consts.FG_MADE_Y, 0))
+            row['pfs'] = int(stats_dict.get(consts.FG_MADE_Y, 0))
+            row['techs'] = int(stats_dict.get(consts.FG_MADE_Y, 0))
+            row['pts'] = int(stats_dict.get(consts.PTS_Y, 0))
+            row['fpts'] = float(stats_dict.get(consts.FG_MADE_Y, 0))
 
             data_array.append(row)
 
