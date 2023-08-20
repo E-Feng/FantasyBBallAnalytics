@@ -55,18 +55,20 @@ function LeagueSettings() {
       <Label>League</Label>
       <Dropdown value={leagueId} onChange={handleLeagueChange}>
         {leagueDropdownValues.map((o) => {
+          const raw = o.includes('.l.') ? o.split('.l.')[1] : o;
           return (
             <option value={o} key={o}>
-              {o}
+              {raw}
             </option>
           );
         })}
       </Dropdown>
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
-        {leagueYearList.map((year) => {
+        {leagueYearList.map((year, i) => {
+          const key = `${year}_${i}`;
           return (
-            <option value={year} key={year}>
+            <option value={year} key={key}>
               {year}
             </option>
           );

@@ -57,6 +57,7 @@ function LeagueChangeModal(props) {
     const [leagueStatus, resLeagueId] = await requestLeagueId(reqPayload);
     const activeLeagueId = resLeagueId || newLeagueId;
     console.log(leagueStatus, activeLeagueId);
+    
     switch (leagueStatus) {
       case 'ACTIVE':
         localStorage.setItem('leagueId', activeLeagueId);
