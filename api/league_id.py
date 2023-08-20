@@ -52,7 +52,7 @@ def get_league_id_status(event, context):
 
     if league_updated:
         print("League already updated, returning active")
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+        return {"statusCode": 200, "body": json.dumps(f"ACTIVE:{league_id}")}
     
     update_params = {
         "league_id": league_id,
@@ -83,7 +83,7 @@ def get_league_id_status(event, context):
             return {"statusCode": 200, "body": json.dumps("ERROR")}
 
         print("League processed, returning active")
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}        
+        return {"statusCode": 200, "body": json.dumps("ACTIVE:{league_id}")}        
     
     elif platform == "yahoo":
         tokens = get_yahoo_access_token(league_auth_code)
@@ -125,7 +125,7 @@ def get_league_id_status(event, context):
             return {"statusCode": 200, "body": json.dumps("ERROR")}
         
         print("League processed, returning active")
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}       
+        return {"statusCode": 200, "body": json.dumps("ACTIVE:{league_id}")}       
 
     print("Uncommon process error, returning error")
     return {"statusCode": 200, "body": json.dumps("ERROR")}
