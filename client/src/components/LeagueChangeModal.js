@@ -54,13 +54,15 @@ function LeagueChangeModal(props) {
 
     setResponseMsg(requestingMsg);
 
-    const leagueStatus = await requestLeagueId(reqPayload);
-    console.log(leagueStatus);
+    const [leagueStatus, resLeagueId] = await requestLeagueId(reqPayload);
+    const activeLeagueId = resLeagueId || newLeagueId;
+    console.log(leagueStatus, activeLeagueId);
+    
     switch (leagueStatus) {
       case 'ACTIVE':
-        localStorage.setItem('leagueId', newLeagueId);
+        localStorage.setItem('leagueId', activeLeagueId);
         props.setShow(false);
-        props.setLeagueKey([newLeagueId, defaultLeagueYear]);
+        props.setLeagueKey([activeLeagueId, defaultLeagueYear]);
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg(
