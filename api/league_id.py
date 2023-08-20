@@ -1,10 +1,12 @@
 import json
 import boto3
 import psycopg2
+import psycopg2.extras
 
 from util import invoke_lambda
 from espn_helper import get_espn_league_status
 from yahoo_auth import get_yahoo_access_token
+from yahoo_helper import get_all_league_ids
 
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
@@ -30,7 +32,7 @@ def get_league_id_status(event, context):
     league_auth_code = event["queryStringParameters"]["leagueAuthCode"]
 
     get_query = open("sql/get_league_info.sql", "r").read()
-    get_params = {"league_id": league_id}
+    get_params = {"league_id_re": f"(?<![0-9]){league_id}(?![0-9])"}
 
     cursor.execute(get_query, get_params)
 
@@ -66,14 +68,23 @@ def get_league_id_status(event, context):
 
         event["queryStringParameters"]['cookieEspnS2'] = league_auth_code
         
-        res = invoke_lambda(lambda_client, "process_espn_league", event)
+        try:
+            res = invoke_lambda(lambda_client, "process_espn_league", event)
 
-        sql_file = "sql/update_espn_league_after_process.sql"
-        update_params["cookie_espn"] = league_auth_code
+            sql_file = "sql/update_espn_league_after_process.sql"
+            update_query = open(sql_file, "r").read()
+            update_params["cookie_espn"] = league_auth_code
+
+            cursor.execute(update_query, update_params)
+            conn.commit()            
+        except Exception:
+            print("Error processing ESPN league")
+            return {"statusCode": 200, "body": json.dumps("ERROR")}
+
+        print("League processed, returning active")
+        return {"statusCode": 200, "body": json.dumps("ACTIVE")}        
     
     elif platform == "yahoo":
-        event["queryStringParameters"]["leagueAuthCode"] = league_auth_code
-
         tokens = get_yahoo_access_token(league_auth_code)
         if tokens.get("error"):
             error = tokens.get("error")
@@ -83,25 +94,41 @@ def get_league_id_status(event, context):
         yahoo_access_token = tokens["yahoo_access_token"]
         yahoo_refresh_token = tokens["yahoo_refresh_token"]
         event["queryStringParameters"]["yahooAccessToken"] = yahoo_access_token
+
+        all_leagues = get_all_league_ids(yahoo_access_token)
         
-        res = invoke_lambda(lambda_client, "process_yahoo_league", event)
+        try:
+            sql_file = "sql/update_yahoo_league_after_process.sql"
+            update_query = open(sql_file, "r").read()
+            update_params["league_id"] = all_leagues[0][0]
+            update_params["yahoo_refresh_token"] = yahoo_refresh_token
 
-        sql_file = "sql/update_yahoo_league_after_process.sql"
-        update_params["yahoo_refresh_token"] = yahoo_refresh_token
+            sql_file_linked = "sql/update_yahoo_linked_leagues.sql"
+            update_query_linked = open(sql_file_linked, "r").read()
+            update_data = []
 
-    if res:
-        update_query = open(sql_file, "r").read()
+            for league in all_leagues:
+                event["queryStringParameters"]["leagueId"] = league[0]
+                event["queryStringParameters"]["leagueYear"] = league[1]
+                event["queryStringParameters"]["allLeagueKeys"] = all_leagues
+                res = invoke_lambda(lambda_client, "process_yahoo_league", event)
 
-        cursor.execute(update_query, update_params)
-        conn.commit()
-    
+                update_data.append((league[0], all_leagues[0][0]))
+
+            cursor.execute(update_query, update_params)
+            psycopg2.extras.execute_values(cursor, update_query_linked, update_data)
+            conn.commit()
+
+        except Exception as e:
+            print("Error processing Yahoo league:", e)
+            return {"statusCode": 200, "body": json.dumps("ERROR")}
+        
         print("League processed, returning active")
-        return {"statusCode": 200, "body": json.dumps("ACTIVE")}
+        return {"statusCode": 200, "body": json.dumps("ACTIVE")}       
 
     print("Uncommon process error, returning error")
     return {"statusCode": 200, "body": json.dumps("ERROR")}
 
-    
 
 sql_last_viewed = """
     UPDATE public.leagueids
@@ -149,12 +176,11 @@ def update_league_info(event, context):
         'body': json.dumps('Updated successfully')
     }
 
-process_payload = {
-  "queryStringParameters": {
-    "leagueId": "57390",
+payload = {
+"queryStringParameters": {
+    "leagueId": "6640",
     "platform": "yahoo",
-    'leagueAuthCode': '',
-    # "cookieEspnS2": "{AEAOzsH5%2B5XiKuX5BO0%2Fwy0zmxlWV%2FfHxbETlKIQrCOTRA7ZdHk0IWgyDuJjkk7HUNb%2ByLP6X1nL8x5eph1TDHELcJJi1KTGPdrtAsmXrWigw35%2F2KBWmPtwdnXwX31TrpqlCPuPJ4zfgo8cxT26vss42m3FLBdY0Bphte8bYHUPgmFk3SZ4lIMkvFEWxXrRtiGGqB5ozn3JNhc4lJWddUCdfks8Lkba19t3csjvPYoTAUlGIFz243%2F%2FYoM2KGKL4Jw%3D}",
-  }
+    "leagueAuthCode": ""
 }
-get_league_id_status(process_payload, "")
+}
+r = get_league_id_status(payload, '')
