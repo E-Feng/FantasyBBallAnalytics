@@ -83,7 +83,7 @@ def get_league_id_status(event, context):
             return {"statusCode": 200, "body": json.dumps("ERROR")}
 
         print("League processed, returning active")
-        return {"statusCode": 200, "body": json.dumps("ACTIVE:{league_id}")}        
+        return {"statusCode": 200, "body": json.dumps(f"ACTIVE:{league_id}")}        
     
     elif platform == "yahoo":
         tokens = get_yahoo_access_token(league_auth_code)
@@ -97,11 +97,16 @@ def get_league_id_status(event, context):
         event["queryStringParameters"]["yahooAccessToken"] = yahoo_access_token
 
         all_leagues = get_all_league_ids(yahoo_access_token)
+        main_league_id = all_leagues[0][0]
+        full_league_id = league_id
+        for id in all_leagues:
+            if league_id in id[0]:
+                full_league_id = id[0]
         
         try:
             sql_file = "sql/update_yahoo_league_after_process.sql"
             update_query = open(sql_file, "r").read()
-            update_params["league_id"] = all_leagues[0][0]
+            update_params["league_id"] = main_league_id
             update_params["yahoo_refresh_token"] = yahoo_refresh_token
 
             sql_file_linked = "sql/update_yahoo_linked_leagues.sql"
@@ -114,7 +119,7 @@ def get_league_id_status(event, context):
                 event["queryStringParameters"]["allLeagueKeys"] = all_leagues
                 res = invoke_lambda(lambda_client, "process_yahoo_league", event)
 
-                update_data.append((league[0], all_leagues[0][0]))
+                update_data.append((league[0], main_league_id))
 
             cursor.execute(update_query, update_params)
             psycopg2.extras.execute_values(cursor, update_query_linked, update_data)
@@ -125,7 +130,7 @@ def get_league_id_status(event, context):
             return {"statusCode": 200, "body": json.dumps("ERROR")}
         
         print("League processed, returning active")
-        return {"statusCode": 200, "body": json.dumps("ACTIVE:{league_id}")}       
+        return {"statusCode": 200, "body": json.dumps(f"ACTIVE:{full_league_id}")}       
 
     print("Uncommon process error, returning error")
     return {"statusCode": 200, "body": json.dumps("ERROR")}

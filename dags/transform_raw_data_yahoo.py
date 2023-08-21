@@ -89,7 +89,7 @@ def transform_scoreboard_to_df(data: dict):
             row["week"] = week
             row["teamId"] = team_id
             row["awayId"] = team_id_1 if team_id == team_id_2 else team_id_2
-            row["won"] = team["win_probability"] > 0.5
+            row["won"] = team.get("win_probability", 0) > 0.5
 
             # Formatting list of dicts to dict for easier extraction
             stats = team["team_stats"]["stats"]

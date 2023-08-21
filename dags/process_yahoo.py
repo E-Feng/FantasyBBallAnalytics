@@ -24,7 +24,7 @@ def process_yahoo_league(event, context):
     access_token = params.get("yahooAccessToken")
     all_league_keys = params.get("allLeagueKeys")
 
-    print(f"Starting processing for {league_year}")
+    print(f"Starting processing for {league_id} {league_year}")
 
     league_data = {
         'leagueId': league_id,
