@@ -12,7 +12,8 @@ league_api_endpoints = {
     'settings': ["league", "settings"],
     'teams': ["league", "teams", "standings"],
     'scoreboard': ["league", f"scoreboard{week_params}"],
-    'draft': ["league", "draftresults"]
+    'draft': ["league", "draftresults"],
+    'players': ["league", "settings"]
 }
 
 
