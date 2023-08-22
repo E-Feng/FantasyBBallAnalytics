@@ -312,6 +312,7 @@ def transform_settings_to_df(settings: dict):
   row = {}
 
   row['isActive'] = data["status"]["isActive"]
+  row['currentWeek'] = data["status"]["currentMatchupPeriod"]
 
   row['categoryIds'] = []
   for category in data['settings']['scoringSettings']['scoringItems']:
