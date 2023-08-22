@@ -58,10 +58,13 @@ def transform_team_to_df(data: dict):
 def transform_settings_to_df(data: dict):
     data_array = []
 
+    data = ["fantasy_content"]["league"]
+
     row = {}
 
     row["isActive"] = True
-    row["scoringType"] = data["fantasy_content"]["league"]["scoring_type"]
+    row['currentWeek'] = data["current_week"]
+    row["scoringType"] = data["scoring_type"]
 
     row["categoryIds"] = [20,6,7,0,1,17,2,11,3,19]
 
