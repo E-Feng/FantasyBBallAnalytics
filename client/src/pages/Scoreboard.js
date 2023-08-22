@@ -28,7 +28,7 @@ function Scoreboard(props) {
   let currentWeek = 1;
   let isRotoLeague = false;
   if (!isLoading && scoreboardData.length) {
-    currentWeek = settingsData.currentWeek;
+    currentWeek = settingsData[0].currentWeek;
     isRotoLeague =
       settingsData[0].scoringType === 'ROTO' ||
       typeof scoreboardData === 'string';
