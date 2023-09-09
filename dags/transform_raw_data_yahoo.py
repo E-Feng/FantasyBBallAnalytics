@@ -58,7 +58,7 @@ def transform_team_to_df(data: dict):
 def transform_settings_to_df(data: dict):
     data_array = []
 
-    data = ["fantasy_content"]["league"]
+    data = data["fantasy_content"]["league"]
 
     row = {}
 
@@ -133,12 +133,13 @@ def transform_draft_to_df(data: dict):
         row = {}
         pick = pick["draft_result"]
 
-        row['pickNumber'] = pick['pick']
-        row['round'] = pick['round']
-        row['teamId'] = int(pick['team_key'][-1])
-        row['playerId'] = pick['player_key'].split('.')[-1]
+        if pick:
+            row['pickNumber'] = pick['pick']
+            row['round'] = pick['round']
+            row['teamId'] = int(pick['team_key'][-1])
+            row['playerId'] = pick['player_key'].split('.')[-1]
 
-        data_array.append(row)
+            data_array.append(row)
   
     df = pd.DataFrame.from_records(data_array)
     return df
@@ -147,6 +148,16 @@ def transform_draft_to_df(data: dict):
 def transform_players_to_df(data: dict):
     data_array = []
 
+    players = data["fantasy_content"]["team"]["roster"]["players"]
+
+    for player in players:
+        row = {}
+        player = player["player"]
+
+        row["playerId"] = player["player_id"]
+        row["playerName"] = player["name"]["full"]
+
+        data_array.append(row)
 
     df = pd.DataFrame.from_records(data_array)
     return df

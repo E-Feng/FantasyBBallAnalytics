@@ -15,9 +15,6 @@ def extract_from_yahoo_api(access_token: str, league_key: str, url_params: list)
     headers = {"Authorization": f"Bearer {access_token}"}
 
     res = requests.get(url, headers=headers)
-
-    if res.status_code == 200:
-        data = res.json()
     
     if res.status_code == 200:
       data = res.json()

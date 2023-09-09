@@ -13,7 +13,7 @@ league_api_endpoints = {
     'teams': ["league", "teams", "standings"],
     'scoreboard': ["league", f"scoreboard{week_params}"],
     'draft': ["league", "draftresults"],
-    'players': ["league", "settings"]
+    'players': ["team", "428.l.906.t.1", "roster", "players", "stats"]
 }
 
 
