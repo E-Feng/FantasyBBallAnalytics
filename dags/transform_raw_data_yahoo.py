@@ -1,5 +1,7 @@
 import pandas as pd
 
+import consts
+
 
 def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
     """
@@ -56,10 +58,13 @@ def transform_team_to_df(data: dict):
 def transform_settings_to_df(data: dict):
     data_array = []
 
+    data = data["fantasy_content"]["league"]
+
     row = {}
 
     row["isActive"] = True
-    row["scoringType"] = data["fantasy_content"]["league"]["scoring_type"]
+    row['currentWeek'] = data["current_week"]
+    row["scoringType"] = data["scoring_type"]
 
     row["categoryIds"] = [20,6,7,0,1,17,2,11,3,19]
 
@@ -89,27 +94,31 @@ def transform_scoreboard_to_df(data: dict):
             row["awayId"] = team_id_1 if team_id == team_id_2 else team_id_2
             row["won"] = team.get("win_probability", 0) > 0.5
 
-            row['fgMade'] = int(team["team_points"]["week"])
-            row['fgAtt'] = int(team["team_points"]["week"])
-            row['fgPer'] = int(team["team_points"]["week"])
-            row['ftMade'] = int(team["team_points"]["week"])
-            row['ftAtt'] = int(team["team_points"]["week"])
-            row['ftPer'] = int(team["team_points"]["week"])
-            row['threes'] = int(team["team_points"]["week"])
-            row['orebs'] = int(team["team_points"]["week"])
-            row['drebs'] = int(team["team_points"]["week"])
-            row['rebs'] = int(team["team_points"]["week"])
-            row['asts'] = int(team["team_points"]["week"])
-            row['stls'] = int(team["team_points"]["week"])
-            row['blks'] = int(team["team_points"]["week"])
-            row['tos'] = int(team["team_points"]["week"])
-            row['dqs'] = int(team["team_points"]["week"])
-            row['ejs'] = int(team["team_points"]["week"])
-            row['flags'] = int(team["team_points"]["week"])
-            row['pfs'] = int(team["team_points"]["week"])
-            row['techs'] = int(team["team_points"]["week"])
-            row['pts'] = int(team["team_points"]["week"])
-            row['fpts'] = int(team["team_points"]["week"])
+            # Formatting list of dicts to dict for easier extraction
+            stats = team["team_stats"]["stats"]
+            stats_dict = {stat["stat"]["stat_id"]: stat["stat"]["value"] for stat in stats}
+
+            row['fgMade'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['fgAtt'] = int(stats_dict.get(consts.FG_ATT_Y) or 0)
+            row['fgPer'] = float(stats_dict.get(consts.FG_PER_Y) or 0)
+            row['ftMade'] = int(stats_dict.get(consts.FT_MADE_Y) or 0)
+            row['ftAtt'] = int(stats_dict.get(consts.FT_ATT_Y) or 0)
+            row['ftPer'] = float(stats_dict.get(consts.FT_PER_Y) or 0)
+            row['threes'] = int(stats_dict.get(consts.THREES_Y) or 0)
+            row['orebs'] = int(stats_dict.get(consts.OREBS_Y) or 0)
+            row['drebs'] = int(stats_dict.get(consts.DREBS_Y) or 0)
+            row['rebs'] = int(stats_dict.get(consts.REBS_Y) or 0)
+            row['asts'] = int(stats_dict.get(consts.ASTS_Y) or 0)
+            row['stls'] = int(stats_dict.get(consts.STLS_Y) or 0)
+            row['blks'] = int(stats_dict.get(consts.BLKS_Y) or 0)
+            row['tos'] = int(stats_dict.get(consts.TOS_Y) or 0)
+            row['dqs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['ejs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['flags'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['pfs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['techs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['pts'] = int(stats_dict.get(consts.PTS_Y) or 0)
+            row['fpts'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
 
             data_array.append(row)
 
@@ -122,13 +131,15 @@ def transform_draft_to_df(data: dict):
 
     for pick in data['fantasy_content']["league"]["draft_results"]:
         row = {}
+        pick = pick["draft_result"]
 
-        row['pickNumber'] = pick['pick']
-        row['round'] = pick['round']
-        row['teamId'] = pick['team_key'][-1]
-        row['playerId'] = pick['player_key'].split('.')[-1]
+        if pick:
+            row['pickNumber'] = pick['pick']
+            row['round'] = pick['round']
+            row['teamId'] = int(pick['team_key'][-1])
+            row['playerId'] = pick['player_key'].split('.')[-1]
 
-        data_array.append(row)
+            data_array.append(row)
   
     df = pd.DataFrame.from_records(data_array)
     return df
@@ -137,6 +148,16 @@ def transform_draft_to_df(data: dict):
 def transform_players_to_df(data: dict):
     data_array = []
 
+    players = data["fantasy_content"]["team"]["roster"]["players"]
+
+    for player in players:
+        row = {}
+        player = player["player"]
+
+        row["playerId"] = player["player_id"]
+        row["playerName"] = player["name"]["full"]
+
+        data_array.append(row)
 
     df = pd.DataFrame.from_records(data_array)
     return df

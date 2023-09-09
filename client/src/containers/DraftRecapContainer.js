@@ -33,13 +33,14 @@ function DraftRecapContainer(props) {
 
     return {
       ...pick,
-      fullTeamName: team[0].fullTeamName,
+      fullTeamName: team[0]?.fullTeamName,
       playerName: player?.playerName,
       ranking: ranking,
       rating: rating,
       difference: difference,
     };
   });
+  console.log(data)
 
   const handleSortChange = (e) => {
     setSortMode(e.target.value);

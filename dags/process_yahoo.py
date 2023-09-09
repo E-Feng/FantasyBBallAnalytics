@@ -5,12 +5,17 @@ from transform_raw_data_yahoo import transform_yahoo_raw_to_df
 from upload_to_aws import upload_league_data_to_dynamo
 
 
+week_list = list(range(1, 25))
+week_params = ";week=" + ",".join(map(str, week_list))
+
 league_api_endpoints = {
     'settings': ["league", "settings"],
     'teams': ["league", "teams", "standings"],
-    'scoreboard': ["league", "scoreboard"],
-    'draft': ["league", "draftresults"]
+    'scoreboard': ["league", f"scoreboard{week_params}"],
+    'draft': ["league", "draftresults"],
+    'players': ["team", "428.l.906.t.1", "roster", "players", "stats"]
 }
+
 
 def process_yahoo_league(event, context):
     params = event["queryStringParameters"]
