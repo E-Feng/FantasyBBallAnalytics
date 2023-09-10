@@ -98,6 +98,8 @@ def get_league_id_status(event, context):
 
         all_leagues = get_all_league_ids(yahoo_access_token)
         main_league_id = all_leagues[0][0]
+
+        # Getting full league id, 101 => 428.l.101
         full_league_id = league_id
         for id in all_leagues:
             if league_id in id[0]:
