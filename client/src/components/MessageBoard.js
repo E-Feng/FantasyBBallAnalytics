@@ -113,7 +113,7 @@ function MessageBoard() {
         content = msg.msg;
     }
     return (
-      <li key={msg.time}>
+      <li key={msg.time + "-" + msg.gs}>
         <b>{msg.user}: </b>
         {content}
       </li>
