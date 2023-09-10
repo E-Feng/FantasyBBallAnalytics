@@ -72,6 +72,9 @@ function LeagueChangeModal(props) {
       case 'GENERAL_NOT_FOUND':
         setResponseMsg('League id not found or deleted.');
         break;
+      case 'invalid_grant':
+        setResponseMsg('Error auth, redo authorization and auth code');
+        break;
       case 'AMBIGUOUS':
         setResponseMsg(`Enter ${newLeagueId}e or ${newLeagueId}y`);
         break;
