@@ -181,12 +181,3 @@ def update_league_info(event, context):
         'statusCode': 200,
         'body': json.dumps('Updated successfully')
     }
-
-payload = {
-"queryStringParameters": {
-    "leagueId": "6640",
-    "platform": "yahoo",
-    "leagueAuthCode": ""
-}
-}
-r = get_league_id_status(payload, '')
