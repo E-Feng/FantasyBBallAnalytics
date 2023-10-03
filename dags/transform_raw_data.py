@@ -6,7 +6,8 @@ import consts
 from util import (
   get_current_espn_league_year,
   calculate_gamescore, 
-  format_stat_ratings
+  format_stat_ratings,
+  format_stats
 )
 
 
@@ -68,7 +69,7 @@ def transform_team_to_df(team_info: dict):
     row['roster'] = []
     for entry in team['roster']['entries']:
       modified_entry = {}
-      modified_entry['playerId'] = entry['playerId']
+      modified_entry['playerId'] = str(entry['playerId'])
       modified_entry['lineupSlotId'] = entry['lineupSlotId']
       modified_entry['acquisitionType'] = entry['acquisitionType']
       row['roster'].append(modified_entry)
@@ -204,6 +205,8 @@ def transform_players_to_df(ratings: dict):
   data = ratings  
 
   data_array = []
+  category_ids = []
+
   # Iterate through all players
   for player in data['players']:
     row = {}
@@ -224,6 +227,9 @@ def transform_players_to_df(ratings: dict):
 
         row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
 
+        if not category_ids:
+          category_ids = row['statRatings' + period].keys()
+
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
         year = player["player"]["stats"][0]["seasonId"]
@@ -231,6 +237,12 @@ def transform_players_to_df(ratings: dict):
         stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}'), {})
         if stats_period.get('averageStats'):
           row['stats' + period] = stats_period['averageStats']
+
+          # Filtering category ids only
+          if category_ids:
+            filtered_stats = {k:stats_period['averageStats'][k] for k in category_ids}
+            row['stats' + period] = format_stats(filtered_stats)
+
 
     data_array.append(row)
 
@@ -312,6 +324,7 @@ def transform_settings_to_df(settings: dict):
   row = {}
 
   row['isActive'] = data["status"]["isActive"]
+  row['currentWeek'] = data["status"]["currentMatchupPeriod"]
 
   row['categoryIds'] = []
   for category in data['settings']['scoringSettings']['scoringItems']:

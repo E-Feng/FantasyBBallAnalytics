@@ -49,8 +49,9 @@ export const requestLeagueId = async (payload) => {
     method: 'GET',
   });
   const data = await res.json();
+  const values = data.split(":")
 
-  return data;
+  return values;
 };
 
 const anonymizeTeams = (data) => {

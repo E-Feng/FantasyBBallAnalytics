@@ -24,22 +24,23 @@ function DraftRecapContainer(props) {
     )[0];
 
     const ranking = ejsChecked
-      ? player.totalRankingSeason
-      : player.totalRankingSeason;
+      ? player?.totalRankingSeason
+      : player?.totalRankingSeason;
     const rating = ejsChecked
-      ? player.totalRatingSeason
-      : player.totalRatingSeason;
+      ? player?.totalRatingSeason
+      : player?.totalRatingSeason;
     const difference = ranking ? pick.pickNumber - ranking : null;
 
     return {
       ...pick,
-      fullTeamName: team[0].fullTeamName,
-      playerName: player.playerName,
+      fullTeamName: team[0]?.fullTeamName,
+      playerName: player?.playerName,
       ranking: ranking,
       rating: rating,
       difference: difference,
     };
   });
+  console.log(data)
 
   const handleSortChange = (e) => {
     setSortMode(e.target.value);

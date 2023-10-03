@@ -7,10 +7,11 @@ import LeagueChangeModal from './LeagueChangeModal';
 import styled from 'styled-components';
 
 function LeagueSettings() {
-  const { leagueKey, id, year, modal } = useContext(LeagueContext);
-  const [leagueId, setLeagueId] = id;
-  const [leagueYear, setLeagueYear] = year;
-  const [showModal, setShowModal] = modal;
+  const { leagueState, platform, modalState } = useContext(LeagueContext);
+  const [leagueKey, setLeagueKey] = leagueState;
+  const [showModal, setShowModal] = modalState;
+
+  const [leagueId, leagueYear] = leagueKey;
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
@@ -20,24 +21,33 @@ function LeagueSettings() {
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const yearList =
-    isLoading || data['allYears'] === undefined ? ['2024'] : data['allYears'];
+  const leagueKeysList = isLoading ? [leagueKey] : data['allLeagueKeys'];
+  leagueKeysList.sort((a, b) => parseInt(b[1]) - parseInt(a[1]));
 
-  yearList.sort((a, b) => parseInt(b) - parseInt(a));
+  const leagueIdList = leagueKeysList.map((o) => o[0]);
+  const leagueYearList = leagueKeysList.map((o) => o[1]);
 
-  
-  const leagueDropdownValues = [leagueId, 'Change'];
+  const isSameLeagueId = leagueIdList.every(v => v === leagueIdList[0])
+
+  const leagueDropdownValues =
+    isSameLeagueId
+      ? [leagueIdList[0], 'Change']
+      : [...leagueIdList, 'Change'];
 
   // Functions to handle dropdown changes
   const handleLeagueChange = (e) => {
     const value = e.target.value;
+    const index = e.target.selectedIndex;
     if (value === 'Change') {
       setShowModal(true);
+      return;
     }
+    setLeagueKey(leagueKeysList[index]);
   };
 
   const handleSeasonChange = (e) => {
-    setLeagueYear(e.target.value);
+    const index = e.target.selectedIndex;
+    setLeagueKey(leagueKeysList[index]);
   };
 
   return (
@@ -45,25 +55,27 @@ function LeagueSettings() {
       <Label>League</Label>
       <Dropdown value={leagueId} onChange={handleLeagueChange}>
         {leagueDropdownValues.map((o) => {
+          const raw = o.includes('.l.') ? o.split('.l.')[1] : o;
           return (
             <option value={o} key={o}>
-              {o}
+              {raw}
             </option>
           );
         })}
       </Dropdown>
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
-        {yearList.map((year) => {
+        {leagueYearList.map((year, i) => {
+          const key = `${year}_${i}`;
           return (
-            <option value={year} key={year}>
+            <option value={year} key={key}>
               {year}
             </option>
           );
         })}
       </Dropdown>
       {showModal && (
-        <LeagueChangeModal setShow={setShowModal} setLeagueId={setLeagueId} />
+        <LeagueChangeModal setShow={setShowModal} setLeagueKey={setLeagueKey} />
       )}
     </Container>
   );

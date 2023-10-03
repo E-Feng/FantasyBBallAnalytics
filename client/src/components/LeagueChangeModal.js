@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
+import LeagueContext from './LeagueContext';
 import { requestLeagueId } from '../utils/webAPI';
 
 function LeagueChangeModal(props) {
   const { register, handleSubmit, errors, getValues, formState } = useForm();
   const [responseMsg, setResponseMsg] = useState('');
+  const { defaultLeagueYear } = useContext(LeagueContext);
 
   const requestingMsg = 'Obtaining league data...';
 
@@ -33,7 +35,7 @@ function LeagueChangeModal(props) {
 
     if (newLeagueId === '00000001') {
       props.setShow(false);
-      props.setLeagueId(newLeagueId);
+      props.setLeagueKey([newLeagueId, defaultLeagueYear]);
       return;
     }
 
@@ -52,13 +54,15 @@ function LeagueChangeModal(props) {
 
     setResponseMsg(requestingMsg);
 
-    const leagueStatus = await requestLeagueId(reqPayload);
-    console.log(leagueStatus);
+    const [leagueStatus, resLeagueId] = await requestLeagueId(reqPayload);
+    const activeLeagueId = resLeagueId || newLeagueId;
+    console.log(leagueStatus, activeLeagueId);
+    
     switch (leagueStatus) {
       case 'ACTIVE':
-        localStorage.setItem('leagueId', newLeagueId);
+        localStorage.setItem('leagueId', activeLeagueId);
         props.setShow(false);
-        props.setLeagueId(newLeagueId);
+        props.setLeagueKey([activeLeagueId, defaultLeagueYear]);
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg(
@@ -67,6 +71,9 @@ function LeagueChangeModal(props) {
         break;
       case 'GENERAL_NOT_FOUND':
         setResponseMsg('League id not found or deleted.');
+        break;
+      case 'invalid_grant':
+        setResponseMsg('Error auth, redo authorization and auth code');
         break;
       case 'AMBIGUOUS':
         setResponseMsg(`Enter ${newLeagueId}e or ${newLeagueId}y`);

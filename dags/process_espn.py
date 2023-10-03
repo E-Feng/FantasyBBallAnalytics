@@ -11,8 +11,7 @@ from transform_raw_data import (
   transform_raw_to_df
 )
 from transform_data import (
-  transform_players_truncate,
-  transform_draft_recap
+  transform_players_truncate
 )
 from upload_to_aws import (
   upload_league_data_to_dynamo, upload_data_to_s3
@@ -34,8 +33,6 @@ default_league_info = {
   'leagueYear': current_year,
 }
 
-scoring_period = get_scoring_period_id(default_league_info)
-
 league_api_endpoints = {
   'settings': ['mSettings'],
   'teams': ['mTeam', 'mRoster'],
@@ -47,14 +44,6 @@ league_headers = {
   'players': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
 }
 
-common_api_endpoints = {
-  'players': ['kona_player_info'],
-  'daily': ['kona_playercard']
-}
-common_headers = {
-  'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}''',
-  'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
-}
 
 def process_espn_league(event, context):
   params = event["queryStringParameters"]
@@ -75,26 +64,28 @@ def process_espn_league(event, context):
   previous_years = sorted(league_settings["status"]["previousSeasons"], reverse=True)
 
   # Quickly check valid years
-  valid_all_years = [current_year]
+  all_league_keys = [[league_id, current_year]]
   for test_year in previous_years:
     league_info['leagueYear'] = test_year
     try: 
       extract_from_espn_api(league_info, ['mSettings'])
-      valid_all_years.append(test_year)
+      all_league_keys.append([league_id, test_year])
     except:
       continue
 
-  process_years = [current_year] if process_only_current else valid_all_years
+  process_keys = [[league_id, current_year]] if process_only_current else all_league_keys
 
-  for league_year in process_years:
-    print(f"Starting data extraction for {league_year}...")
+  for league_key in process_keys:
+    print(f"Starting data extraction for {league_key}...")
+    league_year = league_key[1]
 
     league_info['leagueYear'] = league_year
 
     league_data = {
       'leagueId': league_id,
       'leagueYear': league_year,
-      'allYears': valid_all_years
+      'allLeagueKeys': all_league_keys,
+      'platform': "espn"
     }
 
     for endpoint in league_api_endpoints.keys():
@@ -142,6 +133,17 @@ def process_espn_league(event, context):
 
 
 def process_espn_common():
+  scoring_period = get_scoring_period_id(default_league_info)
+
+  common_api_endpoints = {
+  'players': ['kona_player_info'],
+  'daily': ['kona_playercard']
+  }
+  common_headers = {
+    'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}''',
+    'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
+  }
+
   league_info = default_league_info
 
   today = date.today().strftime("%Y-%m-%d")
@@ -212,10 +214,10 @@ def process_espn_common():
   }
 
 
-lambda_client = boto3.client('lambda', region_name='us-east-1')
 
 def update_espn_leagues(event, context):
   print(event)
+  lambda_client = boto3.client('lambda', region_name='us-east-1')
 
   process_espn_common()
 
