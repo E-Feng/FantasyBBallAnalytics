@@ -15,10 +15,10 @@ function NavBar(props) {
             <Link to='/'>Home</Link>
           </li>
           <li>
-            <Link to='/teams'>Teams</Link>
+            <Link to='/scoreboard'>Scoreboard</Link>
           </li>
           <li>
-            <Link to='/scoreboard'>Scoreboard</Link>
+            <Link to='/teams'>Teams</Link>
           </li>
           <li>
             <Link to='/compare'>Compare</Link>

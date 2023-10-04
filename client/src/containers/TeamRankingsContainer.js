@@ -13,10 +13,10 @@ function TeamRankingsContainer(props) {
   const catIds = props.settings[0].categoryIds;
 
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
+  const ratingsKey = `statRatings${period}`;
 
   const data = teams.map((team) => {
-    const ratingsKey = `statRatings${period}`;
-
+    console.log(team)
     const injuredIds = team.roster.flatMap((r) => {
       if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
         return r.playerId;
@@ -48,6 +48,8 @@ function TeamRankingsContainer(props) {
       all: all,
     };
   });
+
+  console.log(data)
 
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);

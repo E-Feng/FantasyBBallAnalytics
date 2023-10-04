@@ -9,7 +9,8 @@ import LoadingIcon from '../components/LoadingIcon';
 import TeamRankingsContainer from '../containers/TeamRankingsContainer';
 
 function Teams(props) {
-  const { leagueKey } = useContext(LeagueContext);
+  const { leagueState } = useContext(LeagueContext);
+  const leagueKey = leagueState[0];
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
