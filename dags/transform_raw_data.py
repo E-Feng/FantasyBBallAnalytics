@@ -240,7 +240,7 @@ def transform_players_to_df(ratings: dict):
 
           # Filtering category ids only
           if category_ids:
-            filtered_stats = {k:stats_period['averageStats'][k] for k in category_ids}
+            filtered_stats = {k:stats_period['averageStats'].get(k, 0) for k in category_ids}
             row['stats' + period] = format_stats(filtered_stats)
 
 
