@@ -58,7 +58,7 @@ def format_stat_ratings(data: list):
 def format_stats(data: dict):
   formatted = {}
   for id in data:
-    formatted[id] = round(float(data[id], 2))
+    formatted[id] = round(float(data[id]), 2)
   
   return formatted
 
