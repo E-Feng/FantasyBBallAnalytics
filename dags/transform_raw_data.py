@@ -225,7 +225,7 @@ def transform_players_to_df(ratings: dict):
         row['totalRating' + period] = player['ratings'][key]['totalRating']
         row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
-        row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
+        row['statRatings' + period] = format_stat_ratings(player['ratings'][key]['statRankings'])
 
         if not category_ids:
           category_ids = row['statRatings' + period].keys()
