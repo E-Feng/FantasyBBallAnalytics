@@ -206,13 +206,13 @@ def process_espn_common():
           
           alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
 
-      upload_to_firebase('alert', alert_data)     
+      upload_to_firebase('alert', alert_data)
+      upload_to_firebase('scoring_period', scoring_period)
 
   return {
     'statusCode': 200,
     'body': "Test response"
   }
-
 
 
 def update_espn_leagues(event, context):
