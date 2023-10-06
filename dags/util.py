@@ -55,6 +55,14 @@ def format_stat_ratings(data: list):
   return formatted
 
 
+def format_stats(data: dict):
+  formatted = {}
+  for id in data:
+    formatted[id] = round(float(data[id]), 2)
+  
+  return formatted
+
+
 def capitalize_dict_keys(data):
   """
   Capitalizes keys from case-insensitive RDS queries for compatibility

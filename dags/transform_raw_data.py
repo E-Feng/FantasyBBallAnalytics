@@ -6,7 +6,8 @@ import consts
 from util import (
   get_current_espn_league_year,
   calculate_gamescore, 
-  format_stat_ratings
+  format_stat_ratings,
+  format_stats
 )
 
 
@@ -57,12 +58,12 @@ def transform_team_to_df(team_info: dict):
     row['fullTeamName'] = team['location'] + ' ' + team['nickname']
 
     # Getting first and last name from teams key
-    row['firstName'] = 'Unowned'
-    row['lastName'] = 'Unowned'
+    row['firstName'] = 'Unknown'
+    row['lastName'] = 'Unknown'
     for member in data['members']:
       if member['id'] == team.get('primaryOwner'):
-        row['firstName'] = member['firstName']
-        row['lastName'] = member['lastName']
+        row['firstName'] = member.get('firstName', 'Unknown')
+        row['lastName'] = member.get('lastName', 'Unknown')
 
     # Roster information
     row['roster'] = []
@@ -204,6 +205,8 @@ def transform_players_to_df(ratings: dict):
   data = ratings  
 
   data_array = []
+  category_ids = []
+
   # Iterate through all players
   for player in data['players']:
     row = {}
@@ -222,7 +225,10 @@ def transform_players_to_df(ratings: dict):
         row['totalRating' + period] = player['ratings'][key]['totalRating']
         row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
-        row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
+        row['statRatings' + period] = format_stat_ratings(player['ratings'][key]['statRankings'])
+
+        if not category_ids:
+          category_ids = row['statRatings' + period].keys()
 
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
@@ -231,6 +237,12 @@ def transform_players_to_df(ratings: dict):
         stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}'), {})
         if stats_period.get('averageStats'):
           row['stats' + period] = stats_period['averageStats']
+
+          # Filtering category ids only
+          if category_ids:
+            filtered_stats = {k:stats_period['averageStats'].get(k, 0) for k in category_ids}
+            row['stats' + period] = format_stats(filtered_stats)
+
 
     data_array.append(row)
 
