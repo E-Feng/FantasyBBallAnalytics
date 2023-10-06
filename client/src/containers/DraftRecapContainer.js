@@ -59,7 +59,6 @@ function DraftRecapContainer(props) {
       avgDifference: avgDifference,
     };
   });
-  console.log(summaryData);
 
   const dataRatings = data.map((o) => o.rating);
   const ratingsRange = getPercentageRange(dataRatings, 0.05);
