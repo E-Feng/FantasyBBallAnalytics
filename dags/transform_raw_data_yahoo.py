@@ -12,6 +12,8 @@ def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
         df = transform_settings_to_df(raw_data)
     elif endpoint == 'teams':
         df = transform_team_to_df(raw_data)
+    elif endpoint == 'roster':
+        df = transform_roster_to_df(raw_data)
     elif endpoint == 'scoreboard':
         df = transform_scoreboard_to_df(raw_data)
     elif endpoint == 'draft':
@@ -53,6 +55,36 @@ def transform_team_to_df(data: dict):
   
     df = pd.DataFrame.from_records(data_array)
     return df
+
+
+def transform_roster_to_df(data: dict):
+    """
+    Transforms roster raw json data from ESPN API to pandas dataframe
+    """
+    data_array = []
+
+    for team in data['fantasy_content']["league"]["teams"]:
+        row = {}
+
+        team = team["team"]
+
+        row['teamId'] = int(team["team_id"])
+        row["roster"] = []
+
+        for player in team["roster"]["players"]:
+            player = player["player"]
+
+            player_row = {}
+
+            player_row["playerId"] = player["player_id"]
+            player_row["lineupSlotId"] = player["selected_position"]["position"]
+            player_row["acquisitionType"] = ""
+            row["roster"].append(player_row)
+
+        data_array.append(row)
+
+    df = pd.DataFrame.from_records(data_array)
+    return df   
 
 
 def transform_settings_to_df(data: dict):
@@ -146,18 +178,19 @@ def transform_draft_to_df(data: dict):
 
 
 def transform_players_to_df(data: dict):
-    data_array = []
+    print(data)
+    # data_array = []
 
-    players = data["fantasy_content"]["team"]["roster"]["players"]
+    # players = data["fantasy_content"]["team"]["roster"]["players"]
 
-    for player in players:
-        row = {}
-        player = player["player"]
+    # for player in players:
+    #     row = {}
+    #     player = player["player"]
 
-        row["playerId"] = player["player_id"]
-        row["playerName"] = player["name"]["full"]
+    #     row["playerId"] = player["player_id"]
+    #     row["playerName"] = player["name"]["full"]
 
-        data_array.append(row)
+    #     data_array.append(row)
 
-    df = pd.DataFrame.from_records(data_array)
+    df = pd.DataFrame.from_records(data)
     return df
