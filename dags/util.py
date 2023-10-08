@@ -31,6 +31,16 @@ def get_current_espn_league_year():
     return league_year
 
 
+def get_default_league_info():
+  league_id = '1978554631'
+
+  league_info = {
+    "leagueId": league_id,
+    "leagueYear": get_current_espn_league_year()
+  }
+  return league_info
+
+
 def calculate_gamescore(player):
   """
   Calculates fantasy gamescore, differing from the real gamescore by omitting
@@ -58,7 +68,12 @@ def format_stat_ratings(data: list):
 def format_stats(data: dict):
   formatted = {}
   for id in data:
-    formatted[id] = round(float(data[id]), 2)
+    val = data[id]
+
+    if val == "Infinity":
+      formatted[id] = 0
+    else:
+      formatted[id] = round(float(val), 2)
   
   return formatted
 
