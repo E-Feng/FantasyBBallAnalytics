@@ -2,6 +2,7 @@ import json
 import requests
 import random
 import boto3
+from decimal import Decimal
 from time import sleep
 
 
@@ -9,12 +10,19 @@ AWS_DDB_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/data'
 AWS_SQS_URL = 'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/sqs'
 
 
+class DecimalEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, Decimal):
+      return str(obj)
+    return json.JSONEncoder.default(self, obj)
+
+
 def upload_league_data_to_dynamo(data: dict):
   """
   Post process the league data and upload to dynamodb
   """
   headers = {'content-type': 'application/json'}
-  payload = json.dumps(data)
+  payload = json.dumps(data, cls=DecimalEncoder)
 
   r = requests.put(AWS_DDB_URL, data=payload, headers=headers)
 

@@ -28,6 +28,9 @@ LAST15 = '2'
 LAST30 = '3'
 
 # Constants for Yahoo API category ids
+GP_Y = '0' # Games played
+GS_Y = '1' # Games started
+MINS_Y = '2'
 FG_ATT_Y = '3'
 FG_MADE_Y = '4'
 FG_PER_Y = '5'
@@ -45,3 +48,11 @@ ASTS_Y = '16'
 STLS_Y = '17'
 BLKS_Y = '18'
 TOS_Y = '19'
+AST_TO_R_Y = '20' # Assist/turnover ratio
+PFS_Y = '21'
+DQS_Y = '22'
+TECHS_Y = '23'
+EJS_Y = '24'
+FLAGS_Y = '25'
+DDS_Y = '27'
+TDS_Y = '28'
