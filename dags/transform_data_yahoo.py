@@ -15,6 +15,9 @@ def truncate_players(league_data: dict):
   draft = league_data["draft"]
   settings = league_data["settings"]
 
+  if draft.empty:
+    return []
+
   category_ids = settings.iloc[0]["categoryIds"]
   for player in players:
     for key in player.keys():
