@@ -152,6 +152,9 @@ def transform_scoreboard_to_df(data: dict):
             row['pts'] = int(stats_dict.get(consts.PTS_Y) or 0)
             # row['fpts'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
 
+            # Clean null values
+            row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
+
             data_array.append(row)
 
     df = pd.DataFrame.from_records(data_array)
@@ -178,19 +181,5 @@ def transform_draft_to_df(data: dict):
 
 
 def transform_players_to_df(data: dict):
-    print(data)
-    # data_array = []
-
-    # players = data["fantasy_content"]["team"]["roster"]["players"]
-
-    # for player in players:
-    #     row = {}
-    #     player = player["player"]
-
-    #     row["playerId"] = player["player_id"]
-    #     row["playerName"] = player["name"]["full"]
-
-    #     data_array.append(row)
-
-    df = pd.DataFrame.from_records(data)
-    return df
+    # df = pd.DataFrame.from_records(data)
+    return data

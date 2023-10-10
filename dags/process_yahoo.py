@@ -2,7 +2,10 @@ import pandas as pd
 
 from extract_yahoo import extract_from_yahoo_api
 from transform_raw_data_yahoo import transform_yahoo_raw_to_df
-from transform_data_yahoo import merge_roster_into_teams
+from transform_data_yahoo import (
+  merge_roster_into_teams,
+  truncate_players
+)
 from upload_to_aws import upload_league_data_to_dynamo
 
 
@@ -42,7 +45,8 @@ def process_yahoo_league(event, context):
         league_data[endpoint] = transform_yahoo_raw_to_df(endpoint, data_endpoint)
 
     # Transforms
-    league_data["teams"] = merge_roster_into_teams(league_data["teams"], league_data["roster"])
+    league_data["teams"] = merge_roster_into_teams(league_data)
+    league_data["players"] = truncate_players(league_data)
 
     league_data.pop("roster", None)
 

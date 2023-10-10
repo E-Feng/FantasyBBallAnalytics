@@ -1,5 +1,8 @@
+import json
 import boto3
 import requests
+
+from util import get_default_league_info
 
 
 base_url = "https://fantasysports.yahooapis.com/fantasy/v2/{}?format=json_f"
@@ -29,12 +32,15 @@ def extract_from_yahoo_api(access_token: str, league_key: str, url_params: list)
     
     # Handling player data, grabbing from ESPN process
     else:
-       league_id = "1978554631"
-       league_year = 2024
+       league_info = get_default_league_info()
+       league_id = league_info["leagueId"]
+       league_year = league_info["leagueYear"]
 
        dynamodb = boto3.resource('dynamodb')
        table = dynamodb.Table("fantasyLeagueData")
 
        league_data = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
 
-       return league_data["Item"]["players"]
+       players = league_data["Item"]["players"]
+
+       return players
