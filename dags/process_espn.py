@@ -214,7 +214,7 @@ def update_espn_leagues(event, context):
   print(event)
   lambda_client = boto3.client('lambda', region_name='us-east-1')
 
-  process_espn_common()
+  # process_espn_common()
 
   db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
 
@@ -233,6 +233,7 @@ def update_espn_leagues(event, context):
     SELECT leagueid, cookieswid, cookieespns2
     FROM leagueids  
     WHERE active
+      AND platform = 'espn'
       AND (NOW() - LastViewed < INTERVAL '7 day')
     """
   )
