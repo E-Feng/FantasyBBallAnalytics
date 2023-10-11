@@ -15,7 +15,7 @@ def truncate_players(league_data: dict):
   draft = league_data["draft"]
   settings = league_data["settings"]
 
-  if draft.empty:
+  if draft.empty or league_data["leagueYear"] < 2024:
     return []
 
   category_ids = settings.iloc[0]["categoryIds"]
