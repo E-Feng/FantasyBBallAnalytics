@@ -168,7 +168,7 @@ def transform_draft_to_df(data: dict):
         row = {}
         pick = pick["draft_result"]
 
-        if pick:
+        if pick and pick.get('player_key'):
             row['pickNumber'] = pick['pick']
             row['round'] = pick['round']
             row['teamId'] = int(pick['team_key'][-1])

@@ -1,3 +1,5 @@
+import boto3
+import psycopg2
 import pandas as pd
 
 from extract_yahoo import extract_from_yahoo_api
@@ -6,7 +8,12 @@ from transform_data_yahoo import (
   merge_roster_into_teams,
   truncate_players
 )
+from yahoo_helper import (
+  get_yahoo_access_token,
+  get_all_league_ids
+)
 from upload_to_aws import upload_league_data_to_dynamo
+from util import invoke_lambda
 
 
 week_list = list(range(1, 25))
@@ -65,4 +72,69 @@ def process_yahoo_league(event, context):
     return {
         'statusCode': 200,
         'body': 'Success'
+    }
+
+
+def process_all_yahoo_leagues(event, context):
+    print(event)
+    lambda_client = boto3.client('lambda', region_name='us-east-1')
+
+    db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
+    conn = psycopg2.connect(
+        host='db.lsygyiijbumuybwyuvrn.supabase.co',
+        port='5432',
+        database='postgres',
+        user='postgres',
+        password=db_pass
+    )
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT l2.linkedid, l1.yahoorefreshtoken
+        FROM leagueids l1
+        LEFT JOIN linkedids l2
+            ON l1.leagueid=l2.mainid
+        WHERE active
+            AND platform = 'yahoo'
+            AND (NOW() - LastViewed < INTERVAL '7 day')
+            AND l2.linkedid LIKE (SELECT MAX(SUBSTRING(linkedid, 1, 3)) FROM linkedids) || '%' 
+        """
+    )
+    res_query = cursor.fetchall()
+
+    num_leagues = len(res_query)
+    num_failed = 0
+
+    for league_info in res_query:
+        league_id = league_info[0]
+        access_token = get_yahoo_access_token(league_info[1])
+
+        process_payload = {
+            "queryStringParameters": {
+                "leagueId": league_id,
+                "leagueYear": 2024,
+                "allLeagueKeys": get_all_league_ids(access_token),
+                "yahooAccessToken": access_token,
+            }
+        }
+        process_res = invoke_lambda(lambda_client, 'process_yahoo_league', process_payload)
+
+        if not process_res:
+            num_failed += 1
+            print(f"League {league_id.ljust(11)} failed")
+        else:
+            update_payload = {
+                "queryStringParameters": {
+                    "leagueId": league_id,
+                    "method": "lastUpdated"
+                }
+            }
+            invoke_lambda(lambda_client, "update_league_info", update_payload)
+
+    print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
+
+    return {
+    'statusCode': 200,
+    'body': "Test response"
     }
