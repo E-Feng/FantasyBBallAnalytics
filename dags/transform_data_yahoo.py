@@ -10,6 +10,24 @@ def merge_roster_into_teams(league_data: dict):
   return teams
 
 
+def map_player_ids(league_data: dict):
+  players_data = league_data["players"]
+
+  players = players_data[0]
+  map_data = players_data[1]
+
+  for i, player in enumerate(players):
+    player_name = player["playerName"]
+    mapped_id = map_data.get(player_name, None)
+
+    if mapped_id:
+      players[i]["playerId"] = mapped_id
+    else:
+      print("Missing map", player_name)
+
+  return players
+
+
 def truncate_players(league_data: dict):
   players = league_data["players"]
   draft = league_data["draft"]
@@ -22,7 +40,7 @@ def truncate_players(league_data: dict):
   for player in players:
     for key in player.keys():
       if isinstance(player[key], dict) and "stat" in key:
-        player[key] = {str(k):player[key][str(k)] for k in category_ids}
+        player[key] = {str(k):float(player[key][str(k)]) for k in category_ids}
 
   players = pd.DataFrame.from_records(players)
 

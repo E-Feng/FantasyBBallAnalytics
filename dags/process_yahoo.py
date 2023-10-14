@@ -6,6 +6,7 @@ from extract_yahoo import extract_from_yahoo_api
 from transform_raw_data_yahoo import transform_yahoo_raw_to_df
 from transform_data_yahoo import (
   merge_roster_into_teams,
+  map_player_ids,
   truncate_players
 )
 from yahoo_helper import (
@@ -53,6 +54,7 @@ def process_yahoo_league(event, context):
 
     # Transforms
     league_data["teams"] = merge_roster_into_teams(league_data)
+    league_data["players"] = map_player_ids(league_data)
     league_data["players"] = truncate_players(league_data)
 
     league_data.pop("roster", None)
@@ -76,7 +78,6 @@ def process_yahoo_league(event, context):
 
 
 def process_all_yahoo_leagues(event, context):
-    print(event)
     lambda_client = boto3.client('lambda', region_name='us-east-1')
 
     db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
@@ -108,7 +109,7 @@ def process_all_yahoo_leagues(event, context):
 
     for league_info in res_query:
         league_id = league_info[0]
-        access_token = get_yahoo_access_token(league_info[1])
+        access_token = get_yahoo_access_token(league_info[1])["yahoo_access_token"]
 
         process_payload = {
             "queryStringParameters": {
@@ -135,6 +136,6 @@ def process_all_yahoo_leagues(event, context):
     print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 
     return {
-    'statusCode': 200,
-    'body': "Test response"
+        'statusCode': 200,
+        'body': "Test response"
     }

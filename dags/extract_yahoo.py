@@ -27,7 +27,7 @@ def extract_from_yahoo_api(access_token: str, league_key: str, url_params: list)
           print(f"Successfully fetched {url_params} from Yahoo API")
           return data
         else:
-          print(f"Failed fetching {url_params} from Yahoo")
+          print(f"Failed {url_params} code:{res.status_code}")
           raise ValueError(f"Error obtaining {url_params} from Yahoo API")
     
     # Handling player data, grabbing from ESPN process
@@ -43,4 +43,8 @@ def extract_from_yahoo_api(access_token: str, league_key: str, url_params: list)
 
        players = league_data["Item"]["players"]
 
-       return players
+       s3 = boto3.resource("s3")
+       obj = s3.Object("nba-player-stats", "yahoo_players_map.json")
+       players_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
+
+       return [players, players_map]
