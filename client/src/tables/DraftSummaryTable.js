@@ -36,7 +36,7 @@ function DraftSummaryTable(props) {
 
         Cell: (props) => (
           <React.Fragment>
-            {props.value ? props.value.toFixed(2) : ''}
+            {props.value ? parseFloat(props.value).toFixed(2) : ''}
           </React.Fragment>
         ),
       },
@@ -46,7 +46,7 @@ function DraftSummaryTable(props) {
         
         Cell: (props) => (
           <React.Fragment>
-            {props.value ? props.value.toFixed(0) : ''}
+            {props.value ? parseFloat(props.value).toFixed(0) : ''}
           </React.Fragment>
         ),
       },
