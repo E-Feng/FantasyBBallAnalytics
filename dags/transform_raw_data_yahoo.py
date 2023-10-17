@@ -3,7 +3,7 @@ import pandas as pd
 import consts
 
 
-def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
+def transform_yahoo_raw_to_df(endpoint: str, raw_data: dict):
     """
     Index function for all endpoint transformations
     """
@@ -12,12 +12,14 @@ def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
         df = transform_settings_to_df(raw_data)
     elif endpoint == 'teams':
         df = transform_team_to_df(raw_data)
+    elif endpoint == 'roster':
+        df = transform_roster_to_df(raw_data)
     elif endpoint == 'scoreboard':
         df = transform_scoreboard_to_df(raw_data)
     elif endpoint == 'draft':
         df = transform_draft_to_df(raw_data)       
-    elif endpoint == 'players':
-        df = transform_players_to_df(raw_data)    
+    elif endpoint in ['players', 'players_id_map']:
+        df = transform_to_df(raw_data)
     else:
         df = pd.DataFrame()
 
@@ -53,6 +55,36 @@ def transform_team_to_df(data: dict):
   
     df = pd.DataFrame.from_records(data_array)
     return df
+
+
+def transform_roster_to_df(data: dict):
+    """
+    Transforms roster raw json data from ESPN API to pandas dataframe
+    """
+    data_array = []
+
+    for team in data['fantasy_content']["league"]["teams"]:
+        row = {}
+
+        team = team["team"]
+
+        row['teamId'] = int(team["team_id"])
+        row["roster"] = []
+
+        for player in team["roster"]["players"]:
+            player = player["player"]
+
+            player_row = {}
+
+            player_row["playerId"] = player["player_id"]
+            player_row["lineupSlotId"] = player["selected_position"]["position"]
+            player_row["acquisitionType"] = ""
+            row["roster"].append(player_row)
+
+        data_array.append(row)
+
+    df = pd.DataFrame.from_records(data_array)
+    return df   
 
 
 def transform_settings_to_df(data: dict):
@@ -112,13 +144,16 @@ def transform_scoreboard_to_df(data: dict):
             row['stls'] = int(stats_dict.get(consts.STLS_Y) or 0)
             row['blks'] = int(stats_dict.get(consts.BLKS_Y) or 0)
             row['tos'] = int(stats_dict.get(consts.TOS_Y) or 0)
-            row['dqs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
-            row['ejs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
-            row['flags'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
-            row['pfs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
-            row['techs'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            row['dqs'] = int(stats_dict.get(consts.DQS_Y) or 0)
+            row['ejs'] = int(stats_dict.get(consts.EJS_Y) or 0)
+            row['flags'] = int(stats_dict.get(consts.FLAGS_Y) or 0)
+            row['pfs'] = int(stats_dict.get(consts.PFS_Y) or 0)
+            row['techs'] = int(stats_dict.get(consts.TECHS_Y) or 0)
             row['pts'] = int(stats_dict.get(consts.PTS_Y) or 0)
-            row['fpts'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+            # row['fpts'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+
+            # Clean null values
+            row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
 
             data_array.append(row)
 
@@ -133,7 +168,7 @@ def transform_draft_to_df(data: dict):
         row = {}
         pick = pick["draft_result"]
 
-        if pick:
+        if pick and pick.get('player_key'):
             row['pickNumber'] = pick['pick']
             row['round'] = pick['round']
             row['teamId'] = int(pick['team_key'][-1])
@@ -145,19 +180,6 @@ def transform_draft_to_df(data: dict):
     return df
 
 
-def transform_players_to_df(data: dict):
-    data_array = []
-
-    players = data["fantasy_content"]["team"]["roster"]["players"]
-
-    for player in players:
-        row = {}
-        player = player["player"]
-
-        row["playerId"] = player["player_id"]
-        row["playerName"] = player["name"]["full"]
-
-        data_array.append(row)
-
-    df = pd.DataFrame.from_records(data_array)
+def transform_to_df(data: dict):
+    df = pd.DataFrame.from_records(data)
     return df

@@ -18,7 +18,8 @@ from upload_to_aws import (
 )
 from util import (
   invoke_lambda,
-  get_current_espn_league_year
+  get_current_espn_league_year,
+  get_default_league_info
 )
 from load_settings import (
   get_scoring_period_id
@@ -28,10 +29,7 @@ from upload_to_cloud import (
 )
 
 current_year = get_current_espn_league_year()
-default_league_info = {
-  'leagueId': '1978554631',
-  'leagueYear': current_year,
-}
+default_league_info = get_default_league_info()
 
 league_api_endpoints = {
   'settings': ['mSettings'],
@@ -105,10 +103,7 @@ def process_espn_league(event, context):
     #   league_data['settings']
     # )
 
-    league_data['players'] = transform_players_truncate(
-      league_data['players'],
-      league_data["draft"]
-    )
+    league_data['players'] = transform_players_truncate(league_data)
 
     # Removing unneeded league data
     #league_data.pop('draft', None)
@@ -219,7 +214,7 @@ def update_espn_leagues(event, context):
   print(event)
   lambda_client = boto3.client('lambda', region_name='us-east-1')
 
-  process_espn_common()
+  # process_espn_common()
 
   db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
 
@@ -238,6 +233,7 @@ def update_espn_leagues(event, context):
     SELECT leagueid, cookieswid, cookieespns2
     FROM leagueids  
     WHERE active
+      AND platform = 'espn'
       AND (NOW() - LastViewed < INTERVAL '7 day')
     """
   )
@@ -271,7 +267,7 @@ def update_espn_leagues(event, context):
         }
       }
 
-    invoke_lambda(lambda_client, "update_league_info", update_payload)
+      invoke_lambda(lambda_client, "update_league_info", update_payload)
 
   print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 

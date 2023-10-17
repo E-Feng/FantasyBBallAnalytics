@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 
 import DraftRecapTable from '../tables/DraftRecapTable';
-import { checkLeagueHasEjections } from '../utils/categoryUtils';
+import DraftSummaryTable from '../tables/DraftSummaryTable';
+import { getPercentageRange, mean } from '../utils/arrayMath';
 
 import styled from 'styled-components';
 
 function DraftRecapContainer(props) {
   const [sortMode, setSortMode] = useState('round');
   const [ejsChecked, setChecked] = useState(false);
+
+  const draft = props.draft;
+  const teams = props.teams;
+  const players = props.players;
 
   const sortList = ['round', 'team', 'ranking', 'difference'];
 
@@ -17,9 +22,9 @@ function DraftRecapContainer(props) {
   const hasEjections = false;
 
   // Adjusting raw data, calculating difference
-  const data = props.draft.map((pick) => {
-    const team = props.teams.filter((team) => team.teamId === pick.teamId);
-    const player = props.players.filter(
+  const data = draft.map((pick) => {
+    const team = teams.filter((team) => team.teamId === pick.teamId);
+    const player = players.filter(
       (player) => player.playerId === pick.playerId
     )[0];
 
@@ -40,7 +45,23 @@ function DraftRecapContainer(props) {
       difference: difference,
     };
   });
-  console.log(data)
+  const summaryData = teams.map((team) => {
+    const teamDraft = data.filter((o) => o.teamId === team.teamId);
+
+    const avgRanking = Math.round(mean(teamDraft.map((o) => o.ranking)));
+    const avgRating = mean(teamDraft.map((o) => o.rating));
+    const avgDifference = mean(teamDraft.map((o) => o.difference));
+
+    return {
+      ...team,
+      avgRanking: avgRanking,
+      avgRating: avgRating,
+      avgDifference: avgDifference,
+    };
+  });
+
+  const dataRatings = data.map((o) => o.rating);
+  const ratingsRange = getPercentageRange(dataRatings, 0.05);
 
   const handleSortChange = (e) => {
     setSortMode(e.target.value);
@@ -51,6 +72,7 @@ function DraftRecapContainer(props) {
 
   return (
     <Container>
+      <DraftSummaryTable data={summaryData} range={ratingsRange} />
       <Forms>
         <DropDown value={sortMode} onChange={handleSortChange}>
           {sortList.map((mode) => {
@@ -75,7 +97,7 @@ function DraftRecapContainer(props) {
           <br />
         )}
       </Forms>
-      <DraftRecapTable data={data} sortMode={sortMode} />
+      <DraftRecapTable data={data} range={ratingsRange} sortMode={sortMode} />
     </Container>
   );
 }
@@ -90,7 +112,8 @@ const Forms = styled.div`
   flex-direction: row;
   justify-content: center;
 
-  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
 `;
 
 const DropDown = styled.select`

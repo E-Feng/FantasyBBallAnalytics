@@ -58,12 +58,12 @@ def transform_team_to_df(team_info: dict):
     row['fullTeamName'] = team['location'] + ' ' + team['nickname']
 
     # Getting first and last name from teams key
-    row['firstName'] = 'Unowned'
-    row['lastName'] = 'Unowned'
+    row['firstName'] = 'Unknown'
+    row['lastName'] = 'Unknown'
     for member in data['members']:
       if member['id'] == team.get('primaryOwner'):
-        row['firstName'] = member['firstName']
-        row['lastName'] = member['lastName']
+        row['firstName'] = member.get('firstName', 'Unknown')
+        row['lastName'] = member.get('lastName', 'Unknown')
 
     # Roster information
     row['roster'] = []
@@ -225,7 +225,7 @@ def transform_players_to_df(ratings: dict):
         row['totalRating' + period] = player['ratings'][key]['totalRating']
         row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
-        row['statRatings' + period] = format_stat_ratings(player['ratings']['0']['statRankings'])
+        row['statRatings' + period] = format_stat_ratings(player['ratings'][key]['statRankings'])
 
         if not category_ids:
           category_ids = row['statRatings' + period].keys()
@@ -240,7 +240,7 @@ def transform_players_to_df(ratings: dict):
 
           # Filtering category ids only
           if category_ids:
-            filtered_stats = {k:stats_period['averageStats'][k] for k in category_ids}
+            filtered_stats = {k:stats_period['averageStats'].get(k, 0) for k in category_ids}
             row['stats' + period] = format_stats(filtered_stats)
 
 

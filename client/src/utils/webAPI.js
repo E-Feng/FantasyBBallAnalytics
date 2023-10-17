@@ -49,7 +49,24 @@ export const requestLeagueId = async (payload) => {
     method: 'GET',
   });
   const data = await res.json();
-  const values = data.split(":")
+  const values = data.split(":");
+
+  if (data.includes(".l.")) {
+    // Temp mapping
+    const yearMap = {
+      353: 2016,
+      364: 2017,
+      375: 2018,
+      385: 2019,
+      395: 2020,
+      402: 2021,
+      410: 2022,
+      418: 2023,
+      428: 2024
+    }
+    const prefix = values[1].split(".l.")[0]
+    values.push(yearMap[prefix]) 
+  }
 
   return values;
 };

@@ -4,48 +4,19 @@ import styled from 'styled-components';
 
 import { getHSLColor } from '../utils/colorsUtil';
 
-function DraftRecapTable(props) {
+function DraftSummaryTable(props) {
   const data = props.data;
   const ratingsColorRange = props.range;
 
-  data.sort((a, b) => a.pickNumber - b.pickNumber);
+  data.sort((a, b) => b.avgRating - a.avgRating);
 
   const diffColorRange = [-100, 100];
-
-  const numTeams = data.filter((player) => player.round === 1).length;
-  const numPicks = data.length / numTeams;
-
-  let borderMod = numTeams;
-
-  switch (props.sortMode) {
-    case 'team':
-      data.sort((a, b) => a.teamId - b.teamId);
-      borderMod = numPicks;
-      break;
-    case 'ranking':
-      data.sort((a, b) => {
-        if (a.ranking === null) return 1;
-        if (b.ranking === null) return -1;
-
-        return a.ranking - b.ranking;
-      });
-      break;
-    case 'difference':
-      data.sort((a, b) => b.difference - a.difference);
-      break;
-    default:
-      break;
-  }
 
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Pick',
-        accessor: 'pickNumber',
-      },
-      {
-        Header: 'Round',
-        accessor: 'round',
+        Header: 'Rank',
+        accessor: 'seed',
       },
       {
         Header: 'Team',
@@ -56,16 +27,12 @@ function DraftRecapTable(props) {
         ),
       },
       {
-        Header: 'Player',
-        accessor: 'playerName',
-      },
-      {
         Header: 'Ranking',
-        accessor: 'ranking',
+        accessor: 'avgRanking',
       },
       {
         Header: 'Rating',
-        accessor: 'rating',
+        accessor: 'avgRating',
 
         Cell: (props) => (
           <React.Fragment>
@@ -75,7 +42,13 @@ function DraftRecapTable(props) {
       },
       {
         Header: 'Difference',
-        accessor: 'difference',
+        accessor: 'avgDifference',
+        
+        Cell: (props) => (
+          <React.Fragment>
+            {props.value ? parseFloat(props.value).toFixed(0) : ''}
+          </React.Fragment>
+        ),
       },
     ],
     []
@@ -126,21 +99,11 @@ function DraftRecapTable(props) {
           {
             // Loop over the table rows
             rows.map((row) => {
-              // Conditional borders separating the rounds
-              const isEndOfRound = (row.index + 1) % borderMod === 0;
-
               // Prepare the row for display
               prepareRow(row);
               return (
                 // Apply the row props
-                <tr
-                  {...row.getRowProps()}
-                  style={{
-                    borderBottom: isEndOfRound
-                      ? '3px solid red'
-                      : '1px solid white',
-                  }}
-                >
+                <tr {...row.getRowProps()}>
                   {
                     // Loop over the rows cells
                     row.cells.map((cell) => {
@@ -151,13 +114,13 @@ function DraftRecapTable(props) {
                       let color = 'gainsboro';
 
                       if (val !== null) {
-                        if (headerId === 'difference') {
+                        if (headerId === 'avgDifference') {
                           color = getHSLColor(
                             val,
                             diffColorRange[0],
                             diffColorRange[1]
                           );
-                        } else if (headerId === 'rating') {
+                        } else if (headerId === 'avgRating') {
                           color = getHSLColor(
                             val,
                             ratingsColorRange[0],
@@ -235,4 +198,4 @@ const Table = styled.table`
   }
 `;
 
-export default DraftRecapTable;
+export default DraftSummaryTable;
