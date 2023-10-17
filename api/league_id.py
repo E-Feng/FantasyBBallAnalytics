@@ -108,7 +108,7 @@ def get_league_id_status(event, context):
         try:
             sql_file = "sql/update_yahoo_league_after_process.sql"
             update_query = open(sql_file, "r").read()
-            update_params["league_id"] = main_league_id
+            update_params["league_id"] = full_league_id
             update_params["yahoo_refresh_token"] = yahoo_refresh_token
 
             sql_file_linked = "sql/update_yahoo_linked_leagues.sql"

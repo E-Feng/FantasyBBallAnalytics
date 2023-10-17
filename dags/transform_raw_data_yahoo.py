@@ -3,7 +3,7 @@ import pandas as pd
 import consts
 
 
-def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
+def transform_yahoo_raw_to_df(endpoint: str, raw_data: dict):
     """
     Index function for all endpoint transformations
     """
@@ -18,8 +18,8 @@ def transform_yahoo_raw_to_df(endpoint: list, raw_data: dict):
         df = transform_scoreboard_to_df(raw_data)
     elif endpoint == 'draft':
         df = transform_draft_to_df(raw_data)       
-    elif endpoint == 'players':
-        df = transform_players_to_df(raw_data)    
+    elif endpoint in ['players', 'players_id_map']:
+        df = transform_to_df(raw_data)
     else:
         df = pd.DataFrame()
 
@@ -168,7 +168,7 @@ def transform_draft_to_df(data: dict):
         row = {}
         pick = pick["draft_result"]
 
-        if pick:
+        if pick and pick.get('player_key'):
             row['pickNumber'] = pick['pick']
             row['round'] = pick['round']
             row['teamId'] = int(pick['team_key'][-1])
@@ -180,6 +180,6 @@ def transform_draft_to_df(data: dict):
     return df
 
 
-def transform_players_to_df(data: dict):
-    # df = pd.DataFrame.from_records(data)
-    return data
+def transform_to_df(data: dict):
+    df = pd.DataFrame.from_records(data)
+    return df

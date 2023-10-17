@@ -10,25 +10,54 @@ def merge_roster_into_teams(league_data: dict):
   return teams
 
 
-def truncate_players(league_data: dict):
+def adjust_player_ratings(league_data: dict):
   players = league_data["players"]
-  draft = league_data["draft"]
   settings = league_data["settings"]
+
+  cols_to_fix = [
+    "statsSeason",
+    "statsLast7",
+    "statsLast15",
+    "statsLast30",
+    "statRatingsSeason",
+    "statRatingsLast7",
+    "statRatingsLast15",
+    "statRatingsLast30"
+  ]
+
+  category_ids = settings.iloc[0]["categoryIds"]
+
+  players = players.dropna(subset="statsSeason")
+
+  for col in cols_to_fix:
+    if col in players.columns:
+      players[col] = players[col].apply(lambda d: {str(k):float(d[str(k)]) for k in category_ids})
+
+  players["totalRatingSeason"] = players["statRatingsSeason"].apply(lambda d: sum(d.values()))
+  players["totalRankingSeason"] = players["totalRatingSeason"].rank(method='min', ascending=False)
+
+  return players
+
+
+def truncate_and_map_player_ids(league_data: dict):
+  players = league_data["players"]
+  players_id_map = league_data["players_id_map"]
+  draft = league_data["draft"]
+  roster = league_data["roster"]
 
   if draft.empty or league_data["leagueYear"] < 2024:
     return []
+  
+  # Map yahoo ids
+  players = players.drop("playerId", axis=1)
+  players = players.merge(players_id_map, on="playerName", how="inner")
 
-  category_ids = settings.iloc[0]["categoryIds"]
-  for player in players:
-    for key in player.keys():
-      if isinstance(player[key], dict) and "stat" in key:
-        player[key] = {str(k):player[key][str(k)] for k in category_ids}
-
-  players = pd.DataFrame.from_records(players)
-
-  is_owned = players['onTeamId'] > 0
+  # Truncate
+  roster_flatten = pd.json_normalize(roster.explode("roster")["roster"])
+  is_owned = players["playerId"].isin(roster_flatten["playerId"])
   is_drafted = players["playerId"].isin(draft["playerId"])
 
   all_cond = is_owned | is_drafted
+  players = players[all_cond]
 
-  return players[all_cond]  
+  return players

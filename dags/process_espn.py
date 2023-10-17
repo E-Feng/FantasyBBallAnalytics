@@ -267,7 +267,7 @@ def update_espn_leagues(event, context):
         }
       }
 
-    invoke_lambda(lambda_client, "update_league_info", update_payload)
+      invoke_lambda(lambda_client, "update_league_info", update_payload)
 
   print(f"Successfully updated, {num_failed}/{num_leagues} failed...")
 
