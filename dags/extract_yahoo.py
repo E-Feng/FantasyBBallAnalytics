@@ -7,7 +7,7 @@ from util import get_default_league_info
 
 base_url = "https://fantasysports.yahooapis.com/fantasy/v2/{}?format=json_f"
 
-def extract_from_yahoo_api(access_token: str, league_key: str, url_params: list):
+def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, url_params: list):
     if url_params:
         url_suffix = ""
         for param in url_params:
@@ -31,20 +31,23 @@ def extract_from_yahoo_api(access_token: str, league_key: str, url_params: list)
           raise ValueError(f"Error obtaining {url_params} from Yahoo API")
     
     # Handling player data, grabbing from ESPN process
-    else:
-       league_info = get_default_league_info()
-       league_id = league_info["leagueId"]
-       league_year = league_info["leagueYear"]
+    elif endpoint == "players":
+        league_info = get_default_league_info()
+        league_id = league_info["leagueId"]
+        league_year = league_info["leagueYear"]
 
-       dynamodb = boto3.resource('dynamodb')
-       table = dynamodb.Table("fantasyLeagueData")
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table("fantasyLeagueData")
 
-       league_data = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
+        league_data = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
 
-       players = league_data["Item"]["players"]
+        players = league_data["Item"]["players"]
 
-       s3 = boto3.resource("s3")
-       obj = s3.Object("nba-player-stats", "yahoo_players_map.json")
-       players_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
+        return players
+    
+    elif endpoint == "players_id_map":
+        s3 = boto3.resource("s3")
+        obj = s3.Object("nba-player-stats", "yahoo_players_map.json")
+        players_id_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
 
-       return [players, players_map]
+        return players_id_map

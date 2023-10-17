@@ -84,7 +84,7 @@ def update_player_list():
     start = 0
     cont = True
 
-    players_data = {}
+    players_data = []
     while cont:
         url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/428.l.906/players;start={start}/?format=json_f"
 
@@ -97,12 +97,13 @@ def update_player_list():
 
             if players:
                 for player in players:
+                    row = {}
                     player = player["player"]
 
-                    player_id = player["player_id"]
-                    full_name = player["name"]["full"]
+                    row["playerId"] = player["player_id"]
+                    row["playerName"] = player["name"]["full"]
 
-                    players_data[full_name] = player_id
+                    players_data.append(row)
             else:
                 cont = False
 
