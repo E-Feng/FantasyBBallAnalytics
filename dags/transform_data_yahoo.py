@@ -14,6 +14,9 @@ def adjust_player_ratings(league_data: dict):
   players = league_data["players"]
   settings = league_data["settings"]
 
+  if players.empty:
+    return []
+
   cols_to_fix = [
     "statsSeason",
     "statsLast7",
@@ -45,7 +48,7 @@ def truncate_and_map_player_ids(league_data: dict):
   draft = league_data["draft"]
   roster = league_data["roster"]
 
-  if draft.empty or league_data["leagueYear"] < 2024:
+  if draft.empty or players.empty:
     return []
   
   # Map yahoo ids
