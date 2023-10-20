@@ -30,24 +30,27 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
           print(f"Failed {url_params} code:{res.status_code}")
           raise ValueError(f"Error obtaining {url_params} from Yahoo API")
     
-    # Handling player data, grabbing from ESPN process
-    elif endpoint == "players":
-        league_info = get_default_league_info()
-        league_id = league_info["leagueId"]
-        league_year = league_info["leagueYear"]
+    # Handling player data, grabbing from ESPN process. Only for 2024
+    elif int(league_key[0:2]) >= 428:
+        if endpoint == "players":
+            league_info = get_default_league_info()
+            league_id = league_info["leagueId"]
+            league_year = league_info["leagueYear"]
 
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table("fantasyLeagueData")
+            dynamodb = boto3.resource('dynamodb')
+            table = dynamodb.Table("fantasyLeagueData")
 
-        league_data = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
+            league_data = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
 
-        players = league_data["Item"]["players"]
+            players = league_data["Item"]["players"]
 
-        return players
-    
-    elif endpoint == "players_id_map":
-        s3 = boto3.resource("s3")
-        obj = s3.Object("nba-player-stats", "yahoo_players_map.json")
-        players_id_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
+            return players
+        
+        elif endpoint == "players_id_map":
+            s3 = boto3.resource("s3")
+            obj = s3.Object("nba-player-stats", "yahoo_players_map.json")
+            players_id_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
 
-        return players_id_map
+            return players_id_map
+    else:
+       return {}
