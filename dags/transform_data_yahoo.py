@@ -29,6 +29,7 @@ def adjust_player_ratings(league_data: dict):
   ]
 
   category_ids = settings.iloc[0]["categoryIds"]
+  category_ids = [id for id in category_ids if id >= 0]
 
   for col in cols_to_fix:
     if col in players.columns:
