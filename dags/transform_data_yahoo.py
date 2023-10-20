@@ -56,8 +56,6 @@ def truncate_and_map_player_ids(league_data: dict):
   players = players.drop("playerId", axis=1)
   players = players.merge(players_id_map, on="playerName", how="inner")
 
-  print(players.loc[players["playerName"]=="Chet Holmgren"])
-
   # Truncate
   roster_flatten = pd.json_normalize(roster.explode("roster")["roster"])
   is_owned = players["playerId"].isin(roster_flatten["playerId"])
@@ -65,7 +63,5 @@ def truncate_and_map_player_ids(league_data: dict):
 
   all_cond = is_owned | is_drafted
   players = players[all_cond]
-
-  print(players.loc[players["playerId"]=="6692"])
 
   return players

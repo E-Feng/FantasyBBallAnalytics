@@ -100,6 +100,13 @@ def transform_settings_to_df(data: dict):
 
     row["categoryIds"] = [20,6,7,0,1,17,2,11,3,19]
 
+    for stat in data["settings"]["stat_categories"]["stats"]:
+        stat = stat["stat"]
+
+        stat_id = str(stat["stat_id"])
+        stat_id_espn = consts.STAT_IDS_MAP_TO_ESPN.get(stat_id, 0)
+        row["categoryIds"].append(stat_id_espn)
+
     data_array.append(row)
 
     df = pd.DataFrame.from_records(data_array)
