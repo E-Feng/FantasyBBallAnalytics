@@ -52,7 +52,9 @@ function DraftRecapTable(props) {
         accessor: 'fullTeamName',
 
         Cell: (props) => (
-          <React.Fragment>{props.value.substring(0, 20)}</React.Fragment>
+          <React.Fragment>
+            {props.value ? props.value.substring(0, 20) : ''}
+          </React.Fragment>
         ),
       },
       {
@@ -80,7 +82,7 @@ function DraftRecapTable(props) {
     ],
     []
   );
-
+  console.log(data);
   const tableInstance = useTable({ columns, data });
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =

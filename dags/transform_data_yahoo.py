@@ -30,14 +30,15 @@ def adjust_player_ratings(league_data: dict):
 
   category_ids = settings.iloc[0]["categoryIds"]
 
-  players = players.dropna(subset="statsSeason").copy()
-
   for col in cols_to_fix:
     if col in players.columns:
-      players[col] = players[col].apply(lambda d: {str(k):float(d[str(k)]) for k in category_ids})
+      mask = players[col].notnull()
 
-  players["totalRatingSeason"] = players["statRatingsSeason"].apply(lambda d: sum(d.values()))
-  players["totalRankingSeason"] = players["totalRatingSeason"].rank(method='min', ascending=False)
+      players.loc[mask, col] = players.loc[mask, col].apply(lambda d: {str(k):float(d[str(k)]) for k in category_ids})
+
+  mask = players["statRatingsSeason"].notnull()
+  players.loc[mask, "totalRatingSeason"] = players.loc[mask, "statRatingsSeason"].apply(lambda d: sum(d.values()))
+  players.loc[mask, "totalRankingSeason"] = players.loc[mask, "totalRatingSeason"].rank(method='min', ascending=False)
 
   return players
 
@@ -55,6 +56,8 @@ def truncate_and_map_player_ids(league_data: dict):
   players = players.drop("playerId", axis=1)
   players = players.merge(players_id_map, on="playerName", how="inner")
 
+  print(players.loc[players["playerName"]=="Chet Holmgren"])
+
   # Truncate
   roster_flatten = pd.json_normalize(roster.explode("roster")["roster"])
   is_owned = players["playerId"].isin(roster_flatten["playerId"])
@@ -62,5 +65,7 @@ def truncate_and_map_player_ids(league_data: dict):
 
   all_cond = is_owned | is_drafted
   players = players[all_cond]
+
+  print(players.loc[players["playerId"]=="6692"])
 
   return players
