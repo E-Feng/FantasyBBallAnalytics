@@ -15,7 +15,7 @@ def adjust_player_ratings(league_data: dict):
   settings = league_data["settings"]
 
   if players.empty:
-    return []
+    return players
 
   cols_to_fix = [
     "statsSeason",
@@ -50,7 +50,7 @@ def truncate_and_map_player_ids(league_data: dict):
   roster = league_data["roster"]
 
   if draft.empty or players.empty:
-    return []
+    return pd.DataFrame()
   
   # Map yahoo ids
   players = players.drop("playerId", axis=1)
