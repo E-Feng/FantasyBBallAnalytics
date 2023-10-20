@@ -27,7 +27,7 @@ def adjust_player_ratings(league_data: dict):
 
   category_ids = settings.iloc[0]["categoryIds"]
 
-  players = players.dropna(subset="statsSeason")
+  players = players.dropna(subset="statsSeason").copy()
 
   for col in cols_to_fix:
     if col in players.columns:
