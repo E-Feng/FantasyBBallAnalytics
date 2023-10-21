@@ -104,7 +104,7 @@ def transform_settings_to_df(data: dict):
         stat = stat["stat"]
 
         stat_id = str(stat["stat_id"])
-        stat_id_espn = int(consts.STAT_IDS_MAP_TO_ESPN.get(stat_id, -1))
+        stat_id_espn = int(consts.STAT_IDS_MAP_TO_ESPN.get(stat_id, -100))
         row["categoryIds"].append(stat_id_espn)
 
     data_array.append(row)
