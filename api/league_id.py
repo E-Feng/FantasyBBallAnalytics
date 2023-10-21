@@ -72,6 +72,10 @@ def get_league_id_status(event, context):
         try:
             res = invoke_lambda(lambda_client, "process_espn_league", event)
 
+            if not res:
+                print("ERROR: Process ESPN lambda failed")
+                raise Exception
+
             sql_file = "sql/update_espn_league_after_process.sql"
             update_query = open(sql_file, "r").read()
             update_params["cookie_espn"] = league_auth_code
@@ -120,6 +124,10 @@ def get_league_id_status(event, context):
                 event["queryStringParameters"]["leagueYear"] = league[1]
                 event["queryStringParameters"]["allLeagueKeys"] = all_leagues
                 res = invoke_lambda(lambda_client, "process_yahoo_league", event)
+
+                if not res:
+                    print("ERROR: Process Yahoo lambda failed")
+                    raise Exception
 
                 update_data.append((league[0], main_league_id))
 
