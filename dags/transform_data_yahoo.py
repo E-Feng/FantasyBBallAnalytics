@@ -14,6 +14,9 @@ def adjust_player_ratings(league_data: dict):
   players = league_data["players"]
   settings = league_data["settings"]
 
+  if players.empty:
+    return players
+
   cols_to_fix = [
     "statsSeason",
     "statsLast7",
@@ -26,15 +29,17 @@ def adjust_player_ratings(league_data: dict):
   ]
 
   category_ids = settings.iloc[0]["categoryIds"]
-
-  players = players.dropna(subset="statsSeason")
+  category_ids = [id for id in category_ids if id >= 0]
 
   for col in cols_to_fix:
     if col in players.columns:
-      players[col] = players[col].apply(lambda d: {str(k):float(d[str(k)]) for k in category_ids})
+      mask = players[col].notnull()
 
-  players["totalRatingSeason"] = players["statRatingsSeason"].apply(lambda d: sum(d.values()))
-  players["totalRankingSeason"] = players["totalRatingSeason"].rank(method='min', ascending=False)
+      players.loc[mask, col] = players.loc[mask, col].apply(lambda d: {str(k):float(d[str(k)]) for k in category_ids})
+
+  mask = players["statRatingsSeason"].notnull()
+  players.loc[mask, "totalRatingSeason"] = players.loc[mask, "statRatingsSeason"].apply(lambda d: sum(d.values()))
+  players.loc[mask, "totalRankingSeason"] = players.loc[mask, "totalRatingSeason"].rank(method='min', ascending=False)
 
   return players
 
@@ -45,8 +50,8 @@ def truncate_and_map_player_ids(league_data: dict):
   draft = league_data["draft"]
   roster = league_data["roster"]
 
-  if draft.empty or league_data["leagueYear"] < 2024:
-    return []
+  if draft.empty or players.empty:
+    return pd.DataFrame()
   
   # Map yahoo ids
   players = players.drop("playerId", axis=1)

@@ -34,9 +34,11 @@ MINS_Y = '2'
 FG_ATT_Y = '3'
 FG_MADE_Y = '4'
 FG_PER_Y = '5'
+FG_DISP_Y = '9004003'
 FT_ATT_Y = '6'
 FT_MADE_Y = '7'
 FT_PER_Y = '8'
+FT_DISP_Y = '9007006'
 THREEA_Y = '9'
 THREES_Y = '10'
 THREE_PER_Y = '11'
@@ -56,3 +58,19 @@ EJS_Y = '24'
 FLAGS_Y = '25'
 DDS_Y = '27'
 TDS_Y = '28'
+
+STAT_IDS_MAP_TO_ESPN = {
+  FG_DISP_Y: -1,
+  FG_ATT_Y: FG_ATT,
+  FT_DISP_Y: -1,
+  FT_ATT_Y: FT_ATT,
+  THREES_Y: THREES,
+  PTS_Y: PTS,
+  OREBS_Y: OREBS,
+  DREBS_Y: DREBS,
+  REBS_Y: REBS,
+  ASTS_Y: ASTS,
+  STLS_Y: STLS,
+  BLKS_Y: BLKS,
+  TOS_Y: TOS
+}

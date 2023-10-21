@@ -31,7 +31,15 @@ function LeagueChangeModal(props) {
   };
 
   const onSubmit = async (data) => {
-    const newLeagueId = data.leagueId;
+    const leagueIdInput = data.leagueId;
+
+    const re = leagueIdInput.match(/\d+$/);
+    if (!re) {
+      setResponseMsg('Invalid league id');
+      return;
+    }
+
+    const newLeagueId = re[0];
 
     if (newLeagueId === '00000001') {
       props.setShow(false);
@@ -68,14 +76,15 @@ function LeagueChangeModal(props) {
         props.setLeagueKey([activeLeagueId, activeLeagueYear]);
         break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
-        setResponseMsg(
-          'League is private, enter in correct cookie information.'
-        );
+        setResponseMsg('League is private, enter in cookie information.');
         break;
       case 'GENERAL_NOT_FOUND':
         setResponseMsg('League id not found or deleted.');
         break;
       case 'invalid_grant':
+        setResponseMsg('Error auth, redo authorization and auth code');
+        break;
+      case 'INVALID_AUTHORIZATION_CODE':
         setResponseMsg('Error auth, redo authorization and auth code');
         break;
       case 'AMBIGUOUS':
@@ -86,7 +95,8 @@ function LeagueChangeModal(props) {
     }
   };
 
-  const description = `View or process league info, allow one minute.
+  const description = `View or process league info, allow a minute or more
+    for large historic leagues.
     Private ESPN leagues will require cookie information. 
     Yahoo leagues will require authorization. Cookie/Auth only 
     needs to be provided once unless errors present.`;

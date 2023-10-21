@@ -94,14 +94,16 @@ def process_all_yahoo_leagues(event, context):
 
     cursor.execute(
         """
-        SELECT l2.linkedid, l1.yahoorefreshtoken
+        SELECT DISTINCT
+            coalesce(l2.linkedid, l1.leagueid), 
+            l1.yahoorefreshtoken
         FROM leagueids l1
         LEFT JOIN linkedids l2
             ON l1.leagueid=l2.mainid
         WHERE active
             AND platform = 'yahoo'
             AND (NOW() - LastViewed < INTERVAL '7 day')
-            AND l2.linkedid LIKE (SELECT MAX(SUBSTRING(linkedid, 1, 3)) FROM linkedids) || '%' 
+            AND coalesce(l2.linkedid, l1.leagueid) LIKE (SELECT MAX(SUBSTRING(linkedid, 1, 3)) FROM linkedids) || '%'
         """
     )
     res_query = cursor.fetchall()
