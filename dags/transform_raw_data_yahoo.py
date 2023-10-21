@@ -178,7 +178,7 @@ def transform_draft_to_df(data: dict):
         if pick and pick.get('player_key'):
             row['pickNumber'] = pick['pick']
             row['round'] = pick['round']
-            row['teamId'] = int(pick['team_key'][-1])
+            row['teamId'] = int(pick['team_key'].split('.')[-1])
             row['playerId'] = pick['player_key'].split('.')[-1]
 
             data_array.append(row)

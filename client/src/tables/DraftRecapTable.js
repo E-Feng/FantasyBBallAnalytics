@@ -82,7 +82,7 @@ function DraftRecapTable(props) {
     ],
     []
   );
-  console.log(data);
+
   const tableInstance = useTable({ columns, data });
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
