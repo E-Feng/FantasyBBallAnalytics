@@ -51,19 +51,12 @@ function MessageBoard() {
       type: 'chat',
     };
 
-    // Updating messageData
-    messageData[date] = messageData[date] ? messageData[date] : [];
-
-    messageData[date][time] = payload;
-
-    reset({ name: name, msg: '' });
-
     // Sending request to server
-    const pre =
-      process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : '';
+    const url =
+      'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/chat';
 
-    fetch(pre + '/api/chat/', {
-      method: 'put',
+    fetch(url, {
+      method: 'post',
       headers: {
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
@@ -71,6 +64,15 @@ function MessageBoard() {
       body: JSON.stringify(payload),
     }).then((res) => {
       console.log('Post status ', res.status);
+
+      if (res.status == 200) {
+        // Updating messageData
+        messageData[date] = messageData[date] ? messageData[date] : [];
+
+        messageData[date][time] = payload;
+
+        reset({ name: name, msg: '' });
+      }
 
       return res.status;
     });
@@ -85,7 +87,11 @@ function MessageBoard() {
         const shootingStats = `(${msg.fgMade}/${msg.fgAtt},
                                   ${msg.threes}/${msg.threesAtt},   
                                   ${msg.ftMade}/${msg.ftAtt})`;
-        content = `[${msg.gs.toFixed(1)}] ${msg.fullName} with ${mainStats} on ${shootingStats} shooting in ${msg.mins} minutes`;
+        content = `[${msg.gs.toFixed(1)}] ${
+          msg.fullName
+        } with ${mainStats} on ${shootingStats} shooting in ${
+          msg.mins
+        } minutes`;
         break;
       case 'date':
         // Formatting new date break lines
@@ -113,7 +119,7 @@ function MessageBoard() {
         content = msg.msg;
     }
     return (
-      <li key={msg.time + "-" + msg.gs}>
+      <li key={msg.time + '-' + msg.gs}>
         <b>{msg.user}: </b>
         {content}
       </li>
