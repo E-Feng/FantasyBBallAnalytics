@@ -49,7 +49,7 @@ def transform_team_to_df(team_info: dict):
 
     row['teamId'] = team['id']
     row['location'] = team.get('location', 'Team')
-    row['teamName'] = team.get('nickname', team['id'])
+    row['teamName'] = team.get('nickname', str(team['id']))
     row['abbrev'] = team['abbrev']
     row['seed'] = team['playoffSeed']
     row['wins'] = team['record']['overall']['wins']
