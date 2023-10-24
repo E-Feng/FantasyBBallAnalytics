@@ -74,7 +74,7 @@ def process_espn_league(event, context):
   process_keys = [[league_id, current_year]] if process_only_current else all_league_keys
 
   for league_key in process_keys:
-    print(f"Starting data extraction for {league_key}...")
+    print(f"Starting process for {league_key} | {cookie_espn}")
     league_year = league_key[1]
 
     league_info['leagueYear'] = league_year
