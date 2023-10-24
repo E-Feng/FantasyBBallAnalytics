@@ -77,7 +77,7 @@ function TotalsTable(props) {
 
     return teamHeaders.concat(catHeaders);
     // eslint-disable-next-line
-  }, []);
+  }, [props]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
