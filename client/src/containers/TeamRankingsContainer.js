@@ -16,15 +16,16 @@ function TeamRankingsContainer(props) {
   const ratingsKey = `statRatings${period}`;
 
   const data = teams.map((team) => {
-    console.log(team)
     const injuredIds = team.roster.flatMap((r) => {
       if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
         return r.playerId;
       }
       return [];
     });
+
+    const teamPlayerIds = team.roster.map(r => r.playerId)
     const teamPlayers = players.filter(
-      (p) => p.onTeamId === team.teamId && !injuredIds.includes(p.playerId)
+      (p) => teamPlayerIds.includes(p.playerId) && !injuredIds.includes(p.playerId)
     );
 
     const teamCats = {};

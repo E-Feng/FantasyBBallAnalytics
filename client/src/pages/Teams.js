@@ -7,6 +7,7 @@ import LeagueContext from '../components/LeagueContext';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 import TeamRankingsContainer from '../containers/TeamRankingsContainer';
+import RosterContainer from '../containers/RosterContainer';
 
 function Teams(props) {
   const { leagueState } = useContext(LeagueContext);
@@ -43,7 +44,12 @@ function Teams(props) {
             players={playerData}
             teams={teamData}
             settings={settingsData}
-          ></TeamRankingsContainer>
+          />
+          <RosterContainer 
+            players={playerData}
+            teams={teamData}
+            settings={settingsData}
+          />
         </Container>
       )}
     </Layout>
