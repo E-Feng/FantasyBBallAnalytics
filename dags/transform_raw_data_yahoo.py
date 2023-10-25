@@ -141,10 +141,10 @@ def transform_scoreboard_to_df(data: dict):
 
             row['fgMade'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
             row['fgAtt'] = int(stats_dict.get(consts.FG_ATT_Y) or 0)
-            row['fgPer'] = float(stats_dict.get(consts.FG_PER_Y) or 0)
+            row['fgPer'] = stats_dict.get(consts.FG_PER_Y) or 0
             row['ftMade'] = int(stats_dict.get(consts.FT_MADE_Y) or 0)
             row['ftAtt'] = int(stats_dict.get(consts.FT_ATT_Y) or 0)
-            row['ftPer'] = float(stats_dict.get(consts.FT_PER_Y) or 0)
+            row['ftPer'] = stats_dict.get(consts.FT_PER_Y) or 0
             row['threes'] = int(stats_dict.get(consts.THREES_Y) or 0)
             row['orebs'] = int(stats_dict.get(consts.OREBS_Y) or 0)
             row['drebs'] = int(stats_dict.get(consts.DREBS_Y) or 0)
@@ -160,6 +160,9 @@ def transform_scoreboard_to_df(data: dict):
             row['techs'] = int(stats_dict.get(consts.TECHS_Y) or 0)
             row['pts'] = int(stats_dict.get(consts.PTS_Y) or 0)
             # row['fpts'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+
+            row['fgPer'] = float(row['fgPer']) if row['fgPer'] != "-" else 0
+            row['ftPer'] = float(row['ftPer']) if row['ftPer'] != "-" else 0
 
             # Clean null values
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
