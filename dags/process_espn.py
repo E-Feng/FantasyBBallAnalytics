@@ -22,7 +22,8 @@ from util import (
   get_default_league_info
 )
 from load_settings import (
-  get_scoring_period_id
+  get_scoring_period_id,
+  get_last_posted_scoring_period
 )
 from upload_to_cloud import (
   upload_to_firebase
@@ -129,6 +130,10 @@ def process_espn_league(event, context):
 
 def process_espn_common():
   scoring_period = get_scoring_period_id(default_league_info)
+  last_scoring_period = get_last_posted_scoring_period(current_year)
+
+  if int(scoring_period) <= int(last_scoring_period):
+    return
 
   common_api_endpoints = {
   'players': ['kona_player_info'],
@@ -172,12 +177,24 @@ def process_espn_common():
 
     # Upload daily data to firebase
     elif k == 'daily':
+      minimum_display = 4
+      minutes_cutoff = 20
+      studs_gs_cutoff = 30
+      scrubs_gs_cutoff = 0
 
       df = transform_raw_to_df(k, v)
-      game_minutes_minimum = 20
 
-      top_studs_list  = df[df['mins'] > game_minutes_minimum].head().to_dict(orient = 'records')
-      top_scrubs_list = df[df['mins'] > game_minutes_minimum].tail().to_dict(orient = 'records')
+      top_studs = df[(df['mins'] > minutes_cutoff) & (df['gs'] >= studs_gs_cutoff)]
+      top_scrubs = df[(df['mins'] > minutes_cutoff) & (df['gs'] <= scrubs_gs_cutoff)]
+
+      if top_studs.shape[0] < minimum_display:
+        top_studs = df[df['mins'] > minutes_cutoff].head(minimum_display)
+
+      if top_scrubs.shape[0] < minimum_display:
+        top_scrubs = df[df['mins'] > minutes_cutoff].tail(minimum_display)
+
+      top_studs_list  = top_studs.to_dict(orient = 'records')
+      top_scrubs_list = top_scrubs.to_dict(orient = 'records')
       ejections       = df[df['ejs'] > 0].to_dict(orient = 'records')
       
       player_daily_alerts = {}
@@ -201,7 +218,8 @@ def process_espn_common():
           
           alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
 
-      upload_to_firebase('alert', alert_data)     
+      upload_to_firebase('alert', alert_data)   
+      upload_to_firebase('scoring_period', scoring_period)    
 
   return {
     'statusCode': 200,
@@ -209,12 +227,11 @@ def process_espn_common():
   }
 
 
-
 def update_espn_leagues(event, context):
   print(event)
   lambda_client = boto3.client('lambda', region_name='us-east-1')
 
-  # process_espn_common()
+  process_espn_common()
 
   db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
 

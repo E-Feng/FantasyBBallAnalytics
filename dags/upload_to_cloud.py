@@ -29,6 +29,8 @@ def upload_to_firebase(type: str, payload: dict):
 
   if type == 'alert':
     url = FIREBASE_URL + 'messageboard.json'
+  elif type == "scoring_period":
+    url = FIREBASE_URL + 'scoring_period.json'
 
   r = authed_session.patch(url, data=json.dumps(payload))
 
