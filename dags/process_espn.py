@@ -22,7 +22,8 @@ from util import (
   get_default_league_info
 )
 from load_settings import (
-  get_scoring_period_id
+  get_scoring_period_id,
+  get_last_posted_scoring_period
 )
 from upload_to_cloud import (
   upload_to_firebase
@@ -129,6 +130,10 @@ def process_espn_league(event, context):
 
 def process_espn_common():
   scoring_period = get_scoring_period_id(default_league_info)
+  last_scoring_period = get_last_posted_scoring_period(current_year)
+
+  if int(scoring_period) <= int(last_scoring_period):
+    return
 
   common_api_endpoints = {
   'players': ['kona_player_info'],
@@ -201,20 +206,22 @@ def process_espn_common():
           
           alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
 
-      upload_to_firebase('alert', alert_data)     
+      print(alert_data)
+      print(scoring_period)
+      # upload_to_firebase('alert', alert_data)   
+      # upload_to_firebase('scoring_period', scoring_period)    
 
   return {
     'statusCode': 200,
     'body': "Test response"
   }
-
-
+process_espn_common()
 
 def update_espn_leagues(event, context):
   print(event)
   lambda_client = boto3.client('lambda', region_name='us-east-1')
 
-  # process_espn_common()
+  process_espn_common()
 
   db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
 
