@@ -8,7 +8,7 @@ from util import get_current_espn_league_year
 
 
 LEAGUE_YEAR = get_current_espn_league_year()
-FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{LEAGUE_YEAR}/common/'
+FIREBASE_URL = f'https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{LEAGUE_YEAR}/common'
 
 
 def upload_to_firebase(type: str, payload: dict):
@@ -28,9 +28,9 @@ def upload_to_firebase(type: str, payload: dict):
   authed_session = AuthorizedSession(credentials)
 
   if type == 'alert':
-    url = FIREBASE_URL + 'messageboard.json'
+    url = FIREBASE_URL + '/messageboard.json'
   elif type == "scoring_period":
-    url = FIREBASE_URL + 'scoring_period.json'
+    url = FIREBASE_URL + '.json'
 
   r = authed_session.patch(url, data=json.dumps(payload))
 
