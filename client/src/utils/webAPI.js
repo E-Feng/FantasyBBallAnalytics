@@ -91,9 +91,7 @@ const anonymizeTeams = (data) => {
   
   data.teams.forEach((team, i) => {
     team.abbrev = anonTeams[i][0];
-    team.location = 'Team';
-    team.teamName = anonTeams[i][1];
-    team.fullTeamName = `${team.location} ${team.teamName}`;
+    team.fullTeamName = `Team ${anonTeams[i][1]}`;
     team.firstName = anonTeams[i][2];
     team.lastName = anonTeams[i][2];
   })

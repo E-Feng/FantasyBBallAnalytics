@@ -48,14 +48,11 @@ def transform_team_to_df(team_info: dict):
     row = {}
 
     row['teamId'] = team['id']
-    row['location'] = team.get('location', 'Team')
-    row['teamName'] = team.get('nickname', str(team['id']))
+    row['fullTeamName'] = team["name"]
     row['abbrev'] = team['abbrev']
     row['seed'] = team['playoffSeed']
     row['wins'] = team['record']['overall']['wins']
     row['losses'] = team['record']['overall']['losses']
-
-    row['fullTeamName'] = row['location'] + ' ' + row['teamName']
 
     # Getting first and last name from teams key
     row['firstName'] = 'Unknown'
