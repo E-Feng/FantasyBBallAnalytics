@@ -177,12 +177,24 @@ def process_espn_common():
 
     # Upload daily data to firebase
     elif k == 'daily':
+      minimum_display = 4
+      minutes_cutoff = 20
+      studs_gs_cutoff = 30
+      scrubs_gs_cutoff = 0
 
       df = transform_raw_to_df(k, v)
-      game_minutes_minimum = 20
 
-      top_studs_list  = df[df['mins'] > game_minutes_minimum].head().to_dict(orient = 'records')
-      top_scrubs_list = df[df['mins'] > game_minutes_minimum].tail().to_dict(orient = 'records')
+      top_studs = df[(df['mins'] > minutes_cutoff) & (df['gs'] >= studs_gs_cutoff)]
+      top_scrubs = df[(df['mins'] > minutes_cutoff) & (df['gs'] <= scrubs_gs_cutoff)]
+
+      if top_studs.shape[0] < minimum_display:
+        top_studs = df[df['mins'] > minutes_cutoff].head(minimum_display)
+
+      if top_scrubs.shape[0] < minimum_display:
+        top_scrubs = df[df['mins'] > minutes_cutoff].tail(minimum_display)
+
+      top_studs_list  = top_studs.to_dict(orient = 'records')
+      top_scrubs_list = top_scrubs.to_dict(orient = 'records')
       ejections       = df[df['ejs'] > 0].to_dict(orient = 'records')
       
       player_daily_alerts = {}
@@ -206,16 +218,14 @@ def process_espn_common():
           
           alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
 
-      print(alert_data)
-      print(scoring_period)
-      # upload_to_firebase('alert', alert_data)   
-      # upload_to_firebase('scoring_period', scoring_period)    
+      upload_to_firebase('alert', alert_data)   
+      upload_to_firebase('scoring_period', scoring_period)    
 
   return {
     'statusCode': 200,
     'body': "Test response"
   }
-process_espn_common()
+
 
 def update_espn_leagues(event, context):
   print(event)
