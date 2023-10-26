@@ -179,7 +179,7 @@ def process_espn_common():
     elif k == 'daily':
       minimum_display = 4
       minutes_cutoff = 20
-      studs_gs_cutoff = 30
+      studs_gs_cutoff = 27.5
       scrubs_gs_cutoff = 0
 
       df = transform_raw_to_df(k, v)

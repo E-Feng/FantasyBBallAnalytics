@@ -116,7 +116,9 @@ def transform_settings_to_df(data: dict):
 def transform_scoreboard_to_df(data: dict):
     data_array = []
 
-    for match in data["fantasy_content"]["league"]["scoreboard"]["matchups"]:
+    data = data["fantasy_content"]["league"]
+
+    for match in data.get("scoreboard", {}).get("matchups"):
         week = int(match["matchup"]["week"])
 
         team_id_1 = int(match["matchup"]["teams"][0]["team"]["team_id"])
