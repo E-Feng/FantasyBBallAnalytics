@@ -214,12 +214,12 @@ def transform_players_to_df(ratings: dict):
     row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
     row['proTeamId'] = player['player']['proTeamId']
 
-    row['percentOwned'] = player['player'].get('ownership', {}).get('percentOwned', 0.0)
+    row['percentOwned'] = round(player['player'].get('ownership', {}).get('percentOwned', 0.0), 2)
 
     for period, key in period_mapping.items():
       # Check if ratings exist for player
       if player['ratings'].get(key, {}).get('statRankings', {}):
-        row['totalRating' + period] = player['ratings'][key]['totalRating']
+        row['totalRating' + period] = round(player['ratings'][key]['totalRating'], 2)
         row['totalRanking' + period] = player['ratings'][key]['totalRanking']
 
         row['statRatings' + period] = format_stat_ratings(player['ratings'][key]['statRankings'])
