@@ -24,4 +24,15 @@ def get_scoring_period_id(default_league_info):
   else:
     print("Failed fetching data from ESPN")
     print(r.text)
-    raise ValueError("Error obtaining data from ESPN API")    
+    raise ValueError("Error obtaining data from ESPN API")
+  
+
+def get_last_posted_scoring_period(year):
+  url = f"https://fantasy-cc6ec-default-rtdb.firebaseio.com/v1/{year}/common/scoring_period.json"
+
+  r = requests.get(url)
+
+  if r.status_code == 200:
+    data = r.json()
+
+    return data

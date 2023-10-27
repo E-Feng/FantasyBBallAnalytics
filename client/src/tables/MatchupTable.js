@@ -43,7 +43,7 @@ function MatchupTable(props) {
 
     return teamHeaders.concat(catHeaders);
     // eslint-disable-next-line
-  }, []);
+  }, [props]);
 
   const tableInstance = useTable({ columns, data });
 

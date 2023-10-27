@@ -39,12 +39,10 @@ def transform_team_to_df(data: dict):
         team = team["team"]
 
         row['teamId'] = int(team['team_id'])
-        row['teamName'] = team['name']
+        row['fullTeamName'] = team['name']
         row['seed'] = team['team_standings']["rank"]
         row['wins'] = team['team_standings']["outcome_totals"]['wins']
         row['losses'] = team['team_standings']["outcome_totals"]['losses']
-
-        row['fullTeamName'] = team['name']
 
         # Getting first and last name from teams key
         row['firstName'] = team["managers"][0]["manager"]["nickname"]
@@ -105,7 +103,9 @@ def transform_settings_to_df(data: dict):
 
         stat_id = str(stat["stat_id"])
         stat_id_espn = int(consts.STAT_IDS_MAP_TO_ESPN.get(stat_id, -1))
-        row["categoryIds"].append(stat_id_espn)
+
+        if stat_id_espn >= 0:
+            row["categoryIds"].append(stat_id_espn)
 
     data_array.append(row)
 
@@ -116,7 +116,9 @@ def transform_settings_to_df(data: dict):
 def transform_scoreboard_to_df(data: dict):
     data_array = []
 
-    for match in data["fantasy_content"]["league"]["scoreboard"]["matchups"]:
+    data = data["fantasy_content"]["league"]
+
+    for match in data.get("scoreboard", {}).get("matchups"):
         week = int(match["matchup"]["week"])
 
         team_id_1 = int(match["matchup"]["teams"][0]["team"]["team_id"])
@@ -139,10 +141,10 @@ def transform_scoreboard_to_df(data: dict):
 
             row['fgMade'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
             row['fgAtt'] = int(stats_dict.get(consts.FG_ATT_Y) or 0)
-            row['fgPer'] = float(stats_dict.get(consts.FG_PER_Y) or 0)
+            row['fgPer'] = stats_dict.get(consts.FG_PER_Y) or 0
             row['ftMade'] = int(stats_dict.get(consts.FT_MADE_Y) or 0)
             row['ftAtt'] = int(stats_dict.get(consts.FT_ATT_Y) or 0)
-            row['ftPer'] = float(stats_dict.get(consts.FT_PER_Y) or 0)
+            row['ftPer'] = stats_dict.get(consts.FT_PER_Y) or 0
             row['threes'] = int(stats_dict.get(consts.THREES_Y) or 0)
             row['orebs'] = int(stats_dict.get(consts.OREBS_Y) or 0)
             row['drebs'] = int(stats_dict.get(consts.DREBS_Y) or 0)
@@ -158,6 +160,9 @@ def transform_scoreboard_to_df(data: dict):
             row['techs'] = int(stats_dict.get(consts.TECHS_Y) or 0)
             row['pts'] = int(stats_dict.get(consts.PTS_Y) or 0)
             # row['fpts'] = int(stats_dict.get(consts.FG_MADE_Y) or 0)
+
+            row['fgPer'] = float(row['fgPer']) if row['fgPer'] != "-" else 0
+            row['ftPer'] = float(row['ftPer']) if row['ftPer'] != "-" else 0
 
             # Clean null values
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
@@ -178,7 +183,7 @@ def transform_draft_to_df(data: dict):
         if pick and pick.get('player_key'):
             row['pickNumber'] = pick['pick']
             row['round'] = pick['round']
-            row['teamId'] = int(pick['team_key'][-1])
+            row['teamId'] = int(pick['team_key'].split('.')[-1])
             row['playerId'] = pick['player_key'].split('.')[-1]
 
             data_array.append(row)

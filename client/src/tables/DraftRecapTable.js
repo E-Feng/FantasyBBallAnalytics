@@ -82,7 +82,7 @@ function DraftRecapTable(props) {
     ],
     []
   );
-  console.log(data);
+
   const tableInstance = useTable({ columns, data });
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -152,7 +152,7 @@ function DraftRecapTable(props) {
                       const val = cell.value;
                       let color = 'gainsboro';
 
-                      if (val !== null) {
+                      if (val !== null && val !== undefined) {
                         if (headerId === 'difference') {
                           color = getHSLColor(
                             val,

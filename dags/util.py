@@ -52,6 +52,8 @@ def calculate_gamescore(player):
               0.4*(player['ftAtt'] - player['ftMade']) + 0.5*player['rebs'] + \
               player['stls'] + 0.7*player['asts'] + 0.7*player['blks'] - \
               player['tos']
+    
+    score = round(score, 1)
     return score
   except:
     return None

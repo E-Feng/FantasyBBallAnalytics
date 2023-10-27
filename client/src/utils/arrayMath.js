@@ -35,7 +35,7 @@ export const getPercentageRange = (data, percent) => {
   const sortedData = filterNaN(data).sort((a, b) => a - b);
 
   const minIndex = Math.floor(sortedData.length * percent);
-  const maxIndex = Math.ceil(sortedData.length * (1 - percent));
+  const maxIndex = Math.ceil(sortedData.length * (1 - percent)) - 1;
 
   return [sortedData[minIndex], sortedData[maxIndex]];
 };
