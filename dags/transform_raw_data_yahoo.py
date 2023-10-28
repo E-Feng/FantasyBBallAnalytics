@@ -93,7 +93,7 @@ def transform_settings_to_df(data: dict):
     row = {}
 
     row["isActive"] = True
-    row['currentWeek'] = data["current_week"]
+    row['currentWeek'] = data.get("current_week", 1)
     row["scoringType"] = data["scoring_type"]
 
     row["categoryIds"] = []
