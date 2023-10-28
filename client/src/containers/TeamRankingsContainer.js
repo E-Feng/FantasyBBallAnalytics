@@ -50,8 +50,6 @@ function TeamRankingsContainer(props) {
     };
   });
 
-  console.log(data)
-
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
   };
