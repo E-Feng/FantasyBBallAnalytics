@@ -24,9 +24,9 @@ function DraftRecapTable(props) {
       break;
     case 'ranking':
       data.sort((a, b) => {
-        // Handle null and non-integer rankings
-        if (a.ranking === null || !Number.isInteger(a.ranking)) return 1;
-        if (b.ranking === null || !Number.isInteger(b.ranking)) return -1;
+        // Handle non-integer rankings
+        if (!Number.isInteger(a.ranking)) return 1;
+        if (!Number.isInteger(b.ranking)) return -1;
         return a.ranking - b.ranking;
       });
       break;
