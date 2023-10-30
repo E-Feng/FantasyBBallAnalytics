@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+import TooltipHeader from '../components/TooltipHeader';
 import { categoryDetails } from '../utils/categoryUtils';
 import TeamRankingsTable from '../tables/TeamRankingsTable';
 import { LINEUP_SLOT_IDS } from '../utils/consts';
@@ -15,6 +16,8 @@ function TeamRankingsContainer(props) {
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const ratingsKey = `statRatings${period}`;
 
+  const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
+
   const data = teams.map((team) => {
     const injuredIds = team.roster.flatMap((r) => {
       if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
@@ -23,17 +26,19 @@ function TeamRankingsContainer(props) {
       return [];
     });
 
-    const teamPlayerIds = team.roster.map(r => r.playerId)
+    const teamPlayerIds = team.roster.map((r) => r.playerId);
     const teamPlayers = players.filter(
-      (p) => teamPlayerIds.includes(p.playerId) && !injuredIds.includes(p.playerId)
+      (p) =>
+        teamPlayerIds.includes(p.playerId) && !injuredIds.includes(p.playerId)
     );
-
+      console.log(teamPlayers)
     const teamCats = {};
-    catIds.forEach((id) => {
-      const catName = categoryDetails.filter((cat) => cat.espnId === id)[0]
-        .name;
+    catsList.forEach((cat) => {
+      const catId = cat.espnId;
+      const catName = cat.name;
+
       const totalRating = teamPlayers.reduce((a, b) => {
-        const idRating = b?.[ratingsKey]?.[id] || 0;
+        const idRating = b?.[ratingsKey]?.[catId] || 0;
 
         return a + idRating;
       }, 0);
@@ -54,8 +59,14 @@ function TeamRankingsContainer(props) {
     setPeriod(e.target.value);
   };
 
+  const teamRankingsInfo = `This table shows the average ratings of
+  each team for each category and totals for each. Ratings are available
+  for different time ranges with 'Last 15' as default. Players in IR 
+  slots are excluded from the ratings.`;
+
   return (
     <Container>
+      <TooltipHeader title='Team Power Rankings' info={teamRankingsInfo} />
       <DropDown value={period} onChange={handlePeriodChange}>
         {periodArray.map((o) => {
           return (
@@ -65,7 +76,7 @@ function TeamRankingsContainer(props) {
           );
         })}
       </DropDown>
-      <TeamRankingsTable data={data} />
+      <TeamRankingsTable data={data} cats={catsList} />
     </Container>
   );
 }
@@ -73,10 +84,11 @@ function TeamRankingsContainer(props) {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 0.5rem 0;
 `;
 
 const DropDown = styled.select`
-  margin: 0.5rem auto;
+  margin: 0.25rem auto;
 `;
 
 export default TeamRankingsContainer;

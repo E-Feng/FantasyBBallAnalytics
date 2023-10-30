@@ -7,21 +7,19 @@ import { getHSLColor } from '../utils/colorsUtil';
 
 function TeamRankingsTable(props) {
   const data = props.data;
+  const cats = props.cats;
+
   data.sort((a, b) => b.all - a.all);
 
-  // Getting cats for the league
-  const catArray = categoryDetails.filter((cat) => {
-    return Object.keys(data[0]).includes(cat.name);
-  });
-  const catNamesArray = catArray.map((cat) => cat.name);
-
+  const catNamesArray = cats.map(cat => cat.name);
+  
   // Calculating ranges for color
-  const catColorRange = {}
-  catNamesArray.forEach(catName => {
-    const dataset = data.map(row => row[catName])
+  const catColorRange = {};
+  catNamesArray.forEach((catName) => {
+    const dataset = data.map((row) => row[catName]);
 
-    catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)]
-  })
+    catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)];
+  });
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
@@ -33,9 +31,7 @@ function TeamRankingsTable(props) {
         Header: 'Team',
         accessor: 'fullTeamName',
 
-        Cell: (props) => (
-          <React.Fragment>{props.value.substring(0, 20)}</React.Fragment>
-        ),
+        Cell: (props) => <p>{props.value.substring(0, 20)}</p>,
       },
       {
         Header: 'Name',
@@ -54,13 +50,18 @@ function TeamRankingsTable(props) {
         accessor: 'losses',
       },
     ];
-    const catHeaders = catArray.map((cat) => {
+    const catHeaders = cats.map((cat) => {
       return {
         Header: cat.display,
         accessor: cat.name,
         sortType: 'basic',
 
-        Cell: (props) => props.value.toFixed(2),
+        Cell: (props) => {
+          const val = props.value;
+          const range = catColorRange[props.column.id];
+          const color = getHSLColor(val, range[0], range[1]);
+          return <p style={{ background: color }}>{val.toFixed(2)}</p>;
+        },
       };
     });
 
@@ -121,27 +122,8 @@ function TeamRankingsTable(props) {
                   {
                     // Loop over the rows cells
                     row.cells.map((cell) => {
-                      // Conditional background color rendering
-                      const val = cell.value;
-                      const catName = cell.column.id;
-
-                      const range = catColorRange[catName];
-
-                      let color = 'gainsboro';
-
-                      if (catNamesArray.includes(catName)) {
-                        color = getHSLColor(val, range[0], range[1]);
-                      }
-
                       return (
-                        <td
-                          {...cell.getCellProps()}
-                          style={{
-                            background: color,
-                          }}
-                        >
-                          {cell.render('Cell')}
-                        </td>
+                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       );
                     })
                   }
@@ -171,13 +153,20 @@ const Table = styled.table`
   white-space: nowrap;
   color: black;
 
+  background: gainsboro;
+
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid white;
 
   th {
+    padding: 0.25rem;
     background: silver;
     color: black;
+  }
+
+  td {
+    padding: 0;
   }
 
   tr {
@@ -190,13 +179,15 @@ const Table = styled.table`
 
   th,
   td {
-    margin: 0;
-    padding: 0.25rem;
     border-bottom: 1px solid white;
     border-right: 1px solid white;
 
     :last-child {
       border-right: 0;
+    }
+
+    p {
+      padding: 0.25rem 0.3rem;
     }
   }
 `;

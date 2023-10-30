@@ -25,21 +25,12 @@ function Teams(props) {
   const playerData = isLoading ? null : data.players;
   const settingsData = isLoading ? null : data.settings;
 
-  const teamRankingsInfo = `This table shows the average ratings of
-    each team for each category and totals for each. Ratings are available
-    for different time ranges with 'Last 15' as default. Players in IR 
-    slots are excluded from the ratings.`;
-
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
       ) : (
         <Container maxWidth={props.maxWidth}>
-          <TooltipHeader
-            title='Team Power Rankings'
-            info={teamRankingsInfo}
-          />
           <TeamRankingsContainer
             players={playerData}
             teams={teamData}

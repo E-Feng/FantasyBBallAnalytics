@@ -7,7 +7,7 @@ import { getHSLColor } from '../utils/colorsUtil';
 
 function RosterTable(props) {
   const data = props.data;  
-  data.sort((a, b) => a.seed - b.seed);
+  // data.sort((a, b) => a.seed - b.seed);
 
   // Getting cats for the league
   const cats = categoryDetails.filter((cat) => {
@@ -48,10 +48,7 @@ function RosterTable(props) {
     const catHeaders = cats.map((cat) => {
       return {
         Header: cat.display,
-        accessor: cat.name,
-        sortType: sortPercent,
-
-        Cell: showPercent,
+        accessor: cat.name
       };
     });
 
