@@ -9,29 +9,20 @@ function RosterContainer(props) {
   const [period, setPeriod] = useState('Last15');
   const [displayList, setDisplayList] = useState([1]);
 
-  const players = props.players;
-  const teams = props.teams;
-  const catIds = props.settings[0].categoryIds;
+  const players = props.leagueData.players;
+  const teams = props.leagueData.teams;
+  const rosters = props.leagueData.rosters;
+  const catIds = props.leagueData.settings[0].categoryIds;
 
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const ratingsKey = `statRatings${period}`;
 
   const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
   // catsList.push(categoryDetails.filter(cat => cat.name == 'mins')[0]);
+console.log(rosters)
+  const data = rosters.map(entry => {
+    const player = players.filter(player => player.playerId == entry.playerId);
 
-  const rosteredPlayerIds = [];
-
-  teams.forEach((team) => {
-    team.roster.forEach((player) => {
-      rosteredPlayerIds.push(player.playerId);
-    });
-  });
-
-  const rosteredPlayers = players.filter((player) =>
-    rosteredPlayerIds.includes(player.playerId)
-  );
-
-  const data = rosteredPlayers.map(player => {
     const catsData = {}
     catsList.forEach(cat => {
       catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId] || null;
@@ -39,7 +30,6 @@ function RosterContainer(props) {
     const all = Object.values(catsData).reduce((a, b) => a + b);
 
     return {
-      ...team,
       playerName: player.playerName,
       ...catsData,
       all: all

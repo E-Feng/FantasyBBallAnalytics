@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import Layout from '../components/Layout';
 import LeagueContext from '../components/LeagueContext';
-import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
 import TeamRankingsContainer from '../containers/TeamRankingsContainer';
 import RosterContainer from '../containers/RosterContainer';
@@ -37,9 +36,7 @@ function Teams(props) {
             settings={settingsData}
           />
           <RosterContainer 
-            players={playerData}
-            teams={teamData}
-            settings={settingsData}
+            leagueData={data}
           />
         </Container>
       )}
