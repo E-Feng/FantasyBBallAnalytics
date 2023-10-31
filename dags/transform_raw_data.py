@@ -64,6 +64,8 @@ def transform_team_to_df(team_info: dict):
         row['firstName'] = member.get('firstName', 'Unknown')
         row['lastName'] = member.get('lastName', 'Unknown')
   
+    data_array.append(row)
+
   df = pd.DataFrame.from_records(data_array)
 
   #print(df.head(2))
