@@ -34,7 +34,8 @@ default_league_info = get_default_league_info()
 
 league_api_endpoints = {
   'settings': ['mSettings'],
-  'teams': ['mTeam', 'mRoster'],
+  'teams': ['mTeam'],
+  'rosters': ['mRoster'],
   'scoreboard': ['mScoreboard'],
   'draft': ['mDraftDetail'],
   'players': ['kona_player_info', 'mStatRatings']

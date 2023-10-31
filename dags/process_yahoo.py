@@ -5,7 +5,6 @@ import pandas as pd
 from extract_yahoo import extract_from_yahoo_api
 from transform_raw_data_yahoo import transform_yahoo_raw_to_df
 from transform_data_yahoo import (
-  merge_roster_into_teams,
   adjust_player_ratings,
   truncate_and_map_player_ids
 )
@@ -23,7 +22,7 @@ week_params = ";week=" + ",".join(map(str, week_list))
 league_api_endpoints = {
     'settings': ["league", "settings"],
     'teams': ["league", "teams", "standings"],
-    'roster': ["league", "teams", "roster"],
+    'rosters': ["league", "teams", "roster"],
     'scoreboard': ["league", f"scoreboard{week_params}"],
     'draft': ["league", "draftresults"],
     'players': [],
@@ -54,11 +53,9 @@ def process_yahoo_league(event, context):
         league_data[endpoint] = transform_yahoo_raw_to_df(endpoint, data_endpoint)
 
     # Transforms
-    league_data["teams"] = merge_roster_into_teams(league_data)
     league_data["players"] = adjust_player_ratings(league_data)
     league_data["players"] = truncate_and_map_player_ids(league_data)
 
-    league_data.pop("roster", None)
     league_data.pop("players_id_map", None)
 
     # Data serialization and upload data to dynamo, cleaning nan values

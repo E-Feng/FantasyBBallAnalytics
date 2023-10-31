@@ -1,15 +1,6 @@
 import pandas as pd
 
 
-def merge_roster_into_teams(league_data: dict):
-  teams = league_data["teams"]
-  roster = league_data["roster"]
-
-  teams = teams.merge(roster, left_on="teamId", right_on="teamId")
-
-  return teams
-
-
 def adjust_player_ratings(league_data: dict):
   players = league_data["players"]
   settings = league_data["settings"]
@@ -48,7 +39,7 @@ def truncate_and_map_player_ids(league_data: dict):
   players = league_data["players"]
   players_id_map = league_data["players_id_map"]
   draft = league_data["draft"]
-  roster = league_data["roster"]
+  rosters = league_data["rosters"]
 
   if draft.empty or players.empty:
     return pd.DataFrame()
@@ -58,8 +49,7 @@ def truncate_and_map_player_ids(league_data: dict):
   players = players.merge(players_id_map, on="playerName", how="inner")
 
   # Truncate
-  roster_flatten = pd.json_normalize(roster.explode("roster")["roster"])
-  is_owned = players["playerId"].isin(roster_flatten["playerId"])
+  is_owned = players["playerId"].isin(rosters["playerId"])
   is_drafted = players["playerId"].isin(draft["playerId"])
 
   all_cond = is_owned | is_drafted

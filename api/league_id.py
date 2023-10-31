@@ -109,35 +109,34 @@ def get_league_id_status(event, context):
             if league_id in id[0]:
                 full_league_id = id[0]
         
-        try:
-            sql_file = "sql/update_yahoo_league_after_process.sql"
-            update_query = open(sql_file, "r").read()
-            update_params["league_id"] = full_league_id
-            update_params["yahoo_refresh_token"] = yahoo_refresh_token
+        sql_file = "sql/update_yahoo_league_after_process.sql"
+        update_query = open(sql_file, "r").read()
+        update_params["league_id"] = full_league_id
+        update_params["yahoo_refresh_token"] = yahoo_refresh_token
 
-            sql_file_linked = "sql/update_yahoo_linked_leagues.sql"
-            update_query_linked = open(sql_file_linked, "r").read()
-            update_data = []
+        sql_file_linked = "sql/update_yahoo_linked_leagues.sql"
+        update_query_linked = open(sql_file_linked, "r").read()
+        update_data = []
 
-            for league in all_leagues:
-                event["queryStringParameters"]["leagueId"] = league[0]
-                event["queryStringParameters"]["leagueYear"] = league[1]
-                event["queryStringParameters"]["allLeagueKeys"] = all_leagues
+        for league in all_leagues:
+            event["queryStringParameters"]["leagueId"] = league[0]
+            event["queryStringParameters"]["leagueYear"] = league[1]
+            event["queryStringParameters"]["allLeagueKeys"] = all_leagues
+
+            try:
                 res = invoke_lambda(lambda_client, "process_yahoo_league", event)
 
                 if not res:
                     print("ERROR: Process Yahoo lambda failed")
                     raise Exception
+                else:
+                    update_data.append((league[0], main_league_id))
+            except Exception as e:
+                print("Error processing Yahoo league:", e)
 
-                update_data.append((league[0], main_league_id))
-
-            cursor.execute(update_query, update_params)
-            psycopg2.extras.execute_values(cursor, update_query_linked, update_data)
-            conn.commit()
-
-        except Exception as e:
-            print("Error processing Yahoo league:", e)
-            return {"statusCode": 200, "body": json.dumps("ERROR")}
+        cursor.execute(update_query, update_params)
+        psycopg2.extras.execute_values(cursor, update_query_linked, update_data)
+        conn.commit()
         
         print("League processed, returning active")
         return {"statusCode": 200, "body": json.dumps(f"ACTIVE:{full_league_id}")}       

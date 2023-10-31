@@ -18,6 +18,8 @@ def transform_raw_to_df(endpoint: list, raw_data: dict):
   # Temperory replacement until match supported in Python 3.10
   if endpoint == 'teams':
     df = transform_team_to_df(raw_data)
+  elif endpoint == 'rosters':
+    df = transform_roster_to_df(raw_data)    
   elif endpoint == 'scoreboard':
     df = transform_scoreboard_to_df(raw_data)
   elif endpoint == 'draft':
@@ -61,23 +63,35 @@ def transform_team_to_df(team_info: dict):
       if member['id'] == team.get('primaryOwner'):
         row['firstName'] = member.get('firstName', 'Unknown')
         row['lastName'] = member.get('lastName', 'Unknown')
-
-    # Roster information
-    row['roster'] = []
-    for entry in team['roster']['entries']:
-      modified_entry = {}
-      modified_entry['playerId'] = str(entry['playerId'])
-      modified_entry['lineupSlotId'] = entry['lineupSlotId']
-      modified_entry['acquisitionType'] = entry['acquisitionType']
-      row['roster'].append(modified_entry)
-
-    #print(row)
-    data_array.append(row)
   
+    data_array.append(row)
+
   df = pd.DataFrame.from_records(data_array)
 
   #print(df.head(2))
   #print(df.tail(2))
+
+  return df
+
+
+def transform_roster_to_df(roster: dict):
+  data = roster
+
+  data_array = []
+
+  for team in data["teams"]:
+    for entry in team["roster"]["entries"]:
+      row = {}
+
+      row["teamId"] = team["id"]
+      
+      row["playerId"] = str(entry['playerId'])
+      row["lineupSlotId"] = entry['lineupSlotId']
+      row["acquisitionType"] = entry['acquisitionType']
+
+      data_array.append(row)
+
+  df = pd.DataFrame.from_records(data_array)
 
   return df
 
@@ -210,7 +224,7 @@ def transform_players_to_df(ratings: dict):
 
     row['playerId'] = str(player['id'])
     row['playerName'] = player['player']['fullName']
-    row['onTeamId'] = player['onTeamId']
+    # row['onTeamId'] = player['onTeamId']
     row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
     row['proTeamId'] = player['player']['proTeamId']
 
