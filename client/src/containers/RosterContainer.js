@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import TooltipHeader from '../components/TooltipHeader';
+import { categoryDetails } from '../utils/categoryUtils';
 import RosterTable from '../tables/RosterTable';
 
 function RosterContainer(props) {
@@ -15,8 +16,37 @@ function RosterContainer(props) {
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const ratingsKey = `statRatings${period}`;
 
-  const data = []
+  const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
+  // catsList.push(categoryDetails.filter(cat => cat.name == 'mins')[0]);
 
+  const rosteredPlayerIds = [];
+
+  teams.forEach((team) => {
+    team.roster.forEach((player) => {
+      rosteredPlayerIds.push(player.playerId);
+    });
+  });
+
+  const rosteredPlayers = players.filter((player) =>
+    rosteredPlayerIds.includes(player.playerId)
+  );
+
+  const data = rosteredPlayers.map(player => {
+    const catsData = {}
+    catsList.forEach(cat => {
+      catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId] || null;
+    })
+    const all = Object.values(catsData).reduce((a, b) => a + b);
+
+    return {
+      ...team,
+      playerName: player.playerName,
+      ...catsData,
+      all: all
+    }
+  })
+
+  console.log(data)
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
   };
@@ -37,18 +67,7 @@ function RosterContainer(props) {
       </DropDown>
       {/* <TablesList>
         {displayList.map((teamId) => {
-          return (
-            <RosterTable
-              key={displayRow.week + displayRow.teamId}
-              cats={cats}
-              home={displayRow}
-              away={joinedData.filter(
-                (row) =>
-                  row.week === displayRow.week &&
-                  row.teamId !== displayRow.teamId
-              )}
-            />
-          );
+          return <RosterTable key={teamId} data={data.filter()} />;
         })}
       </TablesList> */}
     </Container>

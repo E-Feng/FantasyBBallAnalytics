@@ -2,7 +2,6 @@ import React from 'react';
 import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
-import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
 function TeamRankingsTable(props) {
@@ -12,7 +11,7 @@ function TeamRankingsTable(props) {
   data.sort((a, b) => b.all - a.all);
 
   const catNamesArray = cats.map(cat => cat.name);
-  
+
   // Calculating ranges for color
   const catColorRange = {};
   catNamesArray.forEach((catName) => {

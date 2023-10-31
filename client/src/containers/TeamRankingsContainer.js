@@ -31,7 +31,7 @@ function TeamRankingsContainer(props) {
       (p) =>
         teamPlayerIds.includes(p.playerId) && !injuredIds.includes(p.playerId)
     );
-      console.log(teamPlayers)
+
     const teamCats = {};
     catsList.forEach((cat) => {
       const catId = cat.espnId;
@@ -54,6 +54,7 @@ function TeamRankingsContainer(props) {
       all: all,
     };
   });
+  catsList.push(categoryDetails.filter(cat => cat.name == 'all')[0]);
 
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
