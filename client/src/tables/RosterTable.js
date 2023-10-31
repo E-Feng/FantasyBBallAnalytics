@@ -7,7 +7,12 @@ import { getHSLColor } from '../utils/colorsUtil';
 
 function RosterTable(props) {
   const data = props.data;
-  // data.sort((a, b) => a.seed - b.seed);
+  data.sort((a, b) => {
+    if (a.all == null) return 1;
+    if (b.all == null) return -1;
+
+    return b.all - a.all;
+  });
 
   // Getting cats for the league
   const cats = categoryDetails.filter((cat) => {
@@ -36,7 +41,7 @@ function RosterTable(props) {
           const color = getHSLColor(val, range[0], range[1]);
           return (
             <p style={{ background: color, minWidth: '30px' }}>
-              {val.toFixed(2)}
+              {val ? val.toFixed(2) : ''}
             </p>
           );
         },
@@ -58,6 +63,7 @@ function RosterTable(props) {
 
   return (
     <Container>
+      <Title>{props.fullTeamName}</Title>
       <Table {...getTableProps()}>
         <thead>
           {
@@ -120,6 +126,12 @@ const Container = styled.div`
   flex-direction: column;
 
   overflow: auto;
+  margin-bottom: 0.75rem;
+`;
+
+const Title = styled.h3`
+  text-align: center;
+  font-weight: normal;
 `;
 
 const Table = styled.table`

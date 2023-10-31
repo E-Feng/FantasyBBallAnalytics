@@ -243,15 +243,16 @@ def transform_players_to_df(ratings: dict):
 
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
-        year = player["player"]["stats"][0]["seasonId"]
+        year = max([d["seasonId"] for d in player["player"]["stats"]])
 
-        stats_period = next((d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}'), {})
-        if stats_period.get('averageStats'):
-          row['stats' + period] = stats_period['averageStats']
+        stats_period = [d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}']
+        print(year, period, stats_period)
+        if stats_period and stats_period[0].get('averageStats'):
+          row['stats' + period] = stats_period[0]['averageStats']
 
           # Filtering category ids only
           if category_ids:
-            filtered_stats = {k:stats_period['averageStats'].get(k, 0) for k in category_ids}
+            filtered_stats = {k:stats_period[0]['averageStats'].get(k, 0) for k in category_ids}
             row['stats' + period] = format_stats(filtered_stats)
 
 

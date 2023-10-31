@@ -7,7 +7,7 @@ import RosterTable from '../tables/RosterTable';
 
 function RosterContainer(props) {
   const [period, setPeriod] = useState('Last15');
-  const [displayList, setDisplayList] = useState([1, 7]);
+  const [displayList, setDisplayList] = useState([1, 4]);
 
   const players = props.leagueData.players;
   const teams = props.leagueData.teams;
@@ -19,15 +19,18 @@ function RosterContainer(props) {
 
   const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
   // catsList.push(categoryDetails.filter(cat => cat.name == 'mins')[0]);
-  // console.log(rosters)
+  console.log(teams);
   const data = rosters.map((r) => {
+    // const team = teams.filter(team => team.teamId == r.teamId)[0];
     const player = players.filter((player) => player.playerId == r.playerId)[0];
 
     const catsData = {};
     catsList.forEach((cat) => {
       catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId] || null;
     });
-    const all = Object.values(catsData).reduce((a, b) => a + b);
+    const all = Object.values(catsData).includes(null)
+      ? null
+      : Object.values(catsData).reduce((a, b) => a + b);
 
     return {
       teamId: r.teamId,
@@ -37,7 +40,6 @@ function RosterContainer(props) {
     };
   });
 
-  console.log(data);
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
   };
@@ -61,6 +63,9 @@ function RosterContainer(props) {
           return (
             <RosterTable
               key={teamId}
+              fullTeamName={
+                teams.filter((t) => t.teamId == teamId)[0].fullTeamName
+              }
               data={data.filter((p) => p.teamId == teamId)}
             />
           );
@@ -87,7 +92,7 @@ const TablesList = styled.div`
   justify-content: space-evenly;
 
   max-width: 100%;
-  padding: 1rem 0;
+  padding: 0.25rem 0;
 `;
 
 export default RosterContainer;
