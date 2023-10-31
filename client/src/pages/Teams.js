@@ -20,10 +20,6 @@ function Teams(props) {
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const teamData = isLoading ? null : data.teams;
-  const playerData = isLoading ? null : data.players;
-  const settingsData = isLoading ? null : data.settings;
-
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
@@ -31,9 +27,7 @@ function Teams(props) {
       ) : (
         <Container maxWidth={props.maxWidth}>
           <TeamRankingsContainer
-            players={playerData}
-            teams={teamData}
-            settings={settingsData}
+            leagueData={data}
           />
           <RosterContainer 
             leagueData={data}

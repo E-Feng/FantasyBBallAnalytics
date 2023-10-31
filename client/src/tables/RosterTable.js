@@ -6,7 +6,7 @@ import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
 function RosterTable(props) {
-  const data = props.data;  
+  const data = props.data;
   // data.sort((a, b) => a.seed - b.seed);
 
   // Getting cats for the league
@@ -17,38 +17,29 @@ function RosterTable(props) {
   const columns = React.useMemo(() => {
     const teamHeaders = [
       {
-        Header: 'Rank',
-        accessor: 'seed',
-      },
-      {
-        Header: 'Team',
-        accessor: 'fullTeamName',
+        Header: 'Player',
+        accessor: 'playerName',
 
-        Cell: (props) => (
-          <React.Fragment>{props.value.substring(0, 20)}</React.Fragment>
-        ),
-      },
-      {
-        Header: 'Name',
-        accessor: 'firstName',
-
-        Cell: (props) => (
-          <React.Fragment> {props.value.substring(0, 8)} </React.Fragment>
-        ),
-      },
-      {
-        Header: 'W',
-        accessor: 'wins',
-      },
-      {
-        Header: 'L',
-        accessor: 'losses',
+        Cell: (props) => {
+          return <p style={{ width: '140px' }}>{props.value}</p>;
+        },
       },
     ];
     const catHeaders = cats.map((cat) => {
       return {
         Header: cat.display,
-        accessor: cat.name
+        accessor: cat.name,
+
+        Cell: (props) => {
+          const val = props.value;
+          const range = [-2, 4];
+          const color = getHSLColor(val, range[0], range[1]);
+          return (
+            <p style={{ background: color, minWidth: '30px' }}>
+              {val.toFixed(2)}
+            </p>
+          );
+        },
       };
     });
 
@@ -109,24 +100,8 @@ function RosterTable(props) {
                   {
                     // Loop over the rows cells
                     row.cells.map((cell) => {
-                      // Conditional background color rendering
-                      const val = cell.value;
-                      let color = 'gainsboro';
-
-                      if (Array.isArray(cell.value)) {
-                        const denom = val[0] + val[1];
-                        color = getHSLColor(val[0], 0, denom);
-                      }
-
                       return (
-                        <td
-                          {...cell.getCellProps()}
-                          style={{
-                            background: color,
-                          }}
-                        >
-                          {cell.render('Cell')}
-                        </td>
+                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       );
                     })
                   }
@@ -156,13 +131,20 @@ const Table = styled.table`
   white-space: nowrap;
   color: black;
 
+  background: gainsboro;
+
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid white;
 
   th {
+    padding: 0.25rem;
     background: silver;
     color: black;
+  }
+
+  td {
+    padding: 0;
   }
 
   tr {
@@ -175,13 +157,15 @@ const Table = styled.table`
 
   th,
   td {
-    margin: 0;
-    padding: 0.25rem;
     border-bottom: 1px solid white;
     border-right: 1px solid white;
 
     :last-child {
       border-right: 0;
+    }
+
+    p {
+      padding: 0.25rem 0.3rem;
     }
   }
 `;

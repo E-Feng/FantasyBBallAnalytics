@@ -7,7 +7,7 @@ import RosterTable from '../tables/RosterTable';
 
 function RosterContainer(props) {
   const [period, setPeriod] = useState('Last15');
-  const [displayList, setDisplayList] = useState([1]);
+  const [displayList, setDisplayList] = useState([1, 7]);
 
   const players = props.leagueData.players;
   const teams = props.leagueData.teams;
@@ -19,24 +19,25 @@ function RosterContainer(props) {
 
   const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
   // catsList.push(categoryDetails.filter(cat => cat.name == 'mins')[0]);
-console.log(rosters)
-  const data = rosters.map(entry => {
-    const player = players.filter(player => player.playerId == entry.playerId);
+  // console.log(rosters)
+  const data = rosters.map((r) => {
+    const player = players.filter((player) => player.playerId == r.playerId)[0];
 
-    const catsData = {}
-    catsList.forEach(cat => {
+    const catsData = {};
+    catsList.forEach((cat) => {
       catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId] || null;
-    })
+    });
     const all = Object.values(catsData).reduce((a, b) => a + b);
 
     return {
+      teamId: r.teamId,
       playerName: player.playerName,
       ...catsData,
-      all: all
-    }
-  })
+      all: all,
+    };
+  });
 
-  console.log(data)
+  console.log(data);
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
   };
@@ -55,11 +56,16 @@ console.log(rosters)
           );
         })}
       </DropDown>
-      {/* <TablesList>
+      <TablesList>
         {displayList.map((teamId) => {
-          return <RosterTable key={teamId} data={data.filter()} />;
+          return (
+            <RosterTable
+              key={teamId}
+              data={data.filter((p) => p.teamId == teamId)}
+            />
+          );
         })}
-      </TablesList> */}
+      </TablesList>
     </Container>
   );
 }

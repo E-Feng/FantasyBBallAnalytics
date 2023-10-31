@@ -9,28 +9,30 @@ import { LINEUP_SLOT_IDS } from '../utils/consts';
 function TeamRankingsContainer(props) {
   const [period, setPeriod] = useState('Last15');
 
-  const players = props.players;
-  const teams = props.teams;
-  const catIds = props.settings[0].categoryIds;
+  const players = props.leagueData.players;
+  const teams = props.leagueData.teams;
+  const catIds = props.leagueData.settings[0].categoryIds;
+  const rosters = props.leagueData.rosters;
 
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const ratingsKey = `statRatings${period}`;
 
   const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
 
-  const data = teams.map((team) => {
-    const injuredIds = team.roster.flatMap((r) => {
-      if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
-        return r.playerId;
-      }
-      return [];
-    });
+  const injuredIds = rosters.flatMap((r) => {
+    if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
+      return r.playerId;
+    }
+    return [];
+  });
 
-    const teamPlayerIds = team.roster.map((r) => r.playerId);
-    const teamPlayers = players.filter(
-      (p) =>
-        teamPlayerIds.includes(p.playerId) && !injuredIds.includes(p.playerId)
+  const data = teams.map((team) => {
+    const teamRoster = rosters.filter(
+      (r) => r.teamId == team.teamId && !injuredIds.includes(r.playerId)
     );
+    const teamPlayers = teamRoster.map(r => {
+      return players.filter(p => p.playerId == r.playerId)[0]
+    });
 
     const teamCats = {};
     catsList.forEach((cat) => {
@@ -54,7 +56,7 @@ function TeamRankingsContainer(props) {
       all: all,
     };
   });
-  catsList.push(categoryDetails.filter(cat => cat.name == 'all')[0]);
+  catsList.push(categoryDetails.filter((cat) => cat.name == 'all')[0]);
 
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
