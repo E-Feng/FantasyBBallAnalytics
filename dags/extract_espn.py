@@ -37,5 +37,5 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
     return data
   else:
     print(f"Failed fetching {view} from ESPN")
-    print(r.json)
+    print(r.json())
     raise ValueError(f"Error obtaining {view} from ESPN API")  
