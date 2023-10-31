@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
+import { getCatInverse } from '../utils/categoryUtils';
 
 function CompareSummaryTable(props) {
   const data = props.data;
@@ -126,10 +127,9 @@ function CompareSummaryTable(props) {
                           return val[headerId];
                         });
 
-                        let isLargest;
-                        const rowHeader = cell.row.original.rowHeader;
-
-                        if (rowHeader === 'TO' || rowHeader === 'EJ') {
+                        let isLargest;                        
+                        const catID = cell.row.original.catId;
+                        if (getCatInverse(catID)) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
                           isLargest = cell.value > Math.max(...compare);

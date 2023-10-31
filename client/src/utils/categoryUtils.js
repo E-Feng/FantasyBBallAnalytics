@@ -141,9 +141,7 @@ export const categoryDetails = [
 ];
 
 export const getCatInverse = (cat) => {
-  return categoryDetails.filter((o) => o.name === cat).inverse
-  ? true
-  : false;
+  return categoryDetails.filter((o) => o.name === cat)?.[0]?.inverse;
 }
 
 export const determineWinner = (a, b, cat) => {
