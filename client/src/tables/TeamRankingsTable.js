@@ -11,7 +11,7 @@ function TeamRankingsTable(props) {
 
   data.sort((a, b) => b.all - a.all);
 
-  const catNamesArray = cats.map(cat => cat.name);
+  const catNamesArray = cats.map((cat) => cat.name);
 
   // Calculating ranges for color
   const catColorRange = {};
@@ -19,7 +19,7 @@ function TeamRankingsTable(props) {
     const dataset = data.map((row) => row[catName]);
 
     // catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)];
-    catColorRange[catName] = getStdRange(dataset, 1.5)
+    catColorRange[catName] = getStdRange(dataset, 1.5);
   });
 
   const columns = React.useMemo(() => {
@@ -61,7 +61,11 @@ function TeamRankingsTable(props) {
           const val = props.value;
           const range = catColorRange[props.column.id];
           const color = getHSLColor(val, range[0], range[1]);
-          return <p style={{ background: color }}>{val.toFixed(2)}</p>;
+          return (
+            <p style={{ background: color }}>
+              {typeof val === 'number' ? val.toFixed(2) : ''}
+            </p>
+          );
         },
       };
     });
