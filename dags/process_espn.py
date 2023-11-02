@@ -137,12 +137,14 @@ def process_espn_common():
     return
 
   common_api_endpoints = {
-  'players': ['kona_player_info'],
-  'daily': ['kona_playercard']
+    'players': ['kona_player_info'],
+    'daily': ['kona_playercard'],
+    'players_yahoo': ['kona_player_info', 'mStatRatings']
   }
   common_headers = {
     'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}''',
-    'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period)
+    'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period),
+    'players_yahoo': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
   }
 
   league_info = default_league_info
@@ -175,6 +177,18 @@ def process_espn_common():
 
       bucket_name = 'nba-player-stats'
       upload_data_to_s3(player_data_dict, filename, bucket_name)
+
+    elif k == 'players_yahoo':
+      data = common_data[k]
+
+      data_df = transform_raw_to_df('players', data)
+      data_dict = data_df.to_dict(orient='records')
+      data_clean = [{k:v for k, v in x.items() if v == v } for x in data_dict]
+
+      filename = "espn_players.json"
+      bucket_name = "nba-player-stats"
+
+      upload_data_to_s3(data_clean, filename, bucket_name)
 
     # Upload daily data to firebase
     elif k == 'daily':
@@ -226,7 +240,7 @@ def process_espn_common():
     'statusCode': 200,
     'body': "Test response"
   }
-
+process_espn_common()
 
 def update_espn_leagues(event, context):
   print(event)

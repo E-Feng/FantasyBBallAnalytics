@@ -2,10 +2,9 @@ import json
 import boto3
 import requests
 
-from util import get_default_league_info
-
 
 base_url = "https://fantasysports.yahooapis.com/fantasy/v2/{}?format=json_f"
+
 
 def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, url_params: list):
     if url_params:
@@ -32,22 +31,15 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
     
     # Handling player data, grabbing from ESPN process. Only for 2024
     elif int(league_key[0:3]) >= 428:
+        s3 = boto3.resource("s3")
+
         if endpoint == "players":
-            league_info = get_default_league_info()
-            league_id = league_info["leagueId"]
-            league_year = league_info["leagueYear"]
-
-            dynamodb = boto3.resource('dynamodb')
-            table = dynamodb.Table("fantasyLeagueData")
-
-            league_data = table.get_item(Key={"leagueId": league_id, "leagueYear": league_year})
-
-            players = league_data["Item"]["players"]
+            obj = s3.Object("nba-player-stats", "espn_players.json")
+            players = json.loads(obj.get()["Body"].read().decode("utf-8"))
 
             return players
         
         elif endpoint == "players_id_map":
-            s3 = boto3.resource("s3")
             obj = s3.Object("nba-player-stats", "yahoo_players_map.json")
             players_id_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
 

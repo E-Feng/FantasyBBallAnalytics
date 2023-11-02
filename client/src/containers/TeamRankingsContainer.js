@@ -28,10 +28,10 @@ function TeamRankingsContainer(props) {
 
   const data = teams.map((team) => {
     const teamRoster = rosters.filter(
-      (r) => r.teamId == team.teamId && !injuredIds.includes(r.playerId)
+      (r) => r.teamId === team.teamId && !injuredIds.includes(r.playerId)
     );
     const teamPlayers = teamRoster.map(r => {
-      return players.filter(p => p.playerId == r.playerId)[0]
+      return players.filter(p => p.playerId === r.playerId)[0]
     });
 
     const teamCats = {};
@@ -56,7 +56,7 @@ function TeamRankingsContainer(props) {
       all: all,
     };
   });
-  catsList.push(categoryDetails.filter((cat) => cat.name == 'all')[0]);
+  catsList.push(categoryDetails.filter((cat) => cat.name === 'all')[0]);
 
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);

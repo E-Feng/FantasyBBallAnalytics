@@ -1,19 +1,12 @@
 import pandas as pd
 
 import consts
-from util import get_default_league_info
 
 
 def transform_players_truncate(league_data: dict):
   players = league_data["players"]
   draft = league_data["draft"]
   rosters = league_data["rosters"]
-
-  # Dont truncate default league players for yahoo
-  def_info = get_default_league_info()
-  if (league_data["leagueId"] == def_info["leagueId"] 
-    and league_data["leagueYear"] == def_info["leagueYear"]):
-    return players
 
   is_owned = players['playerId'].isin(rosters["playerId"])
   is_drafted = players["playerId"].isin(draft["playerId"])

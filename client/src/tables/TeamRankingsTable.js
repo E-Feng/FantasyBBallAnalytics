@@ -3,6 +3,7 @@ import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
 import { getHSLColor } from '../utils/colorsUtil';
+import { getStdRange } from '../utils/arrayMath';
 
 function TeamRankingsTable(props) {
   const data = props.data;
@@ -17,7 +18,8 @@ function TeamRankingsTable(props) {
   catNamesArray.forEach((catName) => {
     const dataset = data.map((row) => row[catName]);
 
-    catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)];
+    // catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)];
+    catColorRange[catName] = getStdRange(dataset, 1.5)
   });
 
   const columns = React.useMemo(() => {

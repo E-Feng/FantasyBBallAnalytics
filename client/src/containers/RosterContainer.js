@@ -2,43 +2,91 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import TooltipHeader from '../components/TooltipHeader';
+import MultiSelectCheckbox from '../components/MultiSelectCheckbox';
 import { categoryDetails } from '../utils/categoryUtils';
+import { getStdRange } from '../utils/arrayMath';
 import RosterTable from '../tables/RosterTable';
 
 function RosterContainer(props) {
-  const [period, setPeriod] = useState('Last15');
-  const [displayList, setDisplayList] = useState([1, 4]);
+  const teams = props.leagueData.teams;
+
+  const [period, setPeriod] = useState('Season');
+  const [statType, setStatType] = useState('statRatings');
+  const [displayList, setDisplayList] = useState([teams[0].teamId]);
 
   const players = props.leagueData.players;
-  const teams = props.leagueData.teams;
   const rosters = props.leagueData.rosters;
   const catIds = props.leagueData.settings[0].categoryIds;
 
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
-  const ratingsKey = `statRatings${period}`;
+  const statTypeArray = ['statRatings', 'stats'];
+  const ratingsKey = `${statType}${period}`;
+
+  const teamOptions = teams.map((team) => {
+    return {
+      value: team.teamId,
+      label: team.fullTeamName,
+    };
+  });
+  teamOptions.push({
+    value: 0,
+    label: 'All Rostered Players',
+  });
 
   const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
   // catsList.push(categoryDetails.filter(cat => cat.name == 'mins')[0]);
-  console.log(teams);
-  const data = rosters.map((r) => {
-    // const team = teams.filter(team => team.teamId == r.teamId)[0];
-    const player = players.filter((player) => player.playerId == r.playerId)[0];
 
+  const data = rosters.map((r) => {
+    const player = players.filter(
+      (player) => player.playerId === r.playerId
+    )[0];
+    // console.log(player)
     const catsData = {};
     catsList.forEach((cat) => {
-      catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId] || null;
+      catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId];
     });
-    const all = Object.values(catsData).includes(null)
-      ? null
-      : Object.values(catsData).reduce((a, b) => a + b);
+    const all =
+      Object.values(catsData).includes(undefined) || statType === 'stats'
+        ? null
+        : Object.values(catsData).reduce((a, b) => a + b);
 
     return {
       teamId: r.teamId,
       playerName: player.playerName,
+      ranking: player[`totalRanking${period}`],
       ...catsData,
       all: all,
     };
   });
+  if (statType === 'statRatings') {
+    catsList.push(categoryDetails.filter((cat) => cat.name === 'all')[0]);
+  } else {
+  }
+
+  const catColorRange = {};
+  catsList.forEach((cat) => {
+    const allValues = data.map((d) => d[cat.name]);
+
+    catColorRange[cat.name] = getStdRange(allValues, 1.5);
+  });
+
+  const handleTeamChange = (e) => {
+    console.log(e)
+    const selectedTeamIds = e.map((o) => o.value);
+    const lastSelected = selectedTeamIds.slice(-1)[0];
+
+    const teamIds = selectedTeamIds.filter((v) => v !== 0);
+
+    if (lastSelected === 0) {
+      setDisplayList([0]);
+    } else {
+      setDisplayList(teamIds);
+    }
+  };
+
+  const handleStatTypeChange = (e) => {
+    setStatType(e.target.value);
+  };
 
   const handlePeriodChange = (e) => {
     setPeriod(e.target.value);
@@ -49,24 +97,43 @@ function RosterContainer(props) {
   return (
     <Container>
       <TooltipHeader title='Rosters' info={rosterInfo} />
-      <DropDown value={period} onChange={handlePeriodChange}>
-        {periodArray.map((o) => {
-          return (
-            <option value={o} key={o}>
-              {o.replace(/[^0-9](?=[0-9])/g, '$& ')}
-            </option>
-          );
-        })}
-      </DropDown>
+      <FormContainer>
+        <MultiSelectCheckbox
+          options={teamOptions}
+          handleChange={handleTeamChange}
+        />
+        <DropDown value={statType} onChange={handleStatTypeChange}>
+          {statTypeArray.map((o) => {
+            return (
+              <option value={o} key={o}>
+                {o.includes('Ratings') ? 'Ratings' : 'Stats'}
+              </option>
+            );
+          })}
+        </DropDown>
+        <DropDown value={period} onChange={handlePeriodChange}>
+          {periodArray.map((o) => {
+            return (
+              <option value={o} key={o}>
+                {o.replace(/[^0-9](?=[0-9])/g, '$& ')}
+              </option>
+            );
+          })}
+        </DropDown>
+      </FormContainer>
       <TablesList>
         {displayList.map((teamId) => {
           return (
             <RosterTable
               key={teamId}
               fullTeamName={
-                teams.filter((t) => t.teamId == teamId)[0].fullTeamName
+                teams.filter((t) => t.teamId === teamId)?.[0]?.fullTeamName
               }
-              data={data.filter((p) => p.teamId == teamId)}
+              data={
+                teamId !== 0 ? data.filter((p) => p.teamId === teamId) : data
+              }
+              cats={catsList}
+              catColorRange={catColorRange}
             />
           );
         })}
@@ -81,9 +148,19 @@ const Container = styled.div`
   padding: 0.5rem 0;
 `;
 
-const DropDown = styled.select`
-  margin: 0.25rem auto;
+const FormContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  margin: 0 auto;
+
+  > * {
+    margin: 0.25rem 2px;
+  }
 `;
+
+const DropDown = styled.select``;
 
 const TablesList = styled.div`
   display: flex;

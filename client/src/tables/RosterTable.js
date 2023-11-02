@@ -2,21 +2,21 @@ import React from 'react';
 import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
-import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
 function RosterTable(props) {
   const data = props.data;
+  const cats = props.cats;
+  const catColorRange = props.catColorRange;
+
   data.sort((a, b) => {
-    if (a.all == null) return 1;
-    if (b.all == null) return -1;
+    const aa = a.all || a.pts;
+    const bb = b.all || b.pts;
 
-    return b.all - a.all;
-  });
+    if (aa == null) return 1;
+    if (bb == null) return -1;
 
-  // Getting cats for the league
-  const cats = categoryDetails.filter((cat) => {
-    return Object.keys(data[0]).includes(cat.name);
+    return bb - aa;
   });
 
   const columns = React.useMemo(() => {
@@ -29,19 +29,24 @@ function RosterTable(props) {
           return <p style={{ width: '140px' }}>{props.value}</p>;
         },
       },
+      {
+        Header: 'Ranking',
+        accessor: 'ranking'
+      }
     ];
     const catHeaders = cats.map((cat) => {
       return {
         Header: cat.display,
         accessor: cat.name,
+        sortType: 'basic',
 
         Cell: (props) => {
           const val = props.value;
-          const range = [-2, 4];
+          const range = catColorRange[props.column.id];
           const color = getHSLColor(val, range[0], range[1]);
           return (
             <p style={{ background: color, minWidth: '30px' }}>
-              {val ? val.toFixed(2) : ''}
+              {typeof val == 'number' ? parseFloat(val).toFixed(2) : ''}
             </p>
           );
         },

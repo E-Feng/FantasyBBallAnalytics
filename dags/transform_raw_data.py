@@ -246,7 +246,7 @@ def transform_players_to_df(ratings: dict):
         year = max([d["seasonId"] for d in player["player"]["stats"]])
 
         stats_period = [d for d in player['player']['stats'] if d.get('id') == f'0{key}{year}']
-        print(year, period, stats_period)
+
         if stats_period and stats_period[0].get('averageStats'):
           row['stats' + period] = stats_period[0]['averageStats']
 

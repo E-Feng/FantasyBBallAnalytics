@@ -10,7 +10,8 @@ from transform_data_yahoo import (
 )
 from yahoo_helper import (
   get_yahoo_access_token,
-  get_all_league_ids
+  get_all_league_ids,
+  update_player_list
 )
 from upload_to_aws import upload_league_data_to_dynamo
 from util import invoke_lambda
@@ -77,6 +78,8 @@ def process_yahoo_league(event, context):
 
 
 def process_all_yahoo_leagues(event, context):
+    update_player_list()
+    
     lambda_client = boto3.client('lambda', region_name='us-east-1')
 
     db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
