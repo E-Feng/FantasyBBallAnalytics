@@ -40,7 +40,7 @@ function RosterContainer(props) {
     const player = players.filter(
       (player) => player.playerId === r.playerId
     )[0];
-    // console.log(player)
+
     const catsData = {};
     catsList.forEach((cat) => {
       catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId];
@@ -52,15 +52,14 @@ function RosterContainer(props) {
 
     return {
       teamId: r.teamId,
-      playerName: player.playerName,
-      ranking: player[`totalRanking${period}`],
+      playerName: player?.playerName,
+      ranking: player?.[`totalRanking${period}`],
       ...catsData,
       all: all,
     };
   });
   if (statType === 'statRatings') {
     catsList.push(categoryDetails.filter((cat) => cat.name === 'all')[0]);
-  } else {
   }
 
   const catColorRange = {};

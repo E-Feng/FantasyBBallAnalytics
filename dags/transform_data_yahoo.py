@@ -45,6 +45,9 @@ def truncate_and_map_player_ids(league_data: dict):
     return pd.DataFrame()
   
   # Map yahoo ids
+  players["playerName"] = players["playerName"].str.replace(".", "", regex=False)
+  players_id_map["playerName"] = players_id_map["playerName"].str.replace(".", "", regex=False)
+
   players = players.drop("playerId", axis=1)
   players = players.merge(players_id_map, on="playerName", how="inner")
 
