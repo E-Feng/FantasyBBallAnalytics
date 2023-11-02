@@ -7,7 +7,7 @@ function MultiSelectCheckbox(props) {
       ...styles,
       background: 'white',
       color: 'black',
-      width: '300px',
+      width: '250px',
       minHeight: '1px',
       border: '1px solid grey',
     }),

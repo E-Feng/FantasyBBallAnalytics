@@ -71,7 +71,6 @@ function RosterContainer(props) {
   });
 
   const handleTeamChange = (e) => {
-    console.log(e)
     const selectedTeamIds = e.map((o) => o.value);
     const lastSelected = selectedTeamIds.slice(-1)[0];
 
@@ -92,7 +91,10 @@ function RosterContainer(props) {
     setPeriod(e.target.value);
   };
 
-  const rosterInfo = ``;
+  const rosterInfo = `Stats and ratings for all rostered players for the
+    given period ranges. Ratings sourced from ESPN for both ESPN and Yahoo
+    leagues.
+  `;
 
   return (
     <Container>

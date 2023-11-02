@@ -30,8 +30,8 @@ function TeamRankingsContainer(props) {
     const teamRoster = rosters.filter(
       (r) => r.teamId === team.teamId && !injuredIds.includes(r.playerId)
     );
-    const teamPlayers = teamRoster.map(r => {
-      return players.filter(p => p.playerId === r.playerId)[0]
+    const teamPlayers = teamRoster.map((r) => {
+      return players.filter((p) => p.playerId === r.playerId)[0];
     });
 
     const teamCats = {};
@@ -65,7 +65,8 @@ function TeamRankingsContainer(props) {
   const teamRankingsInfo = `This table shows the average ratings of
   each team for each category and totals for each. Ratings are available
   for different time ranges with 'Last 15' as default. Players in IR 
-  slots are excluded from the ratings.`;
+  slots are excluded from the ratings. Ratings sourced from ESPN for both ESPN 
+  and Yahoo leagues.`;
 
   return (
     <Container>
