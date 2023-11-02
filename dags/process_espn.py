@@ -240,7 +240,7 @@ def process_espn_common():
     'statusCode': 200,
     'body': "Test response"
   }
-process_espn_common()
+
 
 def update_espn_leagues(event, context):
   print(event)
