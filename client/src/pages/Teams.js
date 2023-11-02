@@ -20,18 +20,20 @@ function Teams(props) {
 
   const isLoading = !isDataLoaded || isFetching;
 
+  const isMissingPlayerData = isLoading ? null : data.players.length === 0;
+
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
+      ) : isMissingPlayerData ? (
+        <MissingDataContainer>
+          Player Data not available for previous Yahoo leagues
+        </MissingDataContainer>
       ) : (
         <Container maxWidth={props.maxWidth}>
-          <TeamRankingsContainer
-            leagueData={data}
-          />
-          <RosterContainer 
-            leagueData={data}
-          />
+          <TeamRankingsContainer leagueData={data} />
+          <RosterContainer leagueData={data} />
         </Container>
       )}
     </Layout>
@@ -48,6 +50,17 @@ const Container = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
   }
+`;
+
+const MissingDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+
+  font-size: 36px;
 `;
 
 export default Teams;
