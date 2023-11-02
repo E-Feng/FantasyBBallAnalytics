@@ -26,6 +26,8 @@ function DraftRecap(props) {
   const settingsData = isLoading ? null : data.settings;
   const playersData = isLoading ? null : data.players;
 
+  const isMissingPlayerData = isLoading ? null : playersData.length === 0;
+
   const draftRecapInfo = `This table shows a recap of the draft with the end of
     season stats rating and overall ranking. The pick number to ranking difference 
     is calculated to show a picks relative value to its draft number. This can 
@@ -37,6 +39,10 @@ function DraftRecap(props) {
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
+      ) : isMissingPlayerData ? (
+        <MissingDataContainer>
+          Player Data not available for previous Yahoo leagues
+        </MissingDataContainer>
       ) : (
         <Container>
           <TooltipHeader title='Draft Recap' info={draftRecapInfo} />
@@ -58,6 +64,17 @@ const Container = styled.div`
   width: 100%;
   max-width: ${(props) => props.maxWidth}px;
   margin: 0 auto;
+`;
+
+const MissingDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+
+  font-size: 36px;
 `;
 
 export default DraftRecap;

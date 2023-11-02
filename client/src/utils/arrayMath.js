@@ -39,3 +39,10 @@ export const getPercentageRange = (data, percent) => {
 
   return [sortedData[minIndex], sortedData[maxIndex]];
 };
+
+export const getStdRange = (data, nStd) => {
+  const meanVal = mean(data)
+  const stdVal = stdev(data)
+
+  return [meanVal - nStd*stdVal, meanVal + nStd*stdVal];
+}

@@ -18,7 +18,7 @@ function TooltipHeader(props) {
 const Container = styled.div`
   display: flex;
   flex-direction: row;
-  margin: 0.5rem auto 0 auto;
+  margin: 0.25rem auto 0 auto;
 `;
 
 const Title = styled.h1`

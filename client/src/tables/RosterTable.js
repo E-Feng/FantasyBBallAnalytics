@@ -2,76 +2,54 @@ import React from 'react';
 import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
-import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
-function TotalsTable(props) {
-  const getPercent = (values) => {
-    const denom = values[0] + values[1];
-    const percent = denom !== 0 ? (values[0] * 100) / denom : 100;
-    return percent;
-  };
-
-  const showPercent = (cell) => {
-    const values = cell.value;
-    return <React.Fragment>{getPercent(values).toFixed(0)}</React.Fragment>;
-  };
-
-  const sortPercent = (rowA, rowB, id, desc) => {
-    const percentA = getPercent(rowA.values[id]);
-    const percentB = getPercent(rowB.values[id]);
-
-    if (percentA > percentB) return -1;
-    if (percentB > percentA) return 1;
-    return 0;
-  };
-
+function RosterTable(props) {
   const data = props.data;
-  data.sort((a, b) => a.seed - b.seed);
+  const cats = props.cats;
+  const catColorRange = props.catColorRange;
 
-  // Getting cats for the league
-  const cats = categoryDetails.filter((cat) => {
-    return Object.keys(data[0]).includes(cat.name);
+  data.sort((a, b) => {
+    const aa = a.all || a.pts;
+    const bb = b.all || b.pts;
+
+    if (aa == null) return 1;
+    if (bb == null) return -1;
+
+    return bb - aa;
   });
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
       {
-        Header: 'Rank',
-        accessor: 'seed',
-      },
-      {
-        Header: 'Team',
-        accessor: 'fullTeamName',
+        Header: 'Player',
+        accessor: 'playerName',
 
-        Cell: (props) => (
-          <React.Fragment>{props.value.substring(0, 20)}</React.Fragment>
-        ),
+        Cell: (props) => {
+          return <p style={{ width: '140px' }}>{props.value}</p>;
+        },
       },
       {
-        Header: 'Name',
-        accessor: 'firstName',
-
-        Cell: (props) => (
-          <React.Fragment> {props.value.substring(0, 8)} </React.Fragment>
-        ),
-      },
-      {
-        Header: 'W',
-        accessor: 'wins',
-      },
-      {
-        Header: 'L',
-        accessor: 'losses',
-      },
+        Header: 'Ranking',
+        accessor: 'ranking'
+      }
     ];
     const catHeaders = cats.map((cat) => {
       return {
         Header: cat.display,
         accessor: cat.name,
-        sortType: sortPercent,
+        sortType: 'basic',
 
-        Cell: showPercent,
+        Cell: (props) => {
+          const val = props.value;
+          const range = catColorRange[props.column.id];
+          const color = getHSLColor(val, range[0], range[1]);
+          return (
+            <p style={{ background: color, minWidth: '30px' }}>
+              {typeof val == 'number' ? parseFloat(val).toFixed(2) : ''}
+            </p>
+          );
+        },
       };
     });
 
@@ -90,6 +68,7 @@ function TotalsTable(props) {
 
   return (
     <Container>
+      <Title>{props.fullTeamName}</Title>
       <Table {...getTableProps()}>
         <thead>
           {
@@ -132,24 +111,8 @@ function TotalsTable(props) {
                   {
                     // Loop over the rows cells
                     row.cells.map((cell) => {
-                      // Conditional background color rendering
-                      const val = cell.value;
-                      let color = 'gainsboro';
-
-                      if (Array.isArray(cell.value)) {
-                        const denom = val[0] + val[1];
-                        color = getHSLColor(val[0], 0, denom);
-                      }
-
                       return (
-                        <td
-                          {...cell.getCellProps()}
-                          style={{
-                            background: color,
-                          }}
-                        >
-                          {cell.render('Cell')}
-                        </td>
+                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       );
                     })
                   }
@@ -168,6 +131,12 @@ const Container = styled.div`
   flex-direction: column;
 
   overflow: auto;
+  margin-bottom: 0.75rem;
+`;
+
+const Title = styled.h3`
+  text-align: center;
+  font-weight: normal;
 `;
 
 const Table = styled.table`
@@ -179,13 +148,20 @@ const Table = styled.table`
   white-space: nowrap;
   color: black;
 
+  background: gainsboro;
+
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid white;
 
   th {
+    padding: 0.25rem;
     background: silver;
     color: black;
+  }
+
+  td {
+    padding: 0;
   }
 
   tr {
@@ -198,15 +174,17 @@ const Table = styled.table`
 
   th,
   td {
-    margin: 0;
-    padding: 0.25rem;
     border-bottom: 1px solid white;
     border-right: 1px solid white;
 
     :last-child {
       border-right: 0;
     }
+
+    p {
+      padding: 0.25rem 0.3rem;
+    }
   }
 `;
 
-export default TotalsTable;
+export default RosterTable;

@@ -2,36 +2,24 @@ import React from 'react';
 import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
-import { categoryDetails } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
+import { getStdRange } from '../utils/arrayMath';
 
-function TotalsTable(props) {
-  const getPercent = (values) => {
-    const denom = values[0] + values[1];
-    const percent = denom !== 0 ? (values[0] * 100) / denom : 100;
-    return percent;
-  };
-
-  const showPercent = (cell) => {
-    const values = cell.value;
-    return <React.Fragment>{getPercent(values).toFixed(0)}</React.Fragment>;
-  };
-
-  const sortPercent = (rowA, rowB, id, desc) => {
-    const percentA = getPercent(rowA.values[id]);
-    const percentB = getPercent(rowB.values[id]);
-
-    if (percentA > percentB) return -1;
-    if (percentB > percentA) return 1;
-    return 0;
-  };
-
+function TeamRankingsTable(props) {
   const data = props.data;
-  data.sort((a, b) => a.seed - b.seed);
+  const cats = props.cats;
 
-  // Getting cats for the league
-  const cats = categoryDetails.filter((cat) => {
-    return Object.keys(data[0]).includes(cat.name);
+  data.sort((a, b) => b.all - a.all);
+
+  const catNamesArray = cats.map(cat => cat.name);
+
+  // Calculating ranges for color
+  const catColorRange = {};
+  catNamesArray.forEach((catName) => {
+    const dataset = data.map((row) => row[catName]);
+
+    // catColorRange[catName] = [Math.min(...dataset), Math.max(...dataset)];
+    catColorRange[catName] = getStdRange(dataset, 1.5)
   });
 
   const columns = React.useMemo(() => {
@@ -44,9 +32,7 @@ function TotalsTable(props) {
         Header: 'Team',
         accessor: 'fullTeamName',
 
-        Cell: (props) => (
-          <React.Fragment>{props.value.substring(0, 20)}</React.Fragment>
-        ),
+        Cell: (props) => <p>{props.value.substring(0, 20)}</p>,
       },
       {
         Header: 'Name',
@@ -69,15 +55,20 @@ function TotalsTable(props) {
       return {
         Header: cat.display,
         accessor: cat.name,
-        sortType: sortPercent,
+        sortType: 'basic',
 
-        Cell: showPercent,
+        Cell: (props) => {
+          const val = props.value;
+          const range = catColorRange[props.column.id];
+          const color = getHSLColor(val, range[0], range[1]);
+          return <p style={{ background: color }}>{val.toFixed(2)}</p>;
+        },
       };
     });
 
     return teamHeaders.concat(catHeaders);
     // eslint-disable-next-line
-  }, [props]);
+  }, []);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
@@ -132,24 +123,8 @@ function TotalsTable(props) {
                   {
                     // Loop over the rows cells
                     row.cells.map((cell) => {
-                      // Conditional background color rendering
-                      const val = cell.value;
-                      let color = 'gainsboro';
-
-                      if (Array.isArray(cell.value)) {
-                        const denom = val[0] + val[1];
-                        color = getHSLColor(val[0], 0, denom);
-                      }
-
                       return (
-                        <td
-                          {...cell.getCellProps()}
-                          style={{
-                            background: color,
-                          }}
-                        >
-                          {cell.render('Cell')}
-                        </td>
+                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       );
                     })
                   }
@@ -179,13 +154,20 @@ const Table = styled.table`
   white-space: nowrap;
   color: black;
 
+  background: gainsboro;
+
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid white;
 
   th {
+    padding: 0.25rem;
     background: silver;
     color: black;
+  }
+
+  td {
+    padding: 0;
   }
 
   tr {
@@ -198,15 +180,17 @@ const Table = styled.table`
 
   th,
   td {
-    margin: 0;
-    padding: 0.25rem;
     border-bottom: 1px solid white;
     border-right: 1px solid white;
 
     :last-child {
       border-right: 0;
     }
+
+    p {
+      padding: 0.25rem 0.3rem;
+    }
   }
 `;
 
-export default TotalsTable;
+export default TeamRankingsTable;

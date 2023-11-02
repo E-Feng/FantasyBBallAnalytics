@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
+import Teams from './pages/Teams';
 import Scoreboard from './pages/Scoreboard';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
@@ -78,6 +79,10 @@ function App() {
             exact
             path='/'
             render={(props) => <Home {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/teams'
+            render={(props) => <Teams {...props} maxWidth={maxWidth} />}
           />
           <Route
             path='/scoreboard'
