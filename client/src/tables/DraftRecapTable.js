@@ -71,7 +71,7 @@ function DraftRecapTable(props) {
 
         Cell: (props) => (
           <React.Fragment>
-            {props.value ? parseFloat(props.value).toFixed(2) : ''}
+            {typeof props.value === 'number' ? parseFloat(props.value).toFixed(2) : ''}
           </React.Fragment>
         ),
       },
