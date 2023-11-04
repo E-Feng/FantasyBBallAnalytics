@@ -138,13 +138,13 @@ def process_espn_common():
 
   common_api_endpoints = {
     'players': ['kona_player_info'],
+    'players_yahoo': ['kona_player_info', 'mStatRatings'],
     'daily': ['kona_playercard'],
-    'players_yahoo': ['kona_player_info', 'mStatRatings']
   }
   common_headers = {
     'players': '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId": {"value": [0]}, "sortPercOwned": {"sortPriority": 2, "sortAsc": false}, "limit": 250}}''',
+    'players_yahoo': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}''',
     'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period),
-    'players_yahoo': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
   }
 
   league_info = default_league_info

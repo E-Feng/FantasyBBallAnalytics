@@ -91,7 +91,7 @@ def transform_settings_to_df(data: dict):
     row['currentWeek'] = data.get("current_week", 1)
     row["scoringType"] = data["scoring_type"]
 
-    row["categoryIds"] = []
+    row["categoryIds"] = [int(consts.MINS)]
 
     for stat in data["settings"]["stat_categories"]["stats"]:
         stat = stat["stat"]

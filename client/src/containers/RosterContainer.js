@@ -33,8 +33,12 @@ function RosterContainer(props) {
     label: 'All Rostered Players',
   });
 
-  const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
-  // catsList.push(categoryDetails.filter(cat => cat.name == 'mins')[0]);
+  let catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
+
+  if (statType === 'statRatings') {
+    catsList = catsList.filter((cat) => cat.name !== 'mins');
+    catsList.push(categoryDetails.filter((cat) => cat.name === 'all')[0]);
+  }
 
   const data = rosters.map((r) => {
     const player = players.filter(
@@ -45,11 +49,12 @@ function RosterContainer(props) {
     catsList.forEach((cat) => {
       catsData[cat.name] = player?.[ratingsKey]?.[cat.espnId];
     });
-    const all =
-      Object.values(catsData).includes(undefined) || statType === 'stats'
-        ? null
-        : Object.values(catsData).reduce((a, b) => a + b);
-
+    const catValues = Object.values(catsData).filter(
+      (d) => typeof d === 'number'
+    );
+    console.log(catValues);
+    const all = catValues.length > 0 ? catValues.reduce((a, b) => a + b) : null;
+    console.log(catsData, all);
     return {
       teamId: r.teamId,
       playerName: player?.playerName,
@@ -58,9 +63,6 @@ function RosterContainer(props) {
       all: all,
     };
   });
-  if (statType === 'statRatings') {
-    catsList.push(categoryDetails.filter((cat) => cat.name === 'all')[0]);
-  }
 
   const catColorRange = {};
   catsList.forEach((cat) => {

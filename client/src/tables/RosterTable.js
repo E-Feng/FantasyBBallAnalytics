@@ -8,7 +8,7 @@ function RosterTable(props) {
   const data = props.data;
   const cats = props.cats;
   const catColorRange = props.catColorRange;
-
+console.log(cats)
   data.sort((a, b) => {
     const aa = a.all || a.pts;
     const bb = b.all || b.pts;
@@ -55,7 +55,7 @@ function RosterTable(props) {
 
     return teamHeaders.concat(catHeaders);
     // eslint-disable-next-line
-  }, [props]);
+  }, [props.cats]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
