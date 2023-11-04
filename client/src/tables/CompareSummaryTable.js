@@ -134,13 +134,18 @@ function CompareSummaryTable(props) {
                         } else {
                           isLargest = cell.value > Math.max(...compare);
                         }
+                        
+                        let noColor;
+                        if (headerId === "stdev") {
+                          noColor = true;
+                        }
 
                         // Apply the cell props
                         return (
                           <td
                             {...cell.getCellProps()}
                             style={{
-                              background: isLargest ? 'limegreen' : 'gainsboro',
+                              background: (!noColor & isLargest) ? 'limegreen' : 'gainsboro',
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
                             rowSpan={

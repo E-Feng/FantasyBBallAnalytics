@@ -37,8 +37,6 @@ function CompareContainer(props) {
       const allCatValues = [];
       for (const team of selectedTeams) {
         const dataRow = {};
-        dataRow['rowHeader'] = display;
-        dataRow['catId'] = catName;
 
         filteredData.forEach((row) => {
           if (row.teamId.toString() === team) {
@@ -61,6 +59,9 @@ function CompareContainer(props) {
         dataRow.stdev = stdev;
         dataRow.min = min;
         dataRow.max = max;
+        // Move to end so the '3' in 3PM isn't included in stats
+        dataRow['rowHeader'] = display;
+        dataRow['catId'] = catName;
 
         data.push(dataRow);
       }
