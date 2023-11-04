@@ -11,7 +11,7 @@ function MatchupTablesContainer(props) {
   const settings = props.settings[0].categoryIds;
 
   const cats = categoryDetails.filter((o) => {
-    return settings.includes(o.espnId)
+    return settings.includes(o.espnId) && o.name !== 'mins'
   });
 
   // Joining team names to data

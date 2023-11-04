@@ -17,7 +17,7 @@ function TotalsContainer(props) {
    */
   const settings = props.settings[0].categoryIds;
   const cats = categoryDetails.filter(o => {
-    return settings.includes(o.espnId)
+    return settings.includes(o.espnId) && o.name !== 'mins'
   })
 
   const calculateTotalCats = (data, weekRange, onlyMatchup) => {
