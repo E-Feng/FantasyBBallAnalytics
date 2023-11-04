@@ -51,7 +51,7 @@ function CompareContainer(props) {
             allCatValues.push(dataPoint);
           }
         });
-        const dataRowValues = Object.values(dataRow);
+        const dataRowValues = Object.values(dataRow).splice(1);
         const mean = arrayMath.mean(dataRowValues).toFixed(digits);
         const stdev = arrayMath.stdev(dataRowValues).toFixed(digits);
         const min = Math.min(...arrayMath.filterNaN(dataRowValues));
