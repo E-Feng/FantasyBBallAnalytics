@@ -24,16 +24,16 @@ function CompareSummaryTable(props) {
             accessor: 'mean',
           },
           {
-            Header: 'StDev',
-            accessor: 'stdev'
-          },
-          {
             Header: 'Min',
             accessor: 'min',
           },
           {
             Header: 'Max',
             accessor: 'max',
+          },
+          {
+            Header: 'StDev',
+            accessor: 'stdev'
           },
         ],
       },
