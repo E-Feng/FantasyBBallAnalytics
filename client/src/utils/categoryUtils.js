@@ -1,5 +1,11 @@
 export const categoryDetails = [
   {
+    name: 'mins',
+    display: 'MINS',
+    espnId: 40,
+    digits: 0,
+  },
+  {
     name: 'fgMade',
     display: 'FGM',
     espnId: 13,

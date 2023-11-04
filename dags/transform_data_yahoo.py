@@ -26,7 +26,7 @@ def adjust_player_ratings(league_data: dict):
     if col in players.columns:
       mask = players[col].notnull()
 
-      players.loc[mask, col] = players.loc[mask, col].apply(lambda d: {str(k):float(d[str(k)]) for k in category_ids})
+      players.loc[mask, col] = players.loc[mask, col].apply(lambda d: {str(k):float(d.get(str(k), 0)) for k in category_ids})
 
   mask = players["statRatingsSeason"].notnull()
   players.loc[mask, "totalRatingSeason"] = players.loc[mask, "statRatingsSeason"].apply(lambda d: sum(d.values()))

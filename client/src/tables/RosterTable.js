@@ -55,7 +55,7 @@ function RosterTable(props) {
 
     return teamHeaders.concat(catHeaders);
     // eslint-disable-next-line
-  }, [props]);
+  }, [props.cats]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(

@@ -60,6 +60,7 @@ DDS_Y = '27'
 TDS_Y = '28'
 
 STAT_IDS_MAP_TO_ESPN = {
+  MINS_Y: MINS,
   FG_DISP_Y: -1,
   FG_ATT_Y: FG_ATT,
   FG_PER_Y: FG_PER,

@@ -239,7 +239,8 @@ def transform_players_to_df(ratings: dict):
         row['statRatings' + period] = format_stat_ratings(player['ratings'][key]['statRankings'])
 
         if not category_ids:
-          category_ids = row['statRatings' + period].keys()
+          category_ids = list(row['statRatings' + period].keys())
+          category_ids.append(consts.MINS)
 
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
@@ -338,7 +339,7 @@ def transform_settings_to_df(settings: dict):
   row['isActive'] = data["status"]["isActive"]
   row['currentWeek'] = data["status"]["currentMatchupPeriod"]
 
-  row['categoryIds'] = []
+  row['categoryIds'] = [int(consts.MINS)]
   for category in data['settings']['scoringSettings']['scoringItems']:
     row['categoryIds'].append(category['statId'])
 
