@@ -8,7 +8,7 @@ function RosterTable(props) {
   const data = props.data;
   const cats = props.cats;
   const catColorRange = props.catColorRange;
-console.log(cats)
+
   data.sort((a, b) => {
     const aa = a.all || a.pts;
     const bb = b.all || b.pts;

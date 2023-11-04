@@ -52,9 +52,8 @@ function RosterContainer(props) {
     const catValues = Object.values(catsData).filter(
       (d) => typeof d === 'number'
     );
-    console.log(catValues);
     const all = catValues.length > 0 ? catValues.reduce((a, b) => a + b) : null;
-    console.log(catsData, all);
+
     return {
       teamId: r.teamId,
       playerName: player?.playerName,
