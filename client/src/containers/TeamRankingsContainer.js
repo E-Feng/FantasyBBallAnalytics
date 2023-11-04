@@ -17,7 +17,9 @@ function TeamRankingsContainer(props) {
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const ratingsKey = `statRatings${period}`;
 
-  const catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
+  const catsList = categoryDetails.filter(
+    (cat) => catIds.includes(cat.espnId) && cat.name !== 'mins'
+  );
 
   const injuredIds = rosters.flatMap((r) => {
     if (r.lineupSlotId === LINEUP_SLOT_IDS.IR) {
