@@ -24,7 +24,7 @@ function CompareContainer(props) {
 
   // Filtering out the categories
   const cats = catUtils.categoryDetails.filter(o => {
-    return catSettings.includes(o.espnId)
+    return catSettings.includes(o.espnId) && o.name !== 'mins'
   })
 
   // Calculating comparison table and summary table
@@ -45,15 +45,15 @@ function CompareContainer(props) {
             const dataPoint = row[catName];
 
             // Setting individual team data
-            dataRow['week' + row.week] = dataPoint.toFixed(digits);
+            dataRow['week' + row.week] = dataPoint?.toFixed(digits);
 
             // Setting summary data
             allCatValues.push(dataPoint);
           }
         });
         const dataRowValues = Object.values(dataRow).splice(1);
-        const mean = arrayMath.mean(dataRowValues).toFixed(digits);
-        const stdev = arrayMath.stdev(dataRowValues).toFixed(digits);
+        const mean = arrayMath.mean(dataRowValues)?.toFixed(digits);
+        const stdev = arrayMath.stdev(dataRowValues)?.toFixed(digits);
         const min = Math.min(...arrayMath.filterNaN(dataRowValues));
         const max = Math.max(...arrayMath.filterNaN(dataRowValues));
 
