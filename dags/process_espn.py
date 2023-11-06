@@ -11,7 +11,8 @@ from transform_raw_data import (
   transform_raw_to_df
 )
 from transform_data import (
-  transform_players_truncate
+  transform_players_truncate,
+  transform_unrostered_daily
 )
 from upload_to_aws import (
   upload_league_data_to_dynamo, upload_data_to_s3
@@ -32,16 +33,20 @@ from upload_to_cloud import (
 current_year = get_current_espn_league_year()
 default_league_info = get_default_league_info()
 
+scoring_period = get_scoring_period_id(default_league_info)
+
 league_api_endpoints = {
   'settings': ['mSettings'],
   'teams': ['mTeam'],
   'rosters': ['mRoster'],
   'scoreboard': ['mScoreboard'],
   'draft': ['mDraftDetail'],
-  'players': ['kona_player_info', 'mStatRatings']
+  'players': ['kona_player_info', 'mStatRatings'],
+  'daily': ['kona_playercard']
 }
 league_headers = {
-  'players': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}'''
+  'players': '''{"players":{"limit":1000,"sortPercOwned":{"sortAsc":false,"sortPriority":1},"sortDraftRanks":{"sortPriority":100,"sortAsc":true,"value":"STANDARD"}}}''',
+  'daily':   '''{"players":{"filterStatsForCurrentSeasonScoringPeriodId":{"value":[%s]},"sortStatIdForScoringPeriodId":{"additionalValue":%s,"sortAsc":false,"sortPriority":2,"value":0},"limit":250}}''' % (scoring_period, scoring_period),
 }
 
 
@@ -106,6 +111,7 @@ def process_espn_league(event, context):
     # )
 
     league_data['players'] = transform_players_truncate(league_data)
+    league_data['daily'] = transform_unrostered_daily(league_data)
 
     # Removing unneeded league data
     #league_data.pop('draft', None)
@@ -130,7 +136,6 @@ def process_espn_league(event, context):
 
 
 def process_espn_common():
-  scoring_period = get_scoring_period_id(default_league_info)
   last_scoring_period = get_last_posted_scoring_period(current_year)
 
   if int(scoring_period) <= int(last_scoring_period):
@@ -150,6 +155,7 @@ def process_espn_common():
   league_info = default_league_info
 
   today = date.today().strftime("%Y-%m-%d")
+  bucket_name = 'nba-player-stats'
 
   common_data = {}
 
@@ -175,7 +181,6 @@ def process_espn_common():
 
       filename = f"nba-player-stats-{today}.json"
 
-      bucket_name = 'nba-player-stats'
       upload_data_to_s3(player_data_dict, filename, bucket_name)
 
     elif k == 'players_yahoo':
@@ -232,6 +237,9 @@ def process_espn_common():
             scoreline['type'] = 'stat'
           
           alert_data[today][f'!{alert_type}_stat{i}'] = scoreline
+
+      daily_json = df.to_dict(orient='records')
+      upload_data_to_s3(daily_json, "daily.json", bucket_name)
 
       upload_to_firebase('alert', alert_data)   
       upload_to_firebase('scoring_period', {"scoring_period": scoring_period})    
