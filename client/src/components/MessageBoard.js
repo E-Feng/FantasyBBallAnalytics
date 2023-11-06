@@ -173,8 +173,6 @@ function MessageBoard() {
     }
   }
 
-  console.log(messageArray);
-
   return (
     <Container>
       {isLoading ? (
