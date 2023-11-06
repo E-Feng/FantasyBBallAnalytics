@@ -59,3 +59,19 @@ def truncate_and_map_player_ids(league_data: dict):
   players = players[all_cond]
 
   return players
+
+
+def map_daily_player_ids(league_data: dict):
+  daily = league_data["daily"]
+  players_id_map = league_data["players_id_map"]
+
+  if daily.empty:
+    return pd.DataFrame()
+  
+  daily["playerName"] = daily["playerName"].str.replace(".", "", regex=False)
+  players_id_map["playerName"] = players_id_map["playerName"].str.replace(".", "", regex=False)
+
+  daily = daily.drop("playerId", axis=1)
+  daily = daily.merge(players_id_map, on="playerName", how="inner")
+
+  return daily

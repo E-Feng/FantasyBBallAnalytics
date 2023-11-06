@@ -284,7 +284,7 @@ def transform_daily_to_df(daily_score: dict):
       if len(player['player']['stats'][0]['stats']) > 0:
         row = {}
 
-        row['playerId'] = player['id']
+        row['playerId'] = str(player['id'])
         row['teamId'] = player['onTeamId']
         row['fullName'] = player['player']['fullName']
 

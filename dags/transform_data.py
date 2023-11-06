@@ -22,8 +22,17 @@ def transform_unrostered_daily(league_data: dict):
 
   if daily.empty or rosters.empty:
     return pd.DataFrame()
+  
+  if league_data["platform"] == "yahoo":
+    players_id_map = league_data["players_id_map"]
 
-  daily_unrostered = daily[~daily['playerId'].isin(rosters["playerId"].astype(int))]
+    daily["fullName"] = daily["fullName"].str.replace(".", "", regex=False)
+    players_id_map["playerName"] = players_id_map["playerName"].str.replace(".", "", regex=False)
+
+    daily = daily.drop("playerId", axis=1)
+    daily = daily.merge(players_id_map, left_on="fullName", right_on="playerName", how="inner")
+
+  daily_unrostered = daily[~daily['playerId'].isin(rosters["playerId"])]
   top_daily_unrostered = daily_unrostered.head(4)
 
   return top_daily_unrostered
