@@ -9,17 +9,20 @@ import { hasProfanity } from '../utils/chatUtil';
 
 function MessageBoard() {
   const { leagueState } = useContext(LeagueContext);
-  const leagueYear = leagueState[0][1];
+  const leagueKey = leagueState[0];
+  const leagueYear = leagueKey[1];
 
   const queryClient = useQueryClient();
-  const data = queryClient.getQueryData([leagueYear, 'common']);
+  const commonData = queryClient.getQueryData([leagueYear, 'common']);
+  const data = queryClient.getQueryData(leagueKey);
 
-  const isDataLoaded = data !== undefined;
+  const isDataLoaded = commonData !== undefined && data !== undefined;
   const isFetching = useIsFetching() > 0;
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const messageData = isLoading ? null : data.messageboard;
+  const messageData = isLoading ? null : commonData.messageboard;
+  const unrosteredData = isLoading ? null : data.daily;
 
   const messageArray = [];
 
@@ -115,6 +118,17 @@ function MessageBoard() {
         // Formatting ejections
         content = `${msg.fullName} has been ejected!`;
         break;
+      case 'dailyHeader':
+        const style = {
+          margin: 'auto auto',
+          fontWeight: 'bold',
+        };
+        return (
+          <li key={msg.msg} style={style}>
+            {msg.msg}
+          </li>
+        );
+
       default:
         content = msg.msg;
     }
@@ -140,39 +154,60 @@ function MessageBoard() {
       unsortedMessages.sort((a, b) => (b.time > a.time ? -1 : 1));
       unsortedMessages.forEach((o) => messageArray.push(o));
     });
+
+    // Appending messages for unrostered daily players
+    if (unrosteredData) {
+      messageArray.push({
+        type: 'dailyHeader',
+        user: 'BOT',
+        msg: 'Available FREE AGENTS in this league',
+      });
+
+      unrosteredData.forEach((d) => {
+        messageArray.push({
+          ...d,
+          type: 'stat',
+          user: 'BOT',
+        });
+      });
+    }
   }
+
+  console.log(messageArray);
 
   return (
     <Container>
-      <ScrollWrapper>
-        {isLoading ? (
-          <LoadingIcon></LoadingIcon>
-        ) : (
-          <Messages>
-            {messageArray.map((msg) => {
-              const formatted = formatMessage(msg);
-              return formatted;
-            })}
-          </Messages>
-        )}
-      </ScrollWrapper>
-      <ChatForm onSubmit={handleSubmit(onSubmit)}>
-        <label>Name:</label>
-        <Name
-          type='text'
-          name='name'
-          placeholder='Enter name'
-          ref={register({ required: true })}
-        />
-        <Textbox
-          type='text'
-          name='msg'
-          placeholder='Type your message here'
-          ref={register({ required: true })}
-        />
-        <input type='submit' value='SEND' />
-      </ChatForm>
-      {(errors.name || errors.msg) && <p>Field Required</p>}
+      {isLoading ? (
+        <LoadingIcon />
+      ) : (
+        <MessageBoardContainer>
+          <ScrollWrapper>
+            <Messages>
+              {messageArray.map((msg) => {
+                const formatted = formatMessage(msg);
+                return formatted;
+              })}
+            </Messages>
+          </ScrollWrapper>
+          <ChatForm onSubmit={handleSubmit(onSubmit)}>
+            <label>Name:</label>
+            <Name
+              type='text'
+              name='name'
+              placeholder='Enter name'
+              ref={register({ required: true })}
+            />
+            <Textbox
+              type='text'
+              name='msg'
+              placeholder='Type your message here'
+              ref={register({ required: true })}
+            />
+            <input type='submit' value='SEND' />
+          </ChatForm>
+          {(errors.name || errors.msg) && <p>Field Required</p>}
+        </MessageBoardContainer>
+      )}
     </Container>
   );
 }
@@ -184,16 +219,19 @@ const Container = styled.div`
   width: calc(100% - 2px);
   max-width: 800px;
   margin: 0.75rem 0.5rem;
-  border: 1px solid white;
 `;
+
+const MessageBoardContainer = styled.div``;
 
 const ScrollWrapper = styled.div`
   display: flex;
   flex-direction: column-reverse;
 
-  min-height: 600px;
+  min-height: 500px;
   max-height: 600px;
   overflow: auto;
+
+  border: 1px solid white;
 `;
 
 const Messages = styled.ul`

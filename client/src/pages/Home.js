@@ -19,7 +19,7 @@ function Home(props) {
           title='League Board and Alerts'
           info={leagueBoardInfo}
         ></TooltipHeader>
-        <MessageBoard></MessageBoard>
+        <MessageBoard />
       </Container>
     </Layout>
   );

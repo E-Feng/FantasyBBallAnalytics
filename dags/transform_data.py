@@ -16,6 +16,19 @@ def transform_players_truncate(league_data: dict):
   return players[all_cond]
 
 
+def transform_unrostered_daily(league_data: dict):
+  daily = league_data["daily"]
+  rosters = league_data["rosters"]
+
+  if daily.empty or rosters.empty:
+    return pd.DataFrame()
+
+  daily_unrostered = daily[~daily['playerId'].isin(rosters["playerId"].astype(int))]
+  top_daily_unrostered = daily_unrostered.head(4)
+
+  return top_daily_unrostered
+
+
 def transform_draft_recap(draft: pd.DataFrame, players: pd.DataFrame, settings: pd.DataFrame):
   has_ejections_cat = int(consts.EJS) in settings.iloc[0]['categoryIds']
 
