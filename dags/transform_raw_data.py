@@ -290,22 +290,22 @@ def transform_daily_to_df(daily_score: dict):
 
         stats = player['player']['stats'][0]['stats']
 
-        row['fgPer'] = stats[consts.FG_PER]
-        row['ftPer'] = stats[consts.FT_PER]
-        row['fgAtt'] = stats[consts.FG_ATT]
-        row['fgMade'] = stats[consts.FG_MADE]
-        row['ftAtt'] = stats[consts.FT_ATT]
-        row['ftMade'] = stats[consts.FT_MADE]
-        row['threes'] = stats[consts.THREES]
-        row['threesAtt'] = stats[consts.THREEA]
-        row['rebs'] = stats[consts.REBS]
-        row['asts'] = stats[consts.ASTS]
-        row['stls'] = stats[consts.STLS]
-        row['blks'] = stats[consts.BLKS]
-        row['tos'] = stats[consts.TOS]
-        row['ejs'] = stats[consts.EJS]
-        row['pts'] = stats[consts.PTS]
-        row['mins'] = stats[consts.MINS]
+        row['fgPer'] = stats.get(consts.FG_PER, 0)
+        row['ftPer'] = stats.get(consts.FT_PER, 0)
+        row['fgAtt'] = stats.get(consts.FG_ATT, 0)
+        row['fgMade'] = stats.get(consts.FG_MADE, 0)
+        row['ftAtt'] = stats.get(consts.FT_ATT, 0)
+        row['ftMade'] = stats.get(consts.FT_MADE, 0)
+        row['threes'] = stats.get(consts.THREES, 0)
+        row['threesAtt'] = stats.get(consts.THREEA, 0)
+        row['rebs'] = stats.get(consts.REBS, 0)
+        row['asts'] = stats.get(consts.ASTS, 0)
+        row['stls'] = stats.get(consts.STLS, 0)
+        row['blks'] = stats.get(consts.BLKS, 0)
+        row['tos'] = stats.get(consts.TOS, 0)
+        row['ejs'] = stats.get(consts.EJS, 0)
+        row['pts'] = stats.get(consts.PTS, 0)
+        row['mins'] = stats.get(consts.MINS, 0)
 
         row['gs'] = calculate_gamescore(row)
 
