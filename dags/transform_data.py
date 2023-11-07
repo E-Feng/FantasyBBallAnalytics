@@ -8,6 +8,9 @@ def transform_players_truncate(league_data: dict):
   draft = league_data["draft"]
   rosters = league_data["rosters"]
 
+  if rosters.empty:
+    return pd.DataFrame()
+
   is_owned = players['playerId'].isin(rosters["playerId"])
   is_drafted = players["playerId"].isin(draft["playerId"])
 
@@ -22,7 +25,7 @@ def transform_unrostered_daily(league_data: dict):
 
   if daily.empty or rosters.empty:
     return pd.DataFrame()
-  
+    
   if league_data["platform"] == "yahoo":
     players_id_map = league_data["players_id_map"]
 
