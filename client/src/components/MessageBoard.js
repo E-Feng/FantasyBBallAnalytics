@@ -122,10 +122,11 @@ function MessageBoard() {
         const style = {
           margin: 'auto auto',
           fontWeight: 'bold',
+          textAlign: 'center'
         };
         return (
-          <li key={msg.msg} style={style}>
-            {msg.msg}
+          <li key={msg.msg}>
+            <p style={style}>{msg.msg}</p>
           </li>
         );
 
