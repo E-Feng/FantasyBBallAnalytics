@@ -58,7 +58,7 @@ def get_all_league_ids(access_token):
             games = user["user"]["games"]
 
             for game in games:
-                if game["game"]["code"] == "nba":
+                if game.get("game", {}).get("code", "") == "nba":
                     leagues = game["game"]["leagues"]
 
                     for league in leagues:
