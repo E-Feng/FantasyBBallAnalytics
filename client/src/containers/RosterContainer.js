@@ -136,6 +136,7 @@ function RosterContainer(props) {
               }
               cats={catsList}
               catColorRange={catColorRange}
+              statType={statType}
             />
           );
         })}

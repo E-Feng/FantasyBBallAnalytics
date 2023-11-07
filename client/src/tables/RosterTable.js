@@ -3,11 +3,13 @@ import { useTable, useSortBy } from 'react-table';
 import styled from 'styled-components';
 
 import { getHSLColor } from '../utils/colorsUtil';
+import { getCatInverse } from '../utils/categoryUtils';
 
 function RosterTable(props) {
   const data = props.data;
   const cats = props.cats;
   const catColorRange = props.catColorRange;
+  const statType = props.statType;
 
   data.sort((a, b) => {
     const aa = a.all || a.pts;
@@ -43,7 +45,9 @@ function RosterTable(props) {
         Cell: (props) => {
           const val = props.value;
           const range = catColorRange[props.column.id];
-          const color = getHSLColor(val, range[0], range[1]);
+          // If displaying stats, use inverse coloring where necessary (for TO, etc.)
+          const inverse = statType === 'stats' ? getCatInverse(props.column.id) : false;
+          const color = getHSLColor(val, range[0], range[1], inverse);
           return (
             <p style={{ background: color, minWidth: '30px' }}>
               {typeof val == 'number' ? parseFloat(val).toFixed(2) : ''}
