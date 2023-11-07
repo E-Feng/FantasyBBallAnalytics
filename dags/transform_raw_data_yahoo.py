@@ -18,7 +18,7 @@ def transform_yahoo_raw_to_df(endpoint: str, raw_data: dict):
         df = transform_scoreboard_to_df(raw_data)
     elif endpoint == 'draft':
         df = transform_draft_to_df(raw_data)       
-    elif endpoint in ['players', 'players_id_map']:
+    elif endpoint in ['players', 'players_id_map', 'daily']:
         df = transform_to_df(raw_data)
     else:
         df = pd.DataFrame()

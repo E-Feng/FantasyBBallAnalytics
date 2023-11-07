@@ -44,5 +44,12 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
             players_id_map = json.loads(obj.get()["Body"].read().decode("utf-8"))
 
             return players_id_map
+        
+        elif endpoint == "daily":
+            obj = s3.Object("nba-player-stats", "daily.json")
+            daily = json.loads(obj.get()["Body"].read().decode("utf-8"))
+                               
+            return daily
+
     else:
        return {}

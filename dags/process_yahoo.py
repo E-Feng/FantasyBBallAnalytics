@@ -4,6 +4,7 @@ import pandas as pd
 
 from extract_yahoo import extract_from_yahoo_api
 from transform_raw_data_yahoo import transform_yahoo_raw_to_df
+from transform_data import transform_unrostered_daily
 from transform_data_yahoo import (
   adjust_player_ratings,
   truncate_and_map_player_ids
@@ -27,7 +28,8 @@ league_api_endpoints = {
     'scoreboard': ["league", f"scoreboard{week_params}"],
     'draft': ["league", "draftresults"],
     'players': [],
-    'players_id_map': []
+    'players_id_map': [],
+    'daily': []
 }
 
 
@@ -56,6 +58,7 @@ def process_yahoo_league(event, context):
     # Transforms
     league_data["players"] = adjust_player_ratings(league_data)
     league_data["players"] = truncate_and_map_player_ids(league_data)
+    league_data['daily'] = transform_unrostered_daily(league_data)
 
     league_data.pop("players_id_map", None)
 
