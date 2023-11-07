@@ -45,13 +45,8 @@ function RosterTable(props) {
         Cell: (props) => {
           const val = props.value;
           const range = catColorRange[props.column.id];
-
-          // If displaying stats, use inverse coloring (for TO, etc.)
-          // If displaying ratings, use usual color gradient
-          let inverse;
-          if (statType === 'stats') inverse = getCatInverse(props.column.id);
-          else inverse = false
-
+          // If displaying stats, use inverse coloring where necessary (for TO, etc.)
+          const inverse = getCatInverse(props.column.id) && (statType === 'stats');
           const color = getHSLColor(val, range[0], range[1], inverse);
           return (
             <p style={{ background: color, minWidth: '30px' }}>
