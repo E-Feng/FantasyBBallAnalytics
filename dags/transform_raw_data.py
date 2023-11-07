@@ -280,7 +280,7 @@ def transform_daily_to_df(daily_score: dict):
   # Iterate through all teams
   for player in data['players']:
     # Check if player has played
-    if len(player['player']['stats']) > 0:
+    if len(player['player'].get('stats', [])) > 0:
       if len(player['player']['stats'][0]['stats']) > 0:
         row = {}
 
