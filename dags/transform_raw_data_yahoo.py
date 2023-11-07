@@ -41,8 +41,8 @@ def transform_team_to_df(data: dict):
         row['teamId'] = int(team['team_id'])
         row['fullTeamName'] = team['name']
         row['seed'] = team['team_standings']["rank"]
-        row['wins'] = team['team_standings']["outcome_totals"]['wins']
-        row['losses'] = team['team_standings']["outcome_totals"]['losses']
+        row['wins'] = team['team_standings'].get("outcome_totals", {}).get('wins', 0)
+        row['losses'] = team['team_standings'].get("outcome_totals", {}).get('losses', 0)
 
         # Getting first and last name from teams key
         row['firstName'] = team["managers"][0]["manager"]["nickname"]
