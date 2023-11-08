@@ -69,7 +69,7 @@ function LeagueChangeModal(props) {
     const activeLeagueYear = resLeagueYear || defaultLeagueYear;
     console.log(leagueStatus, activeLeagueId);
 
-    switch (leagueStatus) {        
+    switch (leagueStatus) {
       case 'ACTIVE':
         localStorage.setItem('leagueId', activeLeagueId);
         props.setShow(false);
@@ -86,7 +86,7 @@ function LeagueChangeModal(props) {
         break;
       case 'LEAGUE_NOT_FOUND_DELETED':
         setResponseMsg('League id deleted.');
-        break;        
+        break;
       case 'invalid_grant':
         setResponseMsg('Error auth, redo authorization and auth code');
         break;
@@ -101,7 +101,7 @@ function LeagueChangeModal(props) {
     }
   };
 
-  const description = `View or process league info, allow a minute or more
+  const description = `View or process league info, allow a few minutes
     for large historic leagues.
     Private ESPN leagues will require cookie information. 
     Yahoo leagues will require authorization. Cookie/Auth only 
@@ -162,13 +162,22 @@ function LeagueChangeModal(props) {
             <Platform>
               <h3>Yahoo</h3>
               <p>Yahoo.com Authorization</p>
-              <InfoLink
-                target='_blank'
-                rel='noopener noreferrer'
-                href={yahooAuthLink}
-              >
-                Authorize
-              </InfoLink>
+              {formState.isSubmitting ? (
+                <InfoLink
+                  onClick={(e) => e.preventDefault()}
+                  href=''
+                >
+                  Authorize
+                </InfoLink>
+              ) : (
+                <InfoLink
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  href={yahooAuthLink}
+                >
+                  Authorize
+                </InfoLink>
+              )}
               <LabelInput>
                 <label>Auth Code</label>
                 <input
