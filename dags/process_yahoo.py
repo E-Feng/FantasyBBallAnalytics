@@ -120,17 +120,18 @@ def process_all_yahoo_leagues(event, context):
         league_id = league_info[0]
         access_token = get_yahoo_access_token(league_info[1]).get("yahoo_access_token", "")
 
-        process_payload = {
-            "queryStringParameters": {
-                "leagueId": league_id,
-                "leagueYear": 2024,
-                "allLeagueKeys": get_all_league_ids(access_token),
-                "yahooAccessToken": access_token,
+        if access_token:
+            process_payload = {
+                "queryStringParameters": {
+                    "leagueId": league_id,
+                    "leagueYear": 2024,
+                    "allLeagueKeys": get_all_league_ids(access_token),
+                    "yahooAccessToken": access_token,
+                }
             }
-        }
-        process_res = invoke_lambda(lambda_client, 'process_yahoo_league', process_payload)
+            process_res = invoke_lambda(lambda_client, 'process_yahoo_league', process_payload)
 
-        if not process_res:
+        if not access_token or not process_res:
             num_failed += 1
             print(f"League {league_id.ljust(11)} failed")
         else:
