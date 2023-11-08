@@ -21,7 +21,7 @@ function MessageBoard() {
 
   const isLoading = !isDataLoaded || isFetching;
 
-  const messageData = isLoading ? null : commonData.messageboard;
+  const messageData = isLoading ? null : commonData?.messageboard;
   const unrosteredData = isLoading ? null : data.daily;
 
   const messageArray = [];
@@ -141,7 +141,7 @@ function MessageBoard() {
     );
   };
 
-  if (!isLoading) {
+  if (!isLoading && messageData) {
     // Formatting chat messages from json data
     Object.keys(messageData).forEach((date) => {
       messageArray.push({ type: 'date', date: date });
