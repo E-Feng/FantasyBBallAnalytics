@@ -105,8 +105,10 @@ def process_all_yahoo_leagues(event, context):
             ON l1.leagueid=l2.mainid
         WHERE active
             AND platform = 'yahoo'
-            AND (NOW() - LastViewed < INTERVAL '7 day')
-            AND coalesce(l2.linkedid, l1.leagueid) LIKE (SELECT MAX(SUBSTRING(linkedid, 1, 3)) FROM linkedids) || '%'
+            AND (NOW() - lastviewed < INTERVAL '7 day')
+            AND (NOW() - lastupdated > INTERVAL '12 hour')
+            AND coalesce(l2.linkedid, l1.leagueid) LIKE (SELECT MAX(SPLIT_PART(linkedid, '.l.', 1)::int) FROM linkedids) || '%'
+            LIMIT 150
         """
     )
     res_query = cursor.fetchall()
@@ -116,7 +118,7 @@ def process_all_yahoo_leagues(event, context):
 
     for league_info in res_query:
         league_id = league_info[0]
-        access_token = get_yahoo_access_token(league_info[1])["yahoo_access_token"]
+        access_token = get_yahoo_access_token(league_info[1]).get("yahoo_access_token", "")
 
         process_payload = {
             "queryStringParameters": {
