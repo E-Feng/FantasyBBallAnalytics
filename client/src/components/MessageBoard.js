@@ -22,7 +22,7 @@ function MessageBoard() {
   const isLoading = !isDataLoaded || isFetching;
 
   const messageData = isLoading ? null : commonData?.messageboard;
-  const unrosteredData = isLoading ? null : data.daily;
+  const unrosteredData = isLoading ? null : data?.daily;
 
   const messageArray = [];
 
