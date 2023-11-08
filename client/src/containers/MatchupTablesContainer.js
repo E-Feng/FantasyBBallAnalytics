@@ -9,6 +9,7 @@ function MatchupTablesContainer(props) {
   const data = props.data;
   const teams = props.teams;
   const settings = props.settings[0].categoryIds;
+  const currentWeek = parseInt(props.currentWeek)
 
   const cats = categoryDetails.filter((o) => {
     return settings.includes(o.espnId) && o.name !== 'mins'
@@ -25,20 +26,20 @@ function MatchupTablesContainer(props) {
     }
   })
 
-  const [week, setWeek] = useState(props.currentWeek);
+  const [week, setWeek] = useState(currentWeek);
   const [teamId, setTeamId] = useState('');
   const [displayList, setDisplayList] = useState(
     joinedData.filter((row) => row.week === week)
   );
 
   // Adjustment for changing contexts
-  if (week > props.currentWeek) {
-    setWeek(props.currentWeek);
+  if (week > currentWeek) {
+    setWeek(currentWeek);
     setTeamId('');
-    setDisplayList(joinedData.filter((row) => row.week === props.currentWeek));
+    setDisplayList(joinedData.filter((row) => row.week === currentWeek));
   }
 
-  const weekArray = Array.from(new Array(props.currentWeek), (x, i) => i + 1);
+  const weekArray = Array.from(new Array(currentWeek), (x, i) => i + 1);
 
   const handleWeekChange = (e) => {
     const val = parseInt(e.target.value);
