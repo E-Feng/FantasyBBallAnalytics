@@ -31,7 +31,7 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
           raise ValueError(f"Error obtaining {url_params} from Yahoo API")
     
     # Handling player data, grabbing from ESPN process. Only for 2024
-    elif int(league_key[0:3]) >= 428:
+    elif int(league_key[0:3].replace(".", "")) >= 428:
         s3 = boto3.resource("s3")
 
         if endpoint == "players":
