@@ -108,6 +108,9 @@ def get_league_id_status(event, context):
         for id in all_leagues:
             if league_id in id[0]:
                 full_league_id = id[0]
+
+        if ".l." not in full_league_id:
+            full_league_id = main_league_id
         
         sql_file = "sql/update_yahoo_league_after_process.sql"
         update_query = open(sql_file, "r").read()
