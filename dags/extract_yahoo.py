@@ -27,6 +27,7 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
           return data
         else:
           print(f"Failed {url_params} code:{res.status_code}")
+          print(res.text)
           raise ValueError(f"Error obtaining {url_params} from Yahoo API")
     
     # Handling player data, grabbing from ESPN process. Only for 2024
