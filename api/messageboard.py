@@ -33,7 +33,7 @@ def post_chat_message_to_firebase(event, context):
 
   url = f"{FIREBASE_URL}/{date}/{time}.json"
 
-  r = authed_session.post(url, data=json.dumps(payload))
+  r = authed_session.patch(url, data=json.dumps(payload))
 
   if r.status_code == 200:
     print("Data successfully sent to firebase")
