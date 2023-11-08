@@ -48,6 +48,11 @@ export const requestLeagueId = async (payload) => {
   const res = await fetch(fullURL, {
     method: 'GET',
   });
+
+  if (res.status !== 200) {
+    return ["SERVER_ERROR"]
+  }
+
   const data = await res.json();
   const values = data.split(":");
 

@@ -69,17 +69,20 @@ function LeagueChangeModal(props) {
     const activeLeagueYear = resLeagueYear || defaultLeagueYear;
     console.log(leagueStatus, activeLeagueId);
 
-    switch (leagueStatus) {
+    switch (leagueStatus) {        
       case 'ACTIVE':
         localStorage.setItem('leagueId', activeLeagueId);
         props.setShow(false);
         props.setLeagueKey([activeLeagueId, activeLeagueYear]);
         break;
+      case 'SERVER_ERROR':
+        setResponseMsg('Server issue, please try again later');
+        break;
       case 'AUTH_LEAGUE_NOT_VISIBLE':
         setResponseMsg('League is private, enter in cookie information.');
         break;
       case 'GENERAL_NOT_FOUND':
-        setResponseMsg('League id not found or deleted.');
+        setResponseMsg('League id deleted, or missing authorization');
         break;
       case 'LEAGUE_NOT_FOUND_DELETED':
         setResponseMsg('League id deleted.');
