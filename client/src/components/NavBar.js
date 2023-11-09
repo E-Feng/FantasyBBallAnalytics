@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaHome } from 'react-icons/fa';
 import { SiBuymeacoffee } from "react-icons/si";
+
 import styled from 'styled-components';
 
 import LeagueSettings from './LeagueSettings';
