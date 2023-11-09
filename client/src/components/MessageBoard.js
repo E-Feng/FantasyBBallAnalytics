@@ -26,7 +26,7 @@ function MessageBoard() {
 
   const messageArray = [];
 
-  const { register, handleSubmit, reset, errors } = useForm();
+  const { register, handleSubmit, reset, errors, formState } = useForm();
 
   const onSubmit = async (data) => {
     const name = data.name;
@@ -34,9 +34,9 @@ function MessageBoard() {
 
     // Sanitizing inputs
     const isProfanity = (await hasProfanity(name)) || (await hasProfanity(msg));
-    const isReserved = ['BOT', 'ADMIN'].includes(name.toUpperCase());
+    const isReserved = ['BOT', 'ADMIN'].includes(name?.toUpperCase());
 
-    if (isProfanity || isReserved) {
+    if (isProfanity || isReserved || name === undefined) {
       return;
     }
 
@@ -58,27 +58,27 @@ function MessageBoard() {
     const url =
       'https://p5v5a0pnfi.execute-api.us-east-1.amazonaws.com/v1/chat';
 
-    fetch(url, {
+    const res = await fetch(url, {
       method: 'post',
       headers: {
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    }).then((res) => {
-      console.log('Post status ', res.status);
-
-      if (res.status == 200) {
-        // Updating messageData
-        messageData[date] = messageData[date] ? messageData[date] : [];
-
-        messageData[date][time] = payload;
-
-        reset({ name: name, msg: '' });
-      }
-
-      return res.status;
     });
+
+    if (res.status == 200) {
+      console.log('Message sent')
+      // Updating messageData
+      messageData[date] = messageData[date] ? messageData[date] : [];
+      messageData[date][time] = payload;
+
+      reset({ name: name, msg: '' });
+    } else {
+      reset({ name: name, msg: msg })
+    }
+
+    return;
   };
 
   const formatMessage = (msg) => {
@@ -122,7 +122,7 @@ function MessageBoard() {
         const style = {
           margin: 'auto auto',
           fontWeight: 'bold',
-          textAlign: 'center'
+          textAlign: 'center',
         };
         return (
           <li key={msg.msg}>
@@ -202,7 +202,11 @@ function MessageBoard() {
               placeholder='Type your message here'
               ref={register({ required: true })}
             />
-            <input type='submit' value='SEND' />
+            <input
+              type='submit'
+              value='SEND'
+              disabled={formState.isSubmitting}
+            />
           </ChatForm>
           {(errors.name || errors.msg) && <p>Field Required</p>}
         </MessageBoardContainer>
