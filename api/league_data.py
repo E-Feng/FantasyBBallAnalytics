@@ -51,7 +51,7 @@ def put_league_data_to_ddb(event, context):
   # Obtaining payload to write to dynamodb
   payload = json.loads(event['body'], parse_float=Decimal)
   
-  print(payload)
+  # print(payload)
 
   # Verifying data
   if not 'leagueId' in payload.keys():
