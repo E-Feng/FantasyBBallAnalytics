@@ -274,8 +274,8 @@ def update_espn_leagues(event, context):
     FROM leagueids  
     WHERE active
       AND platform = 'espn'
-      AND (NOW() - LastViewed < INTERVAL '7 day')
-      OR leagueid IN ('1978554631')
+      AND (NOW() - lastviewed < INTERVAL '7 day')
+      and (NOW() - lastupdated) > interval '12 hour'
     """
   )
   res_query = cursor.fetchall()
