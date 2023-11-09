@@ -56,6 +56,7 @@ def process_espn_league(event, context):
   league_id = params.get('leagueId')
   cookie_espn = params.get('cookieEspnS2')
   process_only_current = params.get('processOnlyCurrent')
+  updated_at = params.get('updatedAt', datetime.utcnow().isoformat())
 
   league_info = {
     "leagueId": league_id,
@@ -90,7 +91,8 @@ def process_espn_league(event, context):
       'leagueId': league_id,
       'leagueYear': league_year,
       'allLeagueKeys': all_league_keys,
-      'platform': "espn"
+      'platform': "espn",
+      'updatedAt': updated_at
     }
 
     for endpoint in league_api_endpoints.keys():
@@ -291,7 +293,8 @@ def update_espn_leagues(event, context):
         "leagueId": league_id,
         "cookieSwid": league_info[1],
         "cookieEspnS2": league_info[2],
-        "processOnlyCurrent": True
+        "processOnlyCurrent": True,
+        "updatedAt": datetime.utcnow().isoformat()
       }
     }
 

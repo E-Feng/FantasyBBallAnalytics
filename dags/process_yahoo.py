@@ -1,6 +1,7 @@
 import boto3
 import psycopg2
 import pandas as pd
+from datetime import datetime
 
 from extract_yahoo import extract_from_yahoo_api
 from transform_raw_data_yahoo import transform_yahoo_raw_to_df
@@ -40,6 +41,7 @@ def process_yahoo_league(event, context):
     league_year = params.get("leagueYear")
     access_token = params.get("yahooAccessToken")
     all_league_keys = params.get("allLeagueKeys")
+    updated_at = params.get("updatedAt", datetime.utcnow().isoformat())
 
     print(f"Starting processing for {league_id} {league_year}")
 
@@ -47,7 +49,8 @@ def process_yahoo_league(event, context):
         'leagueId': league_id,
         'leagueYear': league_year,
         'allLeagueKeys': all_league_keys,
-        'platform': "yahoo"
+        'platform': "yahoo",
+        'updatedAt': updated_at
     }
     for endpoint in league_api_endpoints:
         url_params = league_api_endpoints[endpoint]
@@ -128,6 +131,7 @@ def process_all_yahoo_leagues(event, context):
                     "leagueYear": 2024,
                     "allLeagueKeys": get_all_league_ids(access_token),
                     "yahooAccessToken": access_token,
+                    "updatedAt": datetime.utcnow().isoformat()
                 }
             }
             process_res = invoke_lambda(lambda_client, 'process_yahoo_league', process_payload)
