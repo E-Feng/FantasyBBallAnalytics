@@ -3,6 +3,7 @@ import { useQueryClient, useIsFetching } from 'react-query';
 
 import LeagueContext from './LeagueContext';
 import LeagueChangeModal from './LeagueChangeModal';
+import OutdatedIndicator from './OutdatedIndicator';
 
 import styled from 'styled-components';
 
@@ -63,6 +64,7 @@ function LeagueSettings() {
           );
         })}
       </Dropdown>
+      <OutdatedIndicator updatedAt={data?.updatedAt}/>
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
         {leagueYearList.map((year, i) => {
@@ -90,10 +92,12 @@ const Container = styled.div`
 const Label = styled.p`
   text-transform: uppercase;
   text-decoration: none;
+
+  margin-left: 0.35rem;
 `;
 
 const Dropdown = styled.select`
-  margin: 0 0.5rem;
+  margin-left: 0.25rem;
 `;
 
 export default LeagueSettings;
