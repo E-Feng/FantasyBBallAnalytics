@@ -17,8 +17,10 @@ function TeamRankingsContainer(props) {
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const ratingsKey = `statRatings${period}`;
 
+  const catsExclude = ['mins', 'fpts'];
+
   const catsList = categoryDetails.filter(
-    (cat) => catIds.includes(cat.espnId) && cat.name !== 'mins'
+    (cat) => catIds.includes(cat.espnId) && !catsExclude.includes(cat.name)
   );
 
   const injuredIds = rosters.flatMap((r) => {
@@ -82,7 +84,10 @@ function TeamRankingsContainer(props) {
           );
         })}
       </DropDown>
-      <TeamRankingsTable data={data} cats={catsList} />
+      <TeamRankingsTable
+        data={data}
+        cats={catsList}
+      />
     </Container>
   );
 }

@@ -10,7 +10,8 @@ export const categoryDetails = [
     display: 'FGM',
     espnId: 13,
     digits: 0,
-  },{
+  },
+  {
     name: 'fgAtt',
     display: 'FGA',
     espnId: 16,
@@ -53,7 +54,7 @@ export const categoryDetails = [
     display: 'OREB',
     espnId: 4,
     digits: 0,
-  },  
+  },
   {
     name: 'drebs',
     display: 'DREB',
@@ -135,7 +136,7 @@ export const categoryDetails = [
   {
     name: 'fpts',
     display: 'FPTS',
-    espnId: -1,
+    espnId: 41,
     digits: 0,
   },
   {
@@ -143,15 +144,15 @@ export const categoryDetails = [
     display: 'ALL',
     espnId: -2,
     digits: 0,
-  }
+  },
 ];
 
 export const getCatInverse = (cat) => {
   return categoryDetails.filter((o) => o.name === cat)?.[0]?.inverse;
-}
+};
 
 export const determineWinner = (a, b, cat) => {
-  const inverse = getCatInverse(cat)
+  const inverse = getCatInverse(cat);
 
   let isWinner;
 
@@ -167,7 +168,7 @@ export const determineWinner = (a, b, cat) => {
 };
 
 export const checkLeagueHasEjections = (categoryIds) => {
-  const ejectionId = categoryDetails.filter(o => o.name === 'ejs')[0].espnId;
+  const ejectionId = categoryDetails.filter((o) => o.name === 'ejs')[0].espnId;
 
-  return categoryIds.includes(ejectionId)
-}
+  return categoryIds.includes(ejectionId);
+};

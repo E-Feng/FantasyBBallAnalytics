@@ -21,6 +21,7 @@ THREEA = '18'
 FG_PER = '19'
 FT_PER = '20'
 MINS = '40'
+FPTS = '41'
 
 SEASON = '0'
 LAST7 = '1'

@@ -7,10 +7,12 @@ import { getHSLColor } from '../utils/colorsUtil';
 function DraftRecapTable(props) {
   const data = props.data;
   const ratingsColorRange = props.range;
+  const scoringType = props.scoringType;
 
   data.sort((a, b) => a.pickNumber - b.pickNumber);
 
   const diffColorRange = [-100, 100];
+  const digits = scoringType === 'H2H_POINTS' ? 0 : 2;
 
   const numTeams = data.filter((player) => player.round === 1).length;
   const numPicks = data.length / numTeams;
@@ -71,7 +73,7 @@ function DraftRecapTable(props) {
 
         Cell: (props) => (
           <React.Fragment>
-            {typeof props.value === 'number' ? parseFloat(props.value).toFixed(2) : ''}
+            {typeof props.value === 'number' ? props.value.toFixed(digits) : ''}
           </React.Fragment>
         ),
       },

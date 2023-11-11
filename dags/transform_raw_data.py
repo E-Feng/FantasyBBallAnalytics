@@ -348,7 +348,7 @@ def transform_settings_to_df(settings: dict):
 
   # Check if points league, fantasy points will be appended as -1
   if scoring_type == 'H2H_POINTS':
-    row['categoryIds'].append(-1)
+    row['categoryIds'].append(int(consts.FPTS))
 
   data_array.append(row)
 

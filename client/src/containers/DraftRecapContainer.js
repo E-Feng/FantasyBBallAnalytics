@@ -13,6 +13,7 @@ function DraftRecapContainer(props) {
   const draft = props.draft;
   const teams = props.teams;
   const players = props.players;
+  const scoringType = props.settings[0].scoringType;
 
   const sortList = ['round', 'team', 'ranking', 'difference'];
 
@@ -97,7 +98,12 @@ function DraftRecapContainer(props) {
           <br />
         )}
       </Forms>
-      <DraftRecapTable data={data} range={ratingsRange} sortMode={sortMode} />
+      <DraftRecapTable
+        data={data}
+        range={ratingsRange}
+        sortMode={sortMode}
+        scoringType={scoringType}
+      />
     </Container>
   );
 }

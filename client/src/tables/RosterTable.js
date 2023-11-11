@@ -10,6 +10,7 @@ function RosterTable(props) {
   const cats = props.cats;
   const catColorRange = props.catColorRange;
   const statType = props.statType;
+  const scoringType = props.scoringType;
 
   data.sort((a, b) => {
     const aa = a.all || a.pts;
@@ -33,8 +34,8 @@ function RosterTable(props) {
       },
       {
         Header: 'Ranking',
-        accessor: 'ranking'
-      }
+        accessor: 'ranking',
+      },
     ];
     const catHeaders = cats.map((cat) => {
       return {
@@ -46,11 +47,17 @@ function RosterTable(props) {
           const val = props.value;
           const range = catColorRange[props.column.id];
           // If displaying stats, use inverse coloring where necessary (for TO, etc.)
-          const inverse = statType === 'stats' ? getCatInverse(props.column.id) : false;
+          const inverse =
+            statType === 'stats' ? getCatInverse(props.column.id) : false;
           const color = getHSLColor(val, range[0], range[1], inverse);
+
+          const isPoints =
+            scoringType === 'H2H_POINTS' && statType === 'statRatings';
+          const digits = isPoints ? 0 : 2;
+
           return (
             <p style={{ background: color, minWidth: '30px' }}>
-              {typeof val == 'number' ? parseFloat(val).toFixed(2) : ''}
+              {typeof val == 'number' ? parseFloat(val).toFixed(digits) : ''}
             </p>
           );
         },

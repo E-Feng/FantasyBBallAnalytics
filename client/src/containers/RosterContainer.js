@@ -17,10 +17,13 @@ function RosterContainer(props) {
   const players = props.leagueData.players;
   const rosters = props.leagueData.rosters;
   const catIds = props.leagueData.settings[0].categoryIds;
+  const scoringType = props.leagueData.settings[0].scoringType;
 
   const periodArray = ['Last7', 'Last15', 'Last30', 'Season'];
   const statTypeArray = ['statRatings', 'stats'];
   const ratingsKey = `${statType}${period}`;
+
+  const catsExclude = ['mins', 'fpts'];
 
   const teamOptions = teams.map((team) => {
     return {
@@ -33,7 +36,9 @@ function RosterContainer(props) {
     label: 'All Rostered Players',
   });
 
-  let catsList = categoryDetails.filter((cat) => catIds.includes(cat.espnId));
+  let catsList = categoryDetails.filter(
+    (cat) => catIds.includes(cat.espnId) && !catsExclude.includes(cat.name)
+  );
 
   if (statType === 'statRatings') {
     catsList = catsList.filter((cat) => cat.name !== 'mins');
@@ -137,6 +142,7 @@ function RosterContainer(props) {
               cats={catsList}
               catColorRange={catColorRange}
               statType={statType}
+              scoringType={scoringType}
             />
           );
         })}
