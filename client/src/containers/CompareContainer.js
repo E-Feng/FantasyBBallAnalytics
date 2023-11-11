@@ -5,6 +5,8 @@ import CompareTable from '../tables/CompareTable';
 import CompareSummaryTable from '../tables/CompareSummaryTable';
 import * as arrayMath from '../utils/arrayMath';
 import * as catUtils from '../utils/categoryUtils';
+import { calculateMatchup } from '../utils/matchupUtils';
+import CompareH2HTable from '../tables/CompareH2HTable';
 
 function CompareContainer(props) {
   const [selectedTeams, setSelectedTeams] = useState(['', '']);
@@ -15,7 +17,12 @@ function CompareContainer(props) {
   const currentWeek = props.currentWeek;
 
   const data = [];
+  const h2h = [];
   const summaryData = {};
+  console.log(teams);
+  const filteredTeams = teams.filter((team) => 
+    team.teamId === selectedTeams[0]
+  );
 
   // Filtering out unselected teams
   const filteredData = scoreboardData.filter((row) =>
@@ -26,6 +33,27 @@ function CompareContainer(props) {
   const cats = catUtils.categoryDetails.filter(o => {
     return catSettings.includes(o.espnId) && o.name !== 'mins'
   })
+
+  if (!selectedTeams.includes('')) {
+    const h2h_row_1 = {}
+    const h2h_row_2 = {}
+    h2h_row_1['rowHeader']= teams.filter((team) => 
+      team.teamId === parseInt(selectedTeams[0])
+    )?.[0]?.fullTeamName;
+    h2h_row_2['rowHeader']= teams.filter((team) => 
+      team.teamId === parseInt(selectedTeams[1])
+    )?.[0]?.fullTeamName;
+
+    for (let week = 1; week <= currentWeek; week++) {
+      const TeamOneWeekData = filteredData.filter(o => (o.week === week && o.teamId === parseInt(selectedTeams[0])));
+      const TeamTwoWeekData = filteredData.filter(o => (o.week === week && o.teamId === parseInt(selectedTeams[1])));
+      const Team1Win = calculateMatchup(TeamOneWeekData?.[0], TeamTwoWeekData?.[0]);
+      h2h_row_1[`week${week}`] = Team1Win ? 'Won' : '';
+      h2h_row_2[`week${week}`] = !Team1Win? 'Won' : '';
+    }
+    h2h.push(h2h_row_1);
+    h2h.push(h2h_row_2);
+  }
 
   // Calculating comparison table and summary table
   if (!selectedTeams.includes('')) {
@@ -61,7 +89,6 @@ function CompareContainer(props) {
         dataRow.stdev = stdev;
         dataRow.min = min;
         dataRow.max = max;
-
         data.push(dataRow);
       }
       // Calculating summary cat data
@@ -106,6 +133,8 @@ function CompareContainer(props) {
     }
   };
 
+  console.log(h2h)
+  console.log(data)
   return (
     <Container>
       <DropDownList>
@@ -134,6 +163,16 @@ function CompareContainer(props) {
           })}
         </DropDown>
       </DropDownList>
+      {isDataLoaded ? (
+        <H2HTableContainer>
+          <CompareH2HTable
+            data={h2h}
+            currentWeek={currentWeek}
+          />
+        </H2HTableContainer>
+      ) : (
+        <br />
+      )}
       {isDataLoaded ? (
         <TableContainer>
           <CompareTable
@@ -171,6 +210,13 @@ const DropDown = styled.select`
 `;
 
 const TableContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const H2HTableContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
