@@ -19,10 +19,6 @@ function CompareContainer(props) {
   const data = [];
   const h2h = [];
   const summaryData = {};
-  console.log(teams);
-  const filteredTeams = teams.filter((team) => 
-    team.teamId === selectedTeams[0]
-  );
 
   // Filtering out unselected teams
   const filteredData = scoreboardData.filter((row) =>
@@ -34,22 +30,21 @@ function CompareContainer(props) {
     return catSettings.includes(o.espnId) && o.name !== 'mins'
   })
 
+  // Calculating Head to Head matchup table
   if (!selectedTeams.includes('')) {
     const h2h_row_1 = {}
     const h2h_row_2 = {}
-    h2h_row_1['rowHeader']= teams.filter((team) => 
-      team.teamId === parseInt(selectedTeams[0])
-    )?.[0]?.fullTeamName;
-    h2h_row_2['rowHeader']= teams.filter((team) => 
-      team.teamId === parseInt(selectedTeams[1])
-    )?.[0]?.fullTeamName;
+    const teamOneId = parseInt(selectedTeams[0])
+    const teamTwoId = parseInt(selectedTeams[1])
+    h2h_row_1['rowHeader']= teams.filter((team) => team.teamId === teamOneId)?.[0]?.fullTeamName;
+    h2h_row_2['rowHeader']= teams.filter((team) => team.teamId === teamTwoId)?.[0]?.fullTeamName;
 
     for (let week = 1; week <= currentWeek; week++) {
-      const TeamOneWeekData = filteredData.filter(o => (o.week === week && o.teamId === parseInt(selectedTeams[0])));
-      const TeamTwoWeekData = filteredData.filter(o => (o.week === week && o.teamId === parseInt(selectedTeams[1])));
+      const TeamOneWeekData = filteredData.filter(o => (o.week === week && o.teamId === teamOneId));
+      const TeamTwoWeekData = filteredData.filter(o => (o.week === week && o.teamId === teamTwoId));
       const Team1Win = calculateMatchup(TeamOneWeekData?.[0], TeamTwoWeekData?.[0]);
       h2h_row_1[`week${week}`] = Team1Win ? 'Won' : '';
-      h2h_row_2[`week${week}`] = !Team1Win? 'Won' : '';
+      h2h_row_2[`week${week}`] = !Team1Win ? 'Won' : '';
     }
     h2h.push(h2h_row_1);
     h2h.push(h2h_row_2);
@@ -133,8 +128,6 @@ function CompareContainer(props) {
     }
   };
 
-  console.log(h2h)
-  console.log(data)
   return (
     <Container>
       <DropDownList>
@@ -164,12 +157,12 @@ function CompareContainer(props) {
         </DropDown>
       </DropDownList>
       {isDataLoaded ? (
-        <H2HTableContainer>
+        <TableContainer>
           <CompareH2HTable
             data={h2h}
             currentWeek={currentWeek}
           />
-        </H2HTableContainer>
+        </TableContainer>
       ) : (
         <br />
       )}
@@ -210,13 +203,6 @@ const DropDown = styled.select`
 `;
 
 const TableContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-const H2HTableContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
