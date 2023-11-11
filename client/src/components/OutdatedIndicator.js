@@ -8,7 +8,7 @@ function OutdatedIndicator(props) {
 
   const interval = 1 * 24 * 60 * 60 * 1000; // 1 day in milliseconds
 
-  const isOutdated = now - updatedAt > interval;
+  const isOutdated = now - updatedAt > interval || Number.isNaN(updatedAt);
 
   const info = `League is outdated due to failed authorization, open the 'Change'
     league option to the left and redo authorization to update, then refresh
