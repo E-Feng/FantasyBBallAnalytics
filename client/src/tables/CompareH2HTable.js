@@ -98,13 +98,12 @@ function CompareH2HTable(props) {
                                   // Apply the cell props
                                   const headerId = cell.column.id;
                                   const isRowHeader = headerId === 'rowHeader';
-                                  const green = cell.value === 'Won'
-                                  console.log(cell.value)
+                                  const isWinner = cell.value === 'Won'
                                   return (
                                     <td
                                       {...cell.getCellProps()}
                                       style={{
-                                        background: green ? 'limegreen' : 'gainsboro',
+                                        background: isWinner ? 'limegreen' : 'gainsboro',
                                         fontWeight: isRowHeader ? 'bold' : 'normal',
                                       }}
                                     >

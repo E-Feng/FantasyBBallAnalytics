@@ -9,7 +9,7 @@ import { calculateMatchup } from '../utils/matchupUtils';
 import CompareH2HTable from '../tables/CompareH2HTable';
 
 function CompareContainer(props) {
-  const [selectedTeams, setSelectedTeams] = useState(['', '']);
+  const [selectedTeams, setSelectedTeams] = useState([0, 0]);
 
   const teams = props.teams;
   const scoreboardData = props.data;
@@ -22,7 +22,7 @@ function CompareContainer(props) {
 
   // Filtering out unselected teams
   const filteredData = scoreboardData.filter((row) =>
-    selectedTeams.includes(row.teamId.toString())
+    selectedTeams.includes(row.teamId)
   );
 
   // Filtering out the categories
@@ -31,27 +31,30 @@ function CompareContainer(props) {
   })
 
   // Calculating Head to Head matchup table
-  if (!selectedTeams.includes('')) {
-    const h2h_row_1 = {}
-    const h2h_row_2 = {}
-    const teamOneId = parseInt(selectedTeams[0])
-    const teamTwoId = parseInt(selectedTeams[1])
-    h2h_row_1['rowHeader']= teams.filter((team) => team.teamId === teamOneId)?.[0]?.fullTeamName;
-    h2h_row_2['rowHeader']= teams.filter((team) => team.teamId === teamTwoId)?.[0]?.fullTeamName;
+  if (!selectedTeams.includes(0)) {
+    const h2hRowOne = {};
+    const h2hRowTwo = {};
+    const teamOneId = selectedTeams[0];
+    const teamTwoId = selectedTeams[1];
+    h2hRowOne["rowHeader"] = teams.filter((team) => team.teamId === teamOneId)?.[0]?.fullTeamName;
+    h2hRowTwo["rowHeader"] = teams.filter((team) => team.teamId === teamTwoId)?.[0]?.fullTeamName;
 
     for (let week = 1; week <= currentWeek; week++) {
-      const TeamOneWeekData = filteredData.filter(o => (o.week === week && o.teamId === teamOneId));
-      const TeamTwoWeekData = filteredData.filter(o => (o.week === week && o.teamId === teamTwoId));
-      const Team1Win = calculateMatchup(TeamOneWeekData?.[0], TeamTwoWeekData?.[0]);
-      h2h_row_1[`week${week}`] = Team1Win ? 'Won' : '';
-      h2h_row_2[`week${week}`] = !Team1Win ? 'Won' : '';
+      const teamOneWeekData = filteredData.filter((o) => o.week === week && o.teamId === teamOneId);
+      const teamTwoWeekData = filteredData.filter((o) => o.week === week && o.teamId === teamTwoId);
+      const teamOneWin = calculateMatchup(
+        teamOneWeekData?.[0],
+        teamTwoWeekData?.[0]
+      );
+      h2hRowOne[`week${week}`] = teamOneWin ? "Won" : "";
+      h2hRowTwo[`week${week}`] = !teamOneWin ? "Won" : "";
     }
-    h2h.push(h2h_row_1);
-    h2h.push(h2h_row_2);
+    h2h.push(h2hRowOne);
+    h2h.push(h2hRowTwo);
   }
 
   // Calculating comparison table and summary table
-  if (!selectedTeams.includes('')) {
+  if (!selectedTeams.includes(0)) {
     for (const cat of cats) {
       const catName = cat.name;
       const display = cat.display;
@@ -64,7 +67,7 @@ function CompareContainer(props) {
         dataRow['catId'] = catName;
 
         filteredData.forEach((row) => {
-          if (row.teamId.toString() === team) {
+          if (row.teamId === team) {
             const dataPoint = row[catName];
 
             // Setting individual team data
@@ -113,7 +116,7 @@ function CompareContainer(props) {
     }
   })
 
-  const isDataLoaded = data.length !== 0 && !selectedTeams.includes('');
+  const isDataLoaded = data.length !== 0 && !selectedTeams.includes(0);
 
   // Function to handle changing drop down list
   const handleTeamChange = (e) => {
@@ -121,7 +124,7 @@ function CompareContainer(props) {
     const val = e.target.value;
 
     const newSelectedTeams = [selectedTeams[0], selectedTeams[1]];
-    newSelectedTeams[position] = val;
+    newSelectedTeams[position] = parseInt(val);
 
     if (newSelectedTeams[0] !== newSelectedTeams[1]) {
       setSelectedTeams(newSelectedTeams);
@@ -162,7 +165,7 @@ function CompareContainer(props) {
             data={h2h}
             currentWeek={currentWeek}
           />
-        </TableContainer>
+        </TableContainer>        
       ) : (
         <br />
       )}
