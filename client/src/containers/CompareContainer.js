@@ -161,22 +161,20 @@ function CompareContainer(props) {
       </DropDownList>
       {isDataLoaded ? (
         <TableContainer>
-          <CompareH2HTable
-            data={h2h}
-            currentWeek={currentWeek}
-          />
-        </TableContainer>        
-      ) : (
-        <br />
-      )}
-      {isDataLoaded ? (
-        <TableContainer>
-          <CompareTable
-            data={data}
-            summaryData={summaryData}
-            currentWeek={currentWeek}
-          />
-          <CompareSummaryTable data={data} currentWeek={currentWeek} />
+          <TopTableContainer>
+            <CompareH2HTable
+                data={h2h}
+                currentWeek={currentWeek}
+              />
+          </TopTableContainer>
+          <BottomTableContainer>
+            <CompareTable
+                data={data}
+                summaryData={summaryData}
+                currentWeek={currentWeek}
+              />
+            <CompareSummaryTable data={data} currentWeek={currentWeek} />
+          </BottomTableContainer>
         </TableContainer>
       ) : (
         <br />
@@ -206,6 +204,20 @@ const DropDown = styled.select`
 `;
 
 const TableContainer = styled.div`
+  display: table;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const TopTableContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const BottomTableContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
