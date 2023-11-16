@@ -109,7 +109,7 @@ def process_all_yahoo_leagues(event, context):
         WHERE active
             AND platform = 'yahoo'
             AND (NOW() - lastviewed < INTERVAL '7 day')
-            AND (NOW() - lastupdated > INTERVAL '12 hour')
+            AND (NOW() - lastupdated > INTERVAL '2 hour')
             AND coalesce(l2.linkedid, l1.leagueid) LIKE (SELECT MAX(SPLIT_PART(linkedid, '.l.', 1)::int) FROM linkedids) || '%'
             AND viewcount > 1
         LIMIT 100
