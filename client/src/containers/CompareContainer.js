@@ -17,7 +17,7 @@ function CompareContainer(props) {
   const currentWeek = props.currentWeek;
 
   const data = [];
-  const h2h = [];
+  const h2hData = [];
   const summaryData = {};
 
   // Filtering out unselected teams
@@ -30,27 +30,22 @@ function CompareContainer(props) {
     return catSettings.includes(o.espnId) && o.name !== 'mins'
   })
 
-  // Calculating Head to Head matchup table
+  // Aggregate and compute relevant H2H Data
   if (!selectedTeams.includes(0)) {
-    const h2hRowOne = {};
-    const h2hRowTwo = {};
-    const teamOneId = selectedTeams[0];
-    const teamTwoId = selectedTeams[1];
-    h2hRowOne["rowHeader"] = teams.filter((team) => team.teamId === teamOneId)?.[0]?.fullTeamName;
-    h2hRowTwo["rowHeader"] = teams.filter((team) => team.teamId === teamTwoId)?.[0]?.fullTeamName;
-
-    for (let week = 1; week <= currentWeek; week++) {
-      const teamOneWeekData = filteredData.filter((o) => o.week === week && o.teamId === teamOneId);
-      const teamTwoWeekData = filteredData.filter((o) => o.week === week && o.teamId === teamTwoId);
-      const teamOneWin = calculateMatchup(
-        teamOneWeekData?.[0],
-        teamTwoWeekData?.[0]
-      );
-      h2hRowOne[`week${week}`] = teamOneWin ? "Won" : "";
-      h2hRowTwo[`week${week}`] = !teamOneWin ? "Won" : "";
+    for (const teamId of selectedTeams) {
+      const h2hRow = {}
+      h2hRow["rowHeader"] = teams.filter((team) => team.teamId === teamId)?.[0]?.fullTeamName;
+      for (let week = 1; week <= currentWeek; week++) {
+        if (teamId === selectedTeams[0]) {
+          const weekData = filteredData.filter((o) => o.week === week && o.teamId === teamId)?.[0];
+          const oppWeekData = filteredData.filter((o) => o.week === week && o.teamId === selectedTeams[1])?.[0];
+          h2hRow[`week${week}`] = calculateMatchup(weekData, oppWeekData) ? 'Won' : '';
+        } else {
+          h2hRow[`week${week}`] = (h2hData[0][`week${week}`] === 'Won') ? '' : 'Won';
+        }
+      }
+      h2hData.push(h2hRow);
     }
-    h2h.push(h2hRowOne);
-    h2h.push(h2hRowTwo);
   }
 
   // Calculating comparison table and summary table
@@ -163,7 +158,7 @@ function CompareContainer(props) {
         <TableContainer>
           <TopTableContainer>
             <CompareH2HTable
-                data={h2h}
+                data={h2hData}
                 currentWeek={currentWeek}
               />
           </TopTableContainer>
