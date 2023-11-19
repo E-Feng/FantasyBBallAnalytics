@@ -17,7 +17,7 @@ function CompareSummaryTable(props) {
         columns: [
           {
             Header: 'Wins',
-            accessor: 'wins'
+            accessor: 'wins',
           },
           {
             Header: 'Mean',
@@ -33,7 +33,7 @@ function CompareSummaryTable(props) {
           },
           {
             Header: 'StDev',
-            accessor: 'stdev'
+            accessor: 'stdev',
           },
         ],
       },
@@ -127,16 +127,16 @@ function CompareSummaryTable(props) {
                           return val[headerId];
                         });
 
-                        let isLargest;                        
+                        let isLargest;
                         const catID = cell.row.original.catId;
                         if (getCatInverse(catID)) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
                           isLargest = cell.value > Math.max(...compare);
                         }
-                        
+
                         let noColor;
-                        if (headerId === "stdev") {
+                        if (headerId === 'stdev') {
                           noColor = true;
                         }
 
@@ -145,7 +145,10 @@ function CompareSummaryTable(props) {
                           <td
                             {...cell.getCellProps()}
                             style={{
-                              background: (!noColor & isLargest) ? 'limegreen' : 'gainsboro',
+                              background:
+                                !noColor & isLargest
+                                  ? 'limegreen'
+                                  : 'gainsboro',
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
                             rowSpan={
