@@ -34,10 +34,6 @@ function CompareSummaryTable(props) {
           {
             Header: 'StDev',
             accessor: 'stdev'
-          },
-          {
-            Header: 'Win %',
-            accessor: 'winProb'
           }
         ],
       },

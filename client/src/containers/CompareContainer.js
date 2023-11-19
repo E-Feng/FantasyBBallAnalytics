@@ -16,17 +16,16 @@ function CompareContainer(props) {
 
   const data = [];
   const summaryData = {};
-  // console.log(scoreboardData);
+
   // Filtering out unselected teams
-  const filteredData = scoreboardData.filter(
-    (row) =>
-      selectedTeams.includes(row.teamId.toString()) && row.week < currentWeek
+  const filteredData = scoreboardData.filter((row) =>
+    selectedTeams.includes(row.teamId.toString())
   );
 
   // Filtering out the categories
-  const cats = catUtils.categoryDetails.filter((o) => {
-    return catSettings.includes(o.espnId) && o.name !== 'mins';
-  });
+  const cats = catUtils.categoryDetails.filter(o => {
+    return catSettings.includes(o.espnId) && o.name !== 'mins'
+  })
 
   // Calculating comparison table and summary table
   if (!selectedTeams.includes('')) {
@@ -74,36 +73,24 @@ function CompareContainer(props) {
   }
 
   // Calculating the wins between teams for each category
-  data.forEach((row) => {
+  data.forEach(row => {
     row.wins = 0;
-    const filteredCat = data.filter(
-      (o) => o.rowHeader === row.rowHeader && o !== row
-    );
+    const filteredCat = data.filter(o => o.rowHeader === row.rowHeader && o !== row)
 
     // Going through the weeks to add wins
     for (let week = 1; week <= currentWeek; week++) {
-      const weekKey = 'week' + week;
+      const weekKey = 'week' + week
 
-      const allCatValues = filteredCat.map((val) => {
-        return val[weekKey];
-      });
+      const allCatValues = filteredCat.map(val => {
+        return val[weekKey]
+      })
 
       if (catUtils.determineWinner(row[weekKey], allCatValues, row.catId)) {
         row.wins = row.wins + 1;
       }
     }
+  })
 
-    const o = filteredCat[0];
-    // const winProb = arrayMath.getWinProbability(
-    //   row.mean,
-    //   row.stdev,
-    //   o.mean,
-    //   o.stdev
-    // );
-    const winProb = 0
-    row.winProb = (winProb * 100).toFixed(1);
-  });
-  // console.log(data);
   const isDataLoaded = data.length !== 0 && !selectedTeams.includes('');
 
   // Function to handle changing drop down list
