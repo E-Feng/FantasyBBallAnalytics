@@ -27,7 +27,8 @@ export const stdev = (arr) => {
   const meanVal = mean(newArr);
 
   return Math.sqrt(
-    newArr.map((x) => Math.pow(x - meanVal, 2)).reduce((a, b) => a + b) / n
+    newArr.map((x) => Math.pow(x - meanVal, 2)).reduce((a, b) => a + b) /
+      (n - 1)
   );
 };
 
@@ -41,20 +42,8 @@ export const getPercentageRange = (data, percent) => {
 };
 
 export const getStdRange = (data, nStd) => {
-  const meanVal = mean(data)
-  const stdVal = stdev(data)
+  const meanVal = mean(data);
+  const stdVal = stdev(data);
 
-  return [meanVal - nStd*stdVal, meanVal + nStd*stdVal];
-}
-
-export const getWinProbability = (mean1, stdev1, mean2, stdev2) => {
-  // Generated from ChatGPT (no knowledge on this)
-  const meanDifference = mean1 - mean2;
-  const pooledStdev = Math.sqrt((stdev1 ** 2 + stdev2 ** 2) / 2);
-
-  const zScore = meanDifference / pooledStdev;
-
-  const probability = 0.5 * (1 + Math.sign(zScore) * (1 - Math.exp(-2 * zScore * zScore / Math.PI)));
-
-  return probability;
-}
+  return [meanVal - nStd * stdVal, meanVal + nStd * stdVal];
+};

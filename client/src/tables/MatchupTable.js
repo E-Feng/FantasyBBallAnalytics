@@ -3,11 +3,16 @@ import { useTable } from 'react-table';
 import styled from 'styled-components';
 
 import { calculateMatchup } from '../utils/matchupUtils';
-import { categoryDetails } from '../utils/categoryUtils';
+import { getCatInverse } from '../utils/categoryUtils';
+import { getHSLColor } from '../utils/colorsUtil';
 
 function MatchupTable(props) {
-  const data = [].concat([props.home], props.away);
   const cats = props.cats;
+
+  const filler = [{ type: 'filler' }];
+  const data = [].concat([props.home], props.away, filler, props.stats);
+
+  const numTeams = props.away.length + 1;
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
@@ -15,17 +20,49 @@ function MatchupTable(props) {
         Header: 'Team',
         accessor: 'fullTeamName',
 
-        Cell: (props) => (
-          <React.Fragment>{props.value.substring(0, 20)}</React.Fragment>
-        ),
+        Cell: (props) => {
+          const val = props.value;
+          const isFirstRow = props.cell.row.index === 0;
+          const isAwayTeam = props.row.index < numTeams && !isFirstRow;
+          const isProbability = props.row.original.type === 'prob';
+
+          const homeData = props.rows[0].original;
+          const awayData = props.row.original;
+          const prob = props.row.original.firstName;
+
+          const isWinner = calculateMatchup(homeData, awayData);
+
+          let color = 'black';
+          color = isFirstRow ? 'gainsboro' : color;
+          color = isAwayTeam ? (isWinner ? 'limegreen' : 'salmon') : color;
+          color = isProbability ? (prob >= 50 ? 'limegreen' : 'salmon') : color;
+
+          return (
+            <div style={{ background: color }}>
+              <p>{typeof val === 'string' ? val.substring(0, 20) : ''}</p>
+            </div>
+          );
+        },
       },
       {
         Header: 'Name',
         accessor: 'firstName',
 
-        Cell: (props) => (
-          <React.Fragment> {props.value.substring(0, 8)} </React.Fragment>
-        ),
+        Cell: (props) => {
+          const val = props.value;
+          const isAwayTeam = props.row.index < numTeams;
+          const isProbability = props.row.original.type === 'prob';
+
+          let color = 'black';
+          color = isAwayTeam ? 'gainsboro' : color;
+          color = isProbability ? getHSLColor(val, 0, 100) : color;
+
+          return (
+            <div style={{ background: color }}>
+              <p>{typeof val === 'string' ? val.substring(0, 8) : ''}</p>
+            </div>
+          );
+        },
       },
     ];
     const catHeaders = cats.map((cat) => {
@@ -33,11 +70,35 @@ function MatchupTable(props) {
         Header: cat.display,
         accessor: cat.name,
 
-        Cell: (props) => (
-          <React.Fragment>
-            {props.value && props.value.toFixed(cat.digits)}
-          </React.Fragment>
-        ),
+        Cell: (props) => {
+          const val = props.value;
+
+          const catId = props.cell.column.id;
+          const isFirstRow = props.cell.row.index === 0;
+          const isSeparator = props.row.original.type === 'filler';
+          const firstRowVal = props.rows[0].original[catId];
+
+          const inverse = getCatInverse(catId);
+          const isTied = val === firstRowVal;
+          const isWinner = inverse ? val > firstRowVal : val < firstRowVal;
+
+          let color;
+          color = isTied ? 'yellow' : isWinner ? 'limegreen' : 'salmon';
+          color = isFirstRow ? 'gainsboro' : color;
+          color = isSeparator ? 'black' : color;
+
+          if (props.row.original.type === 'prob') {
+            color = getHSLColor(val, 0, 100);
+          }
+
+          const digits = props.row.index < numTeams ? cat.digits : 0;
+
+          return (
+            <div style={{ background: color }}>
+              <p>{typeof val == 'number' ? val.toFixed(digits) : ''}</p>
+            </div>
+          );
+        },
       };
     });
 
@@ -86,57 +147,35 @@ function MatchupTable(props) {
               rows.map((row) => {
                 // Conditional borders for matching matchup
                 const isMatchup = props.home.awayId === row.original.teamId;
+                const isSeparator = row.original.type === 'filler';
 
-                // Determining who won the matchup to color team green/red
-                const isWon = calculateMatchup(props.home, row.values);
+                let rowStyle;
+                let cellStyle;
+
+                if (isMatchup) {
+                  rowStyle = {
+                    background: 'gainsboro',
+                    border: '3px dashed blue',
+                  };
+                }
+                if (isSeparator) {
+                  cellStyle = {
+                    height: '20px',
+                    borderLeft: '0',
+                    borderRight: '0',
+                  };
+                }
 
                 // Prepare the row for display
                 prepareRow(row);
                 return (
                   // Apply the row props
-                  <tr
-                    {...row.getRowProps()}
-                    style={{
-                      border: isMatchup ? '3px dashed blue' : '1px solid white',
-                    }}
-                  >
+                  <tr {...row.getRowProps()} style={rowStyle}>
                     {
                       // Loop over the rows cells
                       row.cells.map((cell) => {
-                        // Conditional background color rendering
-                        const catId = cell.column.id;
-                        const isFirstRow = cell.row.index === 0;
-                        const isTeamId = cell.column.id === 'fullTeamName';
-                        const isName = cell.column.id === 'firstName';
-                        const isTied = props.home[catId] === cell.value;
-                        let isGreater = props.home[catId] > cell.value;
-
-                        // Checking inverse categories and flipping
-                        const catDetail = categoryDetails.filter(
-                          (o) => o.name === cell.column.id
-                        )[0]
-                        if (catDetail && catDetail.inverse) {
-                          isGreater = !isGreater;
-                        }
-
                         return (
-                          <td
-                            {...cell.getCellProps()}
-                            style={{
-                              background:
-                                isFirstRow || isName
-                                  ? 'gainsboro'
-                                  : isTeamId
-                                  ? isWon
-                                    ? 'limegreen'
-                                    : 'salmon'
-                                  : isTied
-                                  ? 'yellow'
-                                  : isGreater
-                                  ? 'limegreen'
-                                  : 'salmon',
-                            }}
-                          >
+                          <td {...cell.getCellProps()} style={cellStyle}>
                             {cell.render('Cell')}
                           </td>
                         );
@@ -158,7 +197,7 @@ const Container = styled.div`
   flex-direction: column;
 
   max-width: 100%;
-  padding: 0.25rem 0;
+  margin: 0.25rem 0;
 `;
 
 const Title = styled.h3`
@@ -171,7 +210,8 @@ const TableContainer = styled.div`
   flex-direction: column;
 
   max-width: 100%;
-  padding: 0 1px;
+  padding: 0;
+  margin: 0;
   overflow: auto;
 `;
 
@@ -181,7 +221,10 @@ const Table = styled.table`
   text-align: center;
   white-space: nowrap;
   color: black;
+  background: black;
 
+  width: 100%;
+  padding: 0;
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid white;
@@ -189,25 +232,41 @@ const Table = styled.table`
   th {
     background: silver;
     color: black;
+    padding: 0.25rem;
+
+    :last-child {
+      border-right: 0;
+    }
   }
 
   tr {
     :last-child {
-      td {
-        border-bottom: 0;
-      }
+      padding: 0;
+      border-bottom: 0;
     }
   }
 
   th,
   td {
     margin: 0;
-    padding: 0.25rem;
     border-bottom: 1px solid white;
     border-right: 1px solid white;
 
     :last-child {
       border-right: 0;
+    }
+  }
+
+  td {
+    padding: 0;
+    margin: 0;
+
+    div {
+      padding: 0.25rem;
+
+      p {
+        max-height: 14px;
+      }
     }
   }
 `;

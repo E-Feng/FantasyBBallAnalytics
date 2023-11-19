@@ -16,7 +16,7 @@ function CompareContainer(props) {
 
   const data = [];
   const summaryData = {};
-  console.log(scoreboardData);
+  // console.log(scoreboardData);
   // Filtering out unselected teams
   const filteredData = scoreboardData.filter(
     (row) =>
@@ -94,15 +94,16 @@ function CompareContainer(props) {
     }
 
     const o = filteredCat[0];
-    const winProb = arrayMath.getWinProbability(
-      row.mean,
-      row.stdev,
-      o.mean,
-      o.stdev
-    );
+    // const winProb = arrayMath.getWinProbability(
+    //   row.mean,
+    //   row.stdev,
+    //   o.mean,
+    //   o.stdev
+    // );
+    const winProb = 0
     row.winProb = (winProb * 100).toFixed(1);
   });
-  console.log(data);
+  // console.log(data);
   const isDataLoaded = data.length !== 0 && !selectedTeams.includes('');
 
   // Function to handle changing drop down list

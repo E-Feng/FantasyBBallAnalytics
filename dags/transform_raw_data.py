@@ -104,8 +104,8 @@ def transform_scoreboard_to_df(scoreboard: dict):
   data = scoreboard['schedule']
 
   num_teams = len(scoreboard['teams'])
-
   num_byes = 0
+  current_week = scoreboard['status'].get('currentMatchupPeriod', 0)
 
   data_array = []
 
@@ -131,27 +131,29 @@ def transform_scoreboard_to_df(scoreboard: dict):
           # Category stats, using .get() for potential KeyErrors
           scores = match[side]['cumulativeScore']['scoreByStat']
 
-          if scores:
-            row['fgMade'] = scores.get(consts.FG_MADE, {}).get('score')
-            row['fgAtt'] = scores.get(consts.FG_ATT, {}).get('score')
-            row['fgPer'] = scores.get(consts.FG_PER, {}).get('score')
-            row['ftMade'] = scores.get(consts.FT_MADE, {}).get('score')
-            row['ftAtt'] = scores.get(consts.FT_ATT, {}).get('score')
-            row['ftPer'] = scores.get(consts.FT_PER, {}).get('score')
-            row['threes'] = scores.get(consts.THREES, {}).get('score')
-            row['orebs'] = scores.get(consts.OREBS, {}).get('score')
-            row['drebs'] = scores.get(consts.DREBS, {}).get('score')
-            row['rebs'] = scores.get(consts.REBS, {}).get('score')
-            row['asts'] = scores.get(consts.ASTS, {}).get('score')
-            row['stls'] = scores.get(consts.STLS, {}).get('score')
-            row['blks'] = scores.get(consts.BLKS, {}).get('score')
-            row['tos'] = scores.get(consts.TOS, {}).get('score')
-            row['dqs'] = scores.get(consts.DQS, {}).get('score')
-            row['ejs'] = scores.get(consts.EJS, {}).get('score')
-            row['flags'] = scores.get(consts.FLAGS, {}).get('score')
-            row['pfs'] = scores.get(consts.PFS, {}).get('score')
-            row['techs'] = scores.get(consts.TECHS, {}).get('score')
-            row['pts'] = scores.get(consts.PTS, {}).get('score')
+          if scores or row['week'] == (current_week + 1):
+            scores = {} if scores is None else scores
+
+            row['fgMade'] = scores.get(consts.FG_MADE, {}).get('score', 0)
+            row['fgAtt'] = scores.get(consts.FG_ATT, {}).get('score', 0)
+            row['fgPer'] = scores.get(consts.FG_PER, {}).get('score', 0)
+            row['ftMade'] = scores.get(consts.FT_MADE, {}).get('score', 0)
+            row['ftAtt'] = scores.get(consts.FT_ATT, {}).get('score', 0)
+            row['ftPer'] = scores.get(consts.FT_PER, {}).get('score', 0)
+            row['threes'] = scores.get(consts.THREES, {}).get('score', 0)
+            row['orebs'] = scores.get(consts.OREBS, {}).get('score', 0)
+            row['drebs'] = scores.get(consts.DREBS, {}).get('score', 0)
+            row['rebs'] = scores.get(consts.REBS, {}).get('score', 0)
+            row['asts'] = scores.get(consts.ASTS, {}).get('score', 0)
+            row['stls'] = scores.get(consts.STLS, {}).get('score', 0)
+            row['blks'] = scores.get(consts.BLKS, {}).get('score', 0)
+            row['tos'] = scores.get(consts.TOS, {}).get('score', 0)
+            row['dqs'] = scores.get(consts.DQS, {}).get('score', 0)
+            row['ejs'] = scores.get(consts.EJS, {}).get('score', 0)
+            row['flags'] = scores.get(consts.FLAGS, {}).get('score', 0)
+            row['pfs'] = scores.get(consts.PFS, {}).get('score', 0)
+            row['techs'] = scores.get(consts.TECHS, {}).get('score', 0)
+            row['pts'] = scores.get(consts.PTS, {}).get('score', 0)
             row['fpts'] = match[side]['totalPoints']
 
             # Clean null values
