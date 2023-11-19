@@ -10,9 +10,10 @@ function OutdatedIndicator(props) {
 
   const isOutdated = now - updatedAt > interval || Number.isNaN(updatedAt);
 
-  const info = `League is outdated due to failed authorization, open the 'Change'
-    league option to the left and redo authorization to update, then refresh
-    the page. If the indicator disappears, your league is now up to date.
+  const info = `Refresh to fetch updated league data. If this warning is
+    still here your league is outdated due to failed authorization, open the 
+    'Change' league option to the left and redo authorization to update, 
+    then refresh again.
   `;
 
   return (
