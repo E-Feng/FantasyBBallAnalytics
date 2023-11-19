@@ -1,4 +1,4 @@
-FROM node:15.5.1-alpine3.11 AS builder
+FROM node:20-alpine3.17 AS builder
 
 # Creating build in first container
 RUN mkdir /app
