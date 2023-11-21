@@ -19,14 +19,11 @@ from upload_to_aws import upload_league_data_to_dynamo
 from util import invoke_lambda
 
 
-week_list = list(range(1, 25))
-week_params = ";week=" + ",".join(map(str, week_list))
-
 league_api_endpoints = {
     'settings': ["league", "settings"],
     'teams': ["league", "teams", "standings"],
     'rosters': ["league", "teams", "roster"],
-    'scoreboard': ["league", f"scoreboard{week_params}"],
+    'scoreboard': ["league", "scoreboard{}"],
     'draft': ["league", "draftresults"],
     'players': [],
     'players_id_map': [],
@@ -54,6 +51,13 @@ def process_yahoo_league(event, context):
     }
     for endpoint in league_api_endpoints:
         url_params = league_api_endpoints[endpoint]
+
+        if endpoint == "scoreboard":
+            start_week = int(league_data["settings"].iloc[0]["startWeek"])
+            week_list = list(range(start_week, 25))
+            week_params = ";week=" + ",".join(map(str, week_list))
+
+            url_params[1] = url_params[1].format(week_params)
 
         data_endpoint = extract_from_yahoo_api(access_token, league_id, endpoint, url_params)
         league_data[endpoint] = transform_yahoo_raw_to_df(endpoint, data_endpoint)
