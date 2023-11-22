@@ -14,7 +14,7 @@ export const categoryDetails = [
   {
     name: 'fgAtt',
     display: 'FGA',
-    espnId: 16,
+    espnId: 14,
     digits: 0,
     inverse: true,
   },
@@ -33,7 +33,7 @@ export const categoryDetails = [
   {
     name: 'ftAtt',
     display: 'FTA',
-    espnId: 14,
+    espnId: 16,
     digits: 0,
     inverse: true,
   },
