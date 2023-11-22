@@ -2,7 +2,7 @@ import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
 import { getHSLColor } from '../utils/colorsUtil';
-import { getCatInverse, determineWinner } from '../utils/categoryUtils';
+import { getCatInverse } from '../utils/categoryUtils';
 
 function CompareTable(props) {
   const data = props.data;
@@ -107,20 +107,9 @@ function CompareTable(props) {
 
                         if (isRowHeader & !isRowSpanned) return null;
 
-                        // Conditional rendering for background
-                        const compare = vals.map((val) => {
-                          return val[headerId];
-                        });
-
                         let color = 'gainsboro';
                         const rowHeader = cell.row.original.rowHeader;
                         const catId = cell.row.original.catId;
-
-                        const isWinner = determineWinner(
-                          cell.value,
-                          compare,
-                          catId
-                        );
 
                         const inverse = getCatInverse(catId);
 

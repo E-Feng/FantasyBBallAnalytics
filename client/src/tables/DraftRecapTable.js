@@ -82,7 +82,7 @@ function DraftRecapTable(props) {
         accessor: 'difference',
       },
     ],
-    []
+    [digits]
   );
 
   const tableInstance = useTable({ columns, data });

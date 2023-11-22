@@ -8,7 +8,7 @@ import OutdatedIndicator from './OutdatedIndicator';
 import styled from 'styled-components';
 
 function LeagueSettings() {
-  const { leagueState, platform, modalState } = useContext(LeagueContext);
+  const { leagueState, modalState } = useContext(LeagueContext);
   const [leagueKey, setLeagueKey] = leagueState;
   const [showModal, setShowModal] = modalState;
 
