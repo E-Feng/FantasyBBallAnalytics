@@ -16,7 +16,6 @@ export const categoryDetails = [
     display: 'FGA',
     espnId: 14,
     digits: 0,
-    inverse: true,
   },
   {
     name: 'fgPer',
@@ -35,7 +34,6 @@ export const categoryDetails = [
     display: 'FTA',
     espnId: 16,
     digits: 0,
-    inverse: true,
   },
   {
     name: 'ftPer',
