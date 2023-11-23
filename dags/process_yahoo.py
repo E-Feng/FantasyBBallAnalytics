@@ -1,4 +1,5 @@
 import boto3
+import copy
 import psycopg2
 import pandas as pd
 from datetime import datetime
@@ -49,7 +50,7 @@ def process_yahoo_league(event, context):
         'platform': "yahoo",
         'updatedAt': updated_at
     }
-    for endpoint, url_params in league_api_endpoints.copy().items():
+    for endpoint, url_params in copy.deepcopy(league_api_endpoints).items():
         if endpoint == "scoreboard":
             start_week = int(league_data["settings"].iloc[0]["startWeek"])
             week_list = list(range(start_week, 25))
