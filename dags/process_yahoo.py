@@ -49,9 +49,7 @@ def process_yahoo_league(event, context):
         'platform': "yahoo",
         'updatedAt': updated_at
     }
-    for endpoint in league_api_endpoints:
-        url_params = league_api_endpoints[endpoint]
-
+    for endpoint, url_params in league_api_endpoints.copy().items():
         if endpoint == "scoreboard":
             start_week = int(league_data["settings"].iloc[0]["startWeek"])
             week_list = list(range(start_week, 25))
