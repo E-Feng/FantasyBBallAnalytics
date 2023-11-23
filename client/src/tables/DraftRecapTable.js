@@ -82,7 +82,7 @@ function DraftRecapTable(props) {
         accessor: 'difference',
       },
     ],
-    [digits]
+    [] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const tableInstance = useTable({ columns, data });
