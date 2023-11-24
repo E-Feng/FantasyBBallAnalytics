@@ -24,6 +24,10 @@ export const stdev = (arr) => {
   if (newArr.length === 0) return null;
 
   const n = newArr.length;
+  if (n === 1) {
+    return 0
+  }
+
   const meanVal = mean(newArr);
 
   return Math.sqrt(

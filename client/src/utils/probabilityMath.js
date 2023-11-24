@@ -35,11 +35,13 @@ export function getMatchupWinProbability(numWin, probabilities) {
   const n = 10000;
   let nWins = 0;
 
+  const isLessThanOne = mean(probabilities) < 1;
+
   for (let i = 0; i < n; i++) {
     let catWins = 0;
 
     probabilities.forEach((p) => {
-      const p1 = p > 1 ? p / 100 : p;
+      const p1 = isLessThanOne ? p : p / 100;
 
       const r = Math.random();
       catWins += r < p1 ? 1 : 0;
@@ -47,6 +49,8 @@ export function getMatchupWinProbability(numWin, probabilities) {
 
     nWins += catWins >= numWin ? 1 : 0;
   }
+  const probability = nWins / n;
+  const realisticProb = Math.min(Math.max(probability, 0.01), 0.99);
 
-  return nWins / n;
+  return realisticProb;
 }

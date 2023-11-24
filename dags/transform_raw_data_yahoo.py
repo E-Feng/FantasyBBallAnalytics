@@ -88,6 +88,7 @@ def transform_settings_to_df(data: dict):
     row = {}
 
     row["isActive"] = True
+    row["startWeek"] = data.get("start_week", 1)
     row['currentWeek'] = data.get("current_week", 1)
     row["scoringType"] = data["scoring_type"]
 

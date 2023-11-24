@@ -67,7 +67,7 @@ function MessageBoard() {
       body: JSON.stringify(payload),
     });
 
-    if (res.status == 200) {
+    if (res.status === 200) {
       console.log('Message sent')
       // Updating messageData
       messageData[date] = messageData[date] ? messageData[date] : [];

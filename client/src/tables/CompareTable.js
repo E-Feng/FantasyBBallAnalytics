@@ -106,11 +106,6 @@ function CompareTable(props) {
 
                         if (isRowHeader & !isRowSpanned) return null;
 
-                        // Conditional rendering for background
-                        const compare = vals.map((val) => {
-                          return val[headerId];
-                        });
-
                         let color = 'gainsboro';
                         const rowHeader = cell.row.original.rowHeader;
                         const catId = cell.row.original.catId;
