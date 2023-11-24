@@ -206,6 +206,9 @@ def process_espn_common():
 
       df = transform_raw_to_df(k, v)
 
+      if df.empty:
+        continue
+
       top_studs = df[(df['mins'] > minutes_cutoff) & (df['gs'] >= studs_gs_cutoff)]
       top_scrubs = df[(df['mins'] > minutes_cutoff) & (df['gs'] <= scrubs_gs_cutoff)]
 
@@ -250,7 +253,7 @@ def process_espn_common():
     'statusCode': 200,
     'body': "Test response"
   }
-
+process_espn_common()
 
 def update_espn_leagues(event, context):
   print(event)
