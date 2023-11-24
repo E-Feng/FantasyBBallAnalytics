@@ -8,7 +8,6 @@ function CompareTable(props) {
   const data = props.data;
   const summaryData = props.summaryData;
   const currentWeek = props.currentWeek;
-  //const currentWeek = 5;
 
   const numCompare = data.filter(
     (row) => row.rowHeader === data[0].rowHeader
@@ -107,18 +106,27 @@ function CompareTable(props) {
 
                         if (isRowHeader & !isRowSpanned) return null;
 
+                        // Conditional rendering for background
+                        const compare = vals.map((val) => {
+                          return val[headerId];
+                        });
+
                         let color = 'gainsboro';
                         const rowHeader = cell.row.original.rowHeader;
                         const catId = cell.row.original.catId;
-
-                        const inverse = getCatInverse(catId);
-
                         const mean = summaryData[rowHeader].mean;
                         const stdev = summaryData[rowHeader].stdev;
-
                         const mult = 2;
                         const lo = mean - stdev * mult;
                         const hi = mean + stdev * mult;
+
+                        let isLargest;
+                        const inverse = getCatInverse(catId);                     
+                        if (inverse) {
+                          isLargest = cell.value < Math.min(...compare);
+                        } else {
+                          isLargest = cell.value > Math.max(...compare);
+                        }
 
                         color = isRowHeader
                           ? color
@@ -129,7 +137,7 @@ function CompareTable(props) {
                           <td
                             {...cell.getCellProps()}
                             style={{
-                              background: color,
+                              background: isLargest ? color : 'gainsboro',
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
                             rowSpan={

@@ -27,7 +27,7 @@ function Compare(props) {
   let currentWeek = 1;
   let isRotoLeague = false;
   if (!isLoading && scoreboardData.length) {
-    currentWeek = scoreboardData[scoreboardData.length - 1].week;
+    currentWeek = settingsData[0].currentWeek;
     isRotoLeague =
       settingsData[0].scoringType === 'ROTO' ||
       typeof scoreboardData === 'string';
