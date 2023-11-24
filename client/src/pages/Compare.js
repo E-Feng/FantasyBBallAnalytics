@@ -24,24 +24,10 @@ function Compare(props) {
   const teamData = isLoading ? null : data.teams;
   const settingsData = isLoading ? null : data.settings;
 
-  function getCurrentWeek(scoreboardData) {
-    for (const data of scoreboardData) {
-      const result = Object.fromEntries(Object
-        .entries(data)
-        .filter(([k, v]) => v !== 0)
-      );
-      // teamId, awayId, and week are non-zero
-      if (Object.keys(result).length === 3) {
-        return result.week - 1;
-      }
-    };
-    return scoreboardData[scoreboardData.length - 1].week;
-  };
-
   let currentWeek = 1;
   let isRotoLeague = false;
   if (!isLoading && scoreboardData.length) {
-    currentWeek = getCurrentWeek(scoreboardData);
+    currentWeek = settingsData[0].currentWeek;
     isRotoLeague =
       settingsData[0].scoringType === 'ROTO' ||
       typeof scoreboardData === 'string';
