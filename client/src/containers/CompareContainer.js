@@ -62,7 +62,7 @@ function CompareContainer(props) {
         dataRow['catId'] = catName;
 
         filteredData.forEach((row) => {
-          if (row.teamId === team) {
+          if (row.teamId === team && row.week <= currentWeek) {
             const dataPoint = row[catName];
 
             // Setting individual team data
