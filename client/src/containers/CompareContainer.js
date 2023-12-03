@@ -7,6 +7,11 @@ import * as arrayMath from '../utils/arrayMath';
 import * as catUtils from '../utils/categoryUtils';
 import { calculateMatchup } from '../utils/matchupUtils';
 import CompareH2HTable from '../tables/CompareH2HTable';
+import CompareWinProbTable from '../tables/CompareWinProbTable';
+import {
+  getCatWinProbability,
+  getMatchupWinProbability,
+} from '../utils/probabilityMath';
 
 function CompareContainer(props) {
   const [selectedTeams, setSelectedTeams] = useState([0, 0]);
@@ -19,6 +24,7 @@ function CompareContainer(props) {
   const data = [];
   const h2hData = [];
   const summaryData = {};
+  const statData = [];
 
   // Filtering out unselected teams
   const filteredData = scoreboardData.filter((row) =>
@@ -30,6 +36,59 @@ function CompareContainer(props) {
     return catSettings.includes(o.espnId) && o.name !== 'mins'
   })
 
+  // Aggregate and compute win probabilities
+  if (!selectedTeams.includes(0)) {
+    for (const team of selectedTeams) {
+      const compTeamId = team;
+      const compAwayTeamId = selectedTeams.filter(o => o != team)?.[0];
+      const statRow = {};
+      statRow["rowHeader"] = teams.filter((team) => team.teamId === compTeamId)?.[0]?.fullTeamName;
+      for (let week = 1; week <= currentWeek; week++) {
+        // TODO update for each loop, instead of recomputing
+        let matchupWinProb;
+        if (team === selectedTeams[0]) {
+          const homeScoreboardData = filteredData.filter(
+            (d) => d.teamId === compTeamId && d.week < week
+          );
+          const awayScoreboardData = filteredData.filter(
+            (d) => d.teamId === compAwayTeamId && d.week < week
+          );
+          const statistics = {};
+          cats.forEach((cat) => {
+            const catHomeData = homeScoreboardData.map((d) => d[cat.name]);
+            const catAwayData = awayScoreboardData.map((d) => d[cat.name]);
+            const winProb = getCatWinProbability(
+              catHomeData,
+              catAwayData,
+              cat.inverse
+            );
+
+            statistics[cat.name] = winProb * 100;
+          });
+
+          const numCats = cats.length;
+          let minCats = Math.ceil(numCats / 2);
+
+          if (numCats % 2 === 0) {
+            if (statistics['pts'] < 50) {
+              minCats = minCats + 1;
+            }
+          }
+
+          const catProbs = Object.values(statistics);
+          matchupWinProb = (getMatchupWinProbability(minCats, catProbs) * 100)
+            .toFixed(0)
+            .toString(10);
+        } else {
+          matchupWinProb = 100 - statData[0][`week${week}`];
+        }
+        statRow[`week${week}`] = matchupWinProb;
+        // statRow[`week${week}CatProbs`] = statistics;
+      };
+      statData.push(statRow);
+      console.log(statData);
+    };
+  };
   // Aggregate and compute relevant H2H Data
   if (!selectedTeams.includes(0)) {
     for (const teamId of selectedTeams) {
@@ -159,6 +218,10 @@ function CompareContainer(props) {
           <TopTableContainer>
             <CompareH2HTable
                 data={h2hData}
+                currentWeek={currentWeek}
+              />
+            <CompareWinProbTable
+                data={statData}
                 currentWeek={currentWeek}
               />
           </TopTableContainer>
