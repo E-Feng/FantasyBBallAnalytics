@@ -2,6 +2,7 @@ import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
 import { getCatInverse } from '../utils/categoryUtils';
+import { getHSLColor } from '../utils/colorsUtil';
 
 function CompareSummaryTable(props) {
   const data = props.data;
@@ -35,6 +36,10 @@ function CompareSummaryTable(props) {
             Header: 'StDev',
             accessor: 'stdev',
           },
+          {
+            Header: 'Cat Win %',
+            accessor: 'winPer',
+          }
         ],
       },
     ],
@@ -82,8 +87,6 @@ function CompareSummaryTable(props) {
             {
               // Loop over the table rows
               rows.map((row) => {
-                //console.log(rows);
-                //console.log(row);
                 // Prepare the row for display
                 prepareRow(row);
 
@@ -115,7 +118,6 @@ function CompareSummaryTable(props) {
                     {
                       // Loop over the rows cells
                       row.cells.map((cell) => {
-                        //console.log(cell);
                         // Conditional rendering for row header span
                         const headerId = cell.column.id;
                         const isRowHeader = headerId === 'rowHeader';
@@ -129,7 +131,8 @@ function CompareSummaryTable(props) {
 
                         let isLargest;
                         const catID = cell.row.original.catId;
-                        if (getCatInverse(catID)) {
+                        const isWinPer = headerId === 'winPer'
+                        if (getCatInverse(catID) & !isWinPer) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
                           isLargest = cell.value > Math.max(...compare);
@@ -140,6 +143,10 @@ function CompareSummaryTable(props) {
                           noColor = true;
                         }
 
+                        const color = (isWinPer & !isRowHeader)
+                          ? getHSLColor(cell.value, 50, 100, false) 
+                          : 'limegreen'
+                        
                         // Apply the cell props
                         return (
                           <td
@@ -147,7 +154,7 @@ function CompareSummaryTable(props) {
                             style={{
                               background:
                                 !noColor & isLargest
-                                  ? 'limegreen'
+                                  ? color
                                   : 'gainsboro',
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
