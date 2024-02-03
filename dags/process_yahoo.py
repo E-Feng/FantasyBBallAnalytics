@@ -93,10 +93,10 @@ def process_all_yahoo_leagues(event, context):
 
     db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
     conn = psycopg2.connect(
-        host='db.lsygyiijbumuybwyuvrn.supabase.co',
+        host='aws-0-us-east-1.pooler.supabase.com',
         port='5432',
         database='postgres',
-        user='postgres',
+        user='postgres.lsygyiijbumuybwyuvrn',
         password=db_pass
     )
     cursor = conn.cursor()
