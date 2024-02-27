@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import CompareTable from '../tables/CompareTable';
-import CompareSummaryTable from '../tables/CompareSummaryTable';
 import * as arrayMath from '../utils/arrayMath';
 import * as catUtils from '../utils/categoryUtils';
 import { calculateMatchup } from '../utils/matchupUtils';
 import CompareH2HTable from '../tables/CompareH2HTable';
+import {
+  getCatWinProbability,
+} from '../utils/probabilityMath';
 
 function CompareContainer(props) {
   const [selectedTeams, setSelectedTeams] = useState([0, 0]);
@@ -29,7 +31,7 @@ function CompareContainer(props) {
   const cats = catUtils.categoryDetails.filter(o => {
     return catSettings.includes(o.espnId) && o.name !== 'mins'
   })
-
+  
   // Aggregate and compute relevant H2H Data
   if (!selectedTeams.includes(0)) {
     for (const teamId of selectedTeams) {
@@ -111,6 +113,32 @@ function CompareContainer(props) {
     }
   })
 
+  // Aggregate and compute category win probabilities
+  if (!selectedTeams.includes(0)) {
+    const homeScoreboardData = filteredData.filter(
+      (d) => d.teamId === selectedTeams[0] && d.week < currentWeek
+    );
+    const awayScoreboardData = filteredData.filter(
+      (d) => d.teamId === selectedTeams[1] && d.week < currentWeek
+    );
+    for (let i = 0; i < data.length; i += 2) {
+      let winProb;
+      const catID = data[i].catId;
+      cats.forEach((cat) => {
+        const catHomeData = homeScoreboardData.map((d) => d[catID]);
+        const catAwayData = awayScoreboardData.map((d) => d[catID]);
+        winProb = getCatWinProbability(
+          catHomeData,
+          catAwayData,
+          cat.inverse
+        );
+      });
+      const winPer = Math.round(winProb * 100);
+      data[i]['winPer'] = winPer;
+      data[i+1]['winPer'] = 100 - winPer;
+    };
+  };
+
   const isDataLoaded = data.length !== 0 && !selectedTeams.includes(0);
 
   // Function to handle changing drop down list
@@ -168,7 +196,6 @@ function CompareContainer(props) {
                 summaryData={summaryData}
                 currentWeek={currentWeek}
               />
-            <CompareSummaryTable data={data} currentWeek={currentWeek} />
           </BottomTableContainer>
         </TableContainer>
       ) : (

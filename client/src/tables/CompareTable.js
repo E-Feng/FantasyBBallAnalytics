@@ -21,10 +21,36 @@ function CompareTable(props) {
         Header: 'Week',
         columns: weekArray.map((week) => {
           return { Header: `${week}`, accessor: `week${week}` };
+          
         }),
       },
     ];
   }, [currentWeek]);
+
+  columns.push({
+    Header: 'Wins',
+    accessor: 'wins',
+  },
+  {
+    Header: 'Mean',
+    accessor: 'mean',
+  },
+  {
+    Header: 'Min',
+    accessor: 'min',
+  },
+  {
+    Header: 'Max',
+    accessor: 'max',
+  },
+  {
+    Header: 'StDev',
+    accessor: 'stdev',
+  },
+  {
+    Header: 'Win %',
+    accessor: 'winPer',
+  })
 
   columns.unshift({
     Header: '',
@@ -113,7 +139,6 @@ function CompareTable(props) {
 
                         let color = 'gainsboro';
                         const rowHeader = cell.row.original.rowHeader;
-                        const catId = cell.row.original.catId;
                         const mean = summaryData[rowHeader].mean;
                         const stdev = summaryData[rowHeader].stdev;
                         const mult = 2;
@@ -121,23 +146,33 @@ function CompareTable(props) {
                         const hi = mean + stdev * mult;
 
                         let isLargest;
-                        const inverse = getCatInverse(catId);                     
-                        if (inverse) {
+                        const catID = cell.row.original.catId;
+                        const isWinPer = headerId === 'winPer'
+                        if (getCatInverse(catID) & !isWinPer) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
                           isLargest = cell.value > Math.max(...compare);
                         }
 
-                        color = isRowHeader
-                          ? color
-                          : getHSLColor(cell.value, lo, hi, inverse);
+                        let noColor;
+                        if (headerId === 'stdev') {
+                          noColor = true;
+                        }
+
+                        if (isWinPer & !isRowHeader) {
+                          color = getHSLColor(cell.value, 50, 100, false)
+                        } else if (['wins', 'min', 'max'].includes(headerId)) {
+                          color = 'limegreen';
+                        } else if (!isRowHeader) {
+                          color = getHSLColor(cell.value, lo, hi, getCatInverse(catID))
+                        } 
 
                         // Apply the cell props
                         return (
                           <td
                             {...cell.getCellProps()}
                             style={{
-                              background: isLargest ? color : 'gainsboro',
+                              background: (!noColor && isLargest) ? color : 'gainsboro',
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
                             rowSpan={
