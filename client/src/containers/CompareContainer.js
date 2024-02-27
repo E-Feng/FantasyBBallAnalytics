@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import CompareTable from '../tables/CompareTable';
-import CompareSummaryTable from '../tables/CompareSummaryTable';
 import * as arrayMath from '../utils/arrayMath';
 import * as catUtils from '../utils/categoryUtils';
 import { calculateMatchup } from '../utils/matchupUtils';
@@ -197,7 +196,6 @@ function CompareContainer(props) {
                 summaryData={summaryData}
                 currentWeek={currentWeek}
               />
-            <CompareSummaryTable data={data} currentWeek={currentWeek} />
           </BottomTableContainer>
         </TableContainer>
       ) : (
