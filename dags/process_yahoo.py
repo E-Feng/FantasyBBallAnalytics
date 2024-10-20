@@ -131,7 +131,7 @@ def process_all_yahoo_leagues(event, context):
             process_payload = {
                 "queryStringParameters": {
                     "leagueId": league_id,
-                    "leagueYear": 2024,
+                    "leagueYear": 2025,
                     "allLeagueKeys": get_all_league_ids(access_token),
                     "yahooAccessToken": access_token,
                     "updatedAt": datetime.utcnow().isoformat()
