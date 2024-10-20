@@ -21,7 +21,7 @@ def invoke_lambda(client, function_name, payload):
 
 
 def get_current_espn_league_year():
-    year_url = "https://fantasy.espn.com/apis/v3/games/fba/seasons/"
+    year_url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/"
 
     res = requests.get(year_url)
 
