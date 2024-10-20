@@ -57,7 +57,7 @@ with DAG(
   # Parameters
   default_league_info = {
     'leagueId': '891817951',
-    'leagueYear': '2024',
+    'leagueYear': '2025',
   }
 
   ### Tasks
