@@ -1,7 +1,7 @@
 import boto3
 import requests
 
-from util import invoke_lambda
+from util import invoke_lambda, strip_character_accents
 from upload_to_aws import upload_data_to_s3
 
 
@@ -101,7 +101,7 @@ def update_player_list():
                     player = player["player"]
 
                     row["playerId"] = player["player_id"]
-                    row["playerName"] = player["name"]["full"]
+                    row["playerName"] = strip_character_accents(player["name"]["full"])
 
                     players_data.append(row)
             else:
