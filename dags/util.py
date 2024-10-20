@@ -1,5 +1,6 @@
 import json
 import requests
+import unicodedata
 
 
 def invoke_lambda(client, function_name, payload):
@@ -112,3 +113,8 @@ def capitalize_dict_keys(data):
     new_data.append(new_dict)
 
   return new_data
+
+
+def strip_character_accents(s):
+    nfkd_form = unicodedata.normalize('NFKD', s)
+    return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
