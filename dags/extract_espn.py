@@ -4,7 +4,7 @@ import json
 
 
 # Initializing parameters
-base_url = 'https://fantasy.espn.com/apis/v3/games/fba/seasons/{}/segments/0/leagues/{}'
+base_url = 'https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/{}/segments/0/leagues/{}'
 
 
 def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):

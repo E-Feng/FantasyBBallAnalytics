@@ -11,7 +11,7 @@ def get_scoring_period_id(default_league_info):
   league_year = default_league_info.get('leagueYear')
 
   # Hardcoded URL very likely to work, my public league
-  url = f'https://fantasy.espn.com/apis/v3/games/fba/seasons/{league_year}/segments/0/leagues/{league_id}?view=scoringperiodid'
+  url = f'https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/{league_year}/segments/0/leagues/{league_id}?view=scoringperiodid'
 
   r = requests.get(url)
 

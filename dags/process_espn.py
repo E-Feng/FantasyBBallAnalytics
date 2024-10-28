@@ -141,6 +141,7 @@ def process_espn_common():
   last_scoring_period = get_last_posted_scoring_period(current_year)
 
   if int(scoring_period) <= int(last_scoring_period):
+    print("ESPN common data already processed")
     return
 
   common_api_endpoints = {
@@ -207,6 +208,7 @@ def process_espn_common():
       df = transform_raw_to_df(k, v)
 
       if df.empty:
+        print("No daily stats available")
         continue
 
       top_studs = df[(df['mins'] > minutes_cutoff) & (df['gs'] >= studs_gs_cutoff)]
@@ -247,7 +249,7 @@ def process_espn_common():
       upload_data_to_s3(daily_json, "daily.json", bucket_name)
 
       upload_to_firebase('alert', alert_data)   
-      upload_to_firebase('scoring_period', {"scoring_period": scoring_period})    
+      upload_to_firebase('scoring_period', {"scoring_period": scoring_period}) 
 
   return {
     'statusCode': 200,
@@ -264,10 +266,10 @@ def update_espn_leagues(event, context):
   db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
 
   conn = psycopg2.connect(
-    host='db.lsygyiijbumuybwyuvrn.supabase.co',
+    host='aws-0-us-east-1.pooler.supabase.com',
     port='5432',
     database='postgres',
-    user='postgres',
+    user='postgres.lsygyiijbumuybwyuvrn',
     password=db_pass
   )
 
