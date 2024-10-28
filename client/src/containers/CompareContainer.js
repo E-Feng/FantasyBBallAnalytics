@@ -64,7 +64,7 @@ function CompareContainer(props) {
         dataRow['catId'] = catName;
 
         filteredData.forEach((row) => {
-          if (row.teamId === team && row.week <= currentWeek) {
+          if (row.teamId === team && row.week <= currentWeek - 1) {
             const dataPoint = row[catName];
 
             // Setting individual team data
@@ -187,14 +187,14 @@ function CompareContainer(props) {
           <TopTableContainer>
             <CompareH2HTable
                 data={h2hData}
-                currentWeek={currentWeek}
+                currentWeek={currentWeek - 1}
               />
           </TopTableContainer>
           <BottomTableContainer>
             <CompareTable
                 data={data}
                 summaryData={summaryData}
-                currentWeek={currentWeek}
+                currentWeek={currentWeek - 1}
               />
           </BottomTableContainer>
         </TableContainer>

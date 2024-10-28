@@ -151,7 +151,7 @@ function CompareTable(props) {
                         if (getCatInverse(catID) & !isWinPer) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
-                          isLargest = cell.value > Math.max(...compare);
+                          isLargest = cell.value >= Math.max(...compare);
                         }
 
                         let noColor;
