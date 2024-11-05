@@ -244,6 +244,12 @@ def transform_players_to_df(ratings: dict):
           category_ids = list(row['statRatings' + period].keys())
           category_ids.append(consts.MINS)
 
+          # Include fg/ft att/made if per exists
+          if consts.FG_PER in category_ids:
+            category_ids.extend([consts.FG_MADE, consts.FG_ATT])
+          if consts.FT_PER in category_ids:
+            category_ids.extend([consts.FT_MADE, consts.FT_ATT])
+
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
         year = max([d["seasonId"] for d in player["player"]["stats"]])

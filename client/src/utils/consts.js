@@ -14,3 +14,36 @@ export const LINEUP_SLOT_IDS = {
   BENCH: 12,
   IR: 13
 };
+
+export const PRO_TEAM_IDS = {
+  ATL: 1,
+  BKN: 17,
+  BOS: 2,
+  CHA: 30,
+  CHI: 4,
+  CLE: 5,
+  DAL: 6,
+  DEN: 7,
+  DET: 8,
+  GSW: 9,
+  HOU: 10,
+  IND: 11,
+  LAC: 12,
+  LAL: 13,
+  MEM: 29,
+  MIA: 14,
+  MIL: 15,
+  MIN: 16,
+  NOP: 3,
+  NYK: 18,
+  OKC: 25,
+  ORL: 19,
+  PHI: 20,
+  PHX: 21,
+  POR: 22,
+  SAC: 23,
+  SAS: 24,
+  TOR: 28,
+  UTA: 26,
+  WAS: 27
+};

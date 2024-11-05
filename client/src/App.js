@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
 import Teams from './pages/Teams';
+import Matchups from './pages/Matchups';
 import Scoreboard from './pages/Scoreboard';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
@@ -87,6 +88,10 @@ function App() {
           <Route
             path='/scoreboard'
             render={(props) => <Scoreboard {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/matchups'
+            render={(props) => <Matchups {...props} maxWidth={maxWidth} />}
           />
           <Route
             path='/compare'

@@ -19,6 +19,9 @@ function NavBar(props) {
             <Link to='/scoreboard'>Scoreboard</Link>
           </li>
           <li>
+            <Link to='/matchups'>Matchups</Link>
+          </li>          
+          <li>
             <Link to='/teams'>Teams</Link>
           </li>
           <li>
