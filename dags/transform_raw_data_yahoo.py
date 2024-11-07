@@ -104,12 +104,12 @@ def transform_settings_to_df(data: dict):
             row["categoryIds"].append(stat_id_espn)
 
         # Adding in fg/ft made/att
-        if stat_id == consts.FG_PER_Y:
-            row["categoryIds"].append(int(consts.FG_MADE))
-            row["categoryIds"].append(int(consts.FG_ATT))
-        if stat_id == consts.FT_PER_Y:
-            row["categoryIds"].append(int(consts.FT_MADE))
-            row["categoryIds"].append(int(consts.FT_ATT))
+        # if stat_id == consts.FG_PER_Y:
+        #     row["categoryIds"].append(int(consts.FG_MADE))
+        #     row["categoryIds"].append(int(consts.FG_ATT))
+        # if stat_id == consts.FT_PER_Y:
+        #     row["categoryIds"].append(int(consts.FT_MADE))
+        #     row["categoryIds"].append(int(consts.FT_ATT))
 
     data_array.append(row)
 

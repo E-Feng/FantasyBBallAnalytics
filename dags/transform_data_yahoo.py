@@ -1,5 +1,6 @@
 import pandas as pd
 
+import consts
 
 def adjust_player_ratings(league_data: dict):
   players = league_data["players"]
@@ -21,6 +22,11 @@ def adjust_player_ratings(league_data: dict):
 
   category_ids = settings.iloc[0]["categoryIds"]
   category_ids = [id for id in category_ids if id >= 0]
+
+  if int(consts.FG_PER) in category_ids:
+    category_ids.extend([int(consts.FG_MADE), int(consts.FG_ATT)])
+  if int(consts.FT_PER) in category_ids:
+    category_ids.extend([int(consts.FT_MADE), int(consts.FT_ATT)])
 
   for col in cols_to_fix:
     if col in players.columns:
