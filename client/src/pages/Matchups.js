@@ -31,6 +31,11 @@ function Matchups(props) {
     settingsData[0].scoringType === 'ROTO' ||
     typeof scoreboardData === 'string';
 
+  const matchUpInfo = `This table shows the current box scores and projections
+    with the players Last15 stats and remaining games. Diff(erences) are calculated
+    and color coded to show the closeness. Player games can be toggled to show
+    new projections.`;
+
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
@@ -39,6 +44,7 @@ function Matchups(props) {
         <RotoError />
       ) : (
         <RootContainer maxWidth={props.maxWidth}>
+          <TooltipHeader title='Box Scores' info={matchUpInfo} />
           <BoxScoresContainer data={data} commonData={commonData} />
         </RootContainer>
       )}

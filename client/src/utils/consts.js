@@ -12,10 +12,11 @@ export const LINEUP_SLOT_IDS = {
   F_C: 10,
   UTIL: 11,
   BENCH: 12,
-  IR: 13
+  IR: 13,
 };
 
 export const PRO_TEAM_IDS = {
+  NONE: 0,
   ATL: 1,
   BKN: 17,
   BOS: 2,
@@ -45,5 +46,5 @@ export const PRO_TEAM_IDS = {
   SAS: 24,
   TOR: 28,
   UTA: 26,
-  WAS: 27
+  WAS: 27,
 };

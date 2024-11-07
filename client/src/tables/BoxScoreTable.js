@@ -11,9 +11,14 @@ function BoxScoreTable(props) {
     colorRanges,
     home,
     away,
-    homeProjected,
-    awayProjected,
-    players,
+    diff,
+    homeProj,
+    awayProj,
+    diffProj,
+    homePlayers,
+    awayPlayers,
+    checkedGames,
+    handleGameChange,
   } = props;
 
   const filler = [{ type: 'filler' }];
@@ -22,13 +27,16 @@ function BoxScoreTable(props) {
     home,
     away,
     filler,
-    homeProjected,
-    awayProjected,
+    homeProj,
+    awayProj,
     filler,
-    players
+    diff,
+    diffProj,
+    filler,
+    homePlayers,
+    filler,
+    awayPlayers
   );
-
-  const numTeams = props.away.length + 1;
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
@@ -40,22 +48,23 @@ function BoxScoreTable(props) {
           const val = props.value;
           const type = props.row.original.type;
 
-          const isTeam = type === 'team' || type === 'proj';
           const isSeparator = type === 'filler';
+          const isPlayer = type === 'player';
+          const isTeam = !isSeparator && !isPlayer;
           const isHome = props.row.original.teamId === home.teamId;
 
           let isWinner;
           if (isHome) {
-            if (type === 'team') {
+            if (type === 'team' || type === 'diff') {
               isWinner = calculateMatchup(home, away);
-            } else if (type === 'proj') {
-              isWinner = calculateMatchup(homeProjected, awayProjected);
+            } else if (type === 'proj' || type === 'diffProj') {
+              isWinner = calculateMatchup(homeProj, awayProj);
             }
           } else {
             if (type === 'team') {
               isWinner = calculateMatchup(away, home);
             } else if (type === 'proj') {
-              isWinner = calculateMatchup(awayProjected, homeProjected);
+              isWinner = calculateMatchup(awayProj, homeProj);
             }
           }
 
@@ -71,22 +80,37 @@ function BoxScoreTable(props) {
         },
       },
       {
-        Header: 'Name',
+        Header: 'Games',
         accessor: 'gamesStatus',
 
         Cell: (props) => {
-          const val = JSON.stringify(props.value);
+          const playerId = props.row.original.playerId;
+          const val = checkedGames[playerId] || [];
 
           const isSeparator = props.row.original.type === 'filler';
-          const isAwayTeam = props.row.index < numTeams;
 
           let color = 'gainsboro';
           color = isSeparator ? 'black' : color;
-          color = isAwayTeam ? 'gainsboro' : color;
 
           return (
-            <div style={{ background: color }}>
-              <p>{typeof val === 'string' ? val.substring(0, 15) : ''}</p>
+            <div style={{ background: color, padding: '2px' }}>
+              {val.map((v, i) => {
+                return (
+                  <input
+                    key={i}
+                    type='checkbox'
+                    checked={v > 0}
+                    disabled={v === 2}
+                    onChange={(e) => handleGameChange(e, playerId, i)}
+                    style={{
+                      visibility: v !== null ? 'visible' : 'hidden',
+                      height: '13px',
+                      width: '13px',
+                      marginLeft: '1px',
+                    }}
+                  />
+                );
+              })}
             </div>
           );
         },

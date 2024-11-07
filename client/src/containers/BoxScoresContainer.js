@@ -10,6 +10,18 @@ import { PRO_TEAM_IDS } from '../utils/consts';
 import { getStdRange } from '../utils/arrayMath';
 
 function BoxScoresContainer(props) {
+  const getCheckedGames = (teamId, week) => {
+    const boxScore = fullScoreboard.find(
+      (row) => row.week === week && row.teamId === teamId
+    );
+    const newCheckedGames = {};
+    players
+      .filter((p) => [boxScore.teamId, boxScore.awayId].includes(p.teamId))
+      .forEach((p) => (newCheckedGames[p.playerId] = p.gameStatus));
+
+    return newCheckedGames;
+  };
+
   const { teams, players, rosters, scoreboard, settings } = props.data;
   const { schedule } = props.commonData;
 
@@ -23,14 +35,97 @@ function BoxScoresContainer(props) {
       name: team.fullTeamName,
     };
   });
-  const weekArray = Array.from(new Array(currentWeek + 1), (x, i) => i + 1);
+  const weekArray = [currentWeek, currentWeek + 1];
 
-  // States
+  // Init states
   const [week, setWeek] = useState(currentWeek);
-  // const [teamId, setTeamId] = useState('');
-  const [displayList, setDisplayList] = useState(
-    fullScoreboard.filter((row) => row.week === week)
+  const [teamId, setTeamId] = useState(teams[0].teamId);
+
+  schedule.forEach((g) => {
+    g.teamIds = g.teams.map((t) => PRO_TEAM_IDS[t]);
+  });
+
+  const todayDate = new Date()
+    .toLocaleString('en-CA', { timeZone: 'America/New_York' })
+    .split(',')[0];
+
+  players.forEach((p) => {
+    p.type = 'player';
+
+    const isInjured = p.injuryStatus === 'OUT';
+    p.name = isInjured ? `${p.playerName}🚑` : p.playerName;
+
+    const roster = rosters.find((r) => r.playerId === p.playerId);
+    const teamId = roster ? roster.teamId : 0;
+    p.teamId = teamId;
+
+    const datesPlayed = {};
+    schedule
+      .filter((g) => g.week === week)
+      .forEach((g) => {
+        datesPlayed[g.date] =
+          datesPlayed[g.date] !== undefined ? datesPlayed[g.date] : null;
+
+        const isPlaying = g.teamIds.includes(p.proTeamId);
+        const isCompleted = g.date < todayDate;
+
+        if (isPlaying && isCompleted) {
+          datesPlayed[g.date] = isPlaying + isCompleted;
+        } else if (isPlaying && isInjured) {
+          datesPlayed[g.date] = 0;
+        } else if (isPlaying) {
+          datesPlayed[g.date] = 1;
+        }
+      });
+
+    p.gameStatus = Object.values(datesPlayed);
+  });
+
+  // Checked game state
+  const [checkedGames, setCheckedGames] = useState(
+    getCheckedGames(teamId, week)
   );
+
+  const weekBoxScores = fullScoreboard.filter((row) => row.week === week);
+
+  const homeBoxScore = weekBoxScores.find((row) => row.teamId === teamId);
+  const bothTeamIds = [homeBoxScore.teamId, homeBoxScore.awayId];
+
+  const bothBoxScores = fullScoreboard.filter(
+    (row) => bothTeamIds.includes(row.teamId) && row.week === week
+  );
+
+  const handleWeekChange = (event) => {
+    const newWeek = parseInt(event.target.value);
+    if (isNaN(newWeek)) return;
+
+    setWeek(newWeek);
+
+    const newCheckedGames = getCheckedGames(teamId, newWeek);
+
+    setCheckedGames(newCheckedGames);
+  };
+
+  const handleTeamIdChange = (e) => {
+    const newTeamId = parseInt(e.target.value);
+    if (isNaN(newTeamId)) return;
+
+    setTeamId(newTeamId);
+
+    const newCheckedGames = getCheckedGames(newTeamId, week);
+
+    setCheckedGames(newCheckedGames);
+  };
+
+  const handleGameChange = (event, playerId, i) => {
+    const gameStatus = checkedGames[playerId];
+    gameStatus[i] = gameStatus[i] === 1 ? 0 : 1;
+
+    setCheckedGames({
+      ...checkedGames,
+      playerId: gameStatus,
+    });
+  };
 
   // Adding Att/Made to cats
   const catIds = settings[0].categoryIds;
@@ -45,92 +140,90 @@ function BoxScoresContainer(props) {
 
   const cats = categoryDetails.filter((o) => catIds.includes(o.espnId));
 
-  const handleWeekChange = (event) => {
-    setWeek(event.target.value);
-  };
-
-  // const handleTeamIdChange = (event) => {
-  //   setTeamId(event.target.value);
-  // };
-
-  schedule.forEach((g) => {
-    g.teamIds = g.teams.map((t) => PRO_TEAM_IDS[t]);
-  });
-
-  const todayDate = new Date().toISOString().split('T')[0];
-
-  // Calculating games left, adding owner id
+  // Calculating games left and stats
   players.forEach((p) => {
-    p.name = p.playerName;
-    p.type = 'player';
-
-    p.gamesLeft = 0;
-    const datesPlayed = {};
-    schedule
-      .filter((g) => g.week === week)
-      .forEach((g) => {
-        datesPlayed[g.date] = datesPlayed[g.date] || 0;
-
-        const isPlaying = g.teamIds.includes(p.proTeamId);
-        const isCompleted = g.date < todayDate;
-
-        if (isPlaying) {
-          datesPlayed[g.date] = isPlaying + isCompleted;
-        }
-
-        if (isPlaying && !isCompleted) {
-          p.gamesLeft++;
-        }
-      });
-    p.gamesStatus = Object.values(datesPlayed);
-
-    const roster = rosters.find((r) => r.playerId === p.playerId);
-    const teamId = roster ? roster.teamId : 0;
-    p.teamId = teamId;
+    if (checkedGames[p.playerId]) {
+      p.gamesLeft = checkedGames[p.playerId].filter((s) => s === 1).length;
+    } else {
+      p.gamesLeft = p.gameStatus.filter((s) => s === 1).length;
+    }
 
     cats.forEach((cat) => {
-      p[cat.name] = p.statsLast15 ? p.statsLast15[cat.espnId] : null;
+      p[cat.name] = p.statsLast15
+        ? p.statsLast15[cat.espnId] * p.gamesLeft
+        : null;
     });
   });
+  calculatePercentageCats(players);
 
-  console.log(players);
-  console.log(cats);
-
-  const projectedScores = displayList.map((row) => {
-    const scoreCopy = structuredClone(row);
+  const projScores = weekBoxScores.map((row) => {
     const teamPlayers = players.filter((p) => p.teamId === row.teamId);
-    console.log('play', teamPlayers);
-
     return teamPlayers.reduce(
       (acc, p) => {
         cats.forEach((cat) => {
-          acc[cat.name] = (acc[cat.name] || 0) + p[cat.name] * p.gamesLeft;
+          acc[cat.name] = (acc[cat.name] || 0) + p[cat.name];
         });
         return acc;
       },
-      { ...scoreCopy, name: `${row.name} (Proj)`, type: 'proj' }
+      { ...row, name: `${row.name} [PROJ]`, type: 'proj' }
     );
   });
-  calculatePercentageCats(projectedScores);
+  calculatePercentageCats(projScores);
 
-  console.log('sb', fullScoreboard);
-  console.log('projected', projectedScores);
-  console.log(displayList);
+  const diff = [];
+  const diffProj = [];
+  weekBoxScores.forEach((row) => {
+    const scoreCopy = structuredClone(row);
+    const projCopy = structuredClone(
+      projScores.find((p) => p.teamId === row.teamId)
+    );
+
+    scoreCopy.name = 'Diff';
+    scoreCopy.type = 'diff';
+    projCopy.name = 'Diff [PROJ]';
+    projCopy.type = 'diffProj';
+
+    const awayRow = weekBoxScores.find((r) => r.teamId === row.awayId);
+    const awayProj = projScores.find((p) => p.teamId === row.awayId);
+
+    cats.forEach((cat) => {
+      if (row[cat.name] && awayRow[cat.name]) {
+        scoreCopy[cat.name] = row[cat.name] - awayRow[cat.name];
+      }
+      if (projCopy[cat.name] && awayProj[cat.name]) {
+        projCopy[cat.name] = projCopy[cat.name] - awayProj[cat.name];
+      }
+    });
+    diff.push(scoreCopy);
+    diffProj.push(projCopy);
+  });
 
   // Calculating color ranges
-  const colorRanges = { player: {}, team: {}, proj: {} };
+  const colorRanges = {
+    player: {},
+    team: {},
+    proj: {},
+    diff: {},
+    diffProj: {},
+  };
   cats.forEach((cat) => {
     const playersData = players.map((p) => p[cat.name]);
     colorRanges.player[cat.name] = getStdRange(playersData, 1.5);
 
-    const teamsData = displayList.map((t) => t[cat.name]);
+    const teamsData = weekBoxScores.map((t) => t[cat.name]);
     colorRanges.team[cat.name] = getStdRange(teamsData, 1.5);
 
-    const projData = projectedScores.map((t) => t[cat.name]);
+    const projData = projScores.map((t) => t[cat.name]);
     colorRanges.proj[cat.name] = getStdRange(projData, 1.5);
-  });
 
-  console.log(colorRanges);
+    const diffData = diff.map((t) => t[cat.name]);
+    const maxVal = Math.max(...diffData);
+    colorRanges.diff[cat.name] = [-maxVal, maxVal];
+
+    const diffProjData = diffProj.map((t) => t[cat.name]);
+    const maxValProj = Math.max(...diffProjData);
+    colorRanges.diffProj[cat.name] = [-maxValProj, maxValProj];
+  });
 
   return (
     <Container>
@@ -145,36 +238,38 @@ function BoxScoresContainer(props) {
             </option>
           ))}
         </DropDown>
-        {/* <DropDown value={teamId} onChange={handleTeamIdChange}>
+        <DropDown value={teamId} onChange={handleTeamIdChange}>
           <option value='' key={0}>
             Select Team
           </option>
-          {props.teams.map((o) => (
-            <option value={o.teamId} key={o.teamId}>
-              {o.fullTeamName}
-            </option>
-          ))}
-        </DropDown> */}
+          {teams.map((o) => {
+            return (
+              <option value={o.teamId} key={o.teamId}>
+                {o.fullTeamName}
+              </option>
+            );
+          })}
+        </DropDown>
       </DropDownList>
       <TablesList>
-        {displayList.map((displayRow) => {
-          return (
-            <BoxScoreTable
-              key={displayRow.week + displayRow.teamId}
-              cats={cats}
-              colorRanges={colorRanges}
-              home={displayRow}
-              away={displayList.find((row) => row.teamId === displayRow.awayId)}
-              homeProjected={projectedScores.find(
-                (p) => p.teamId === displayRow.teamId
-              )}
-              awayProjected={projectedScores.find(
-                (p) => p.teamId === displayRow.awayId
-              )}
-              players={players.filter((p) => p.teamId === displayRow.teamId)}
-            />
-          );
-        })}
+        <BoxScoreTable
+          cats={cats}
+          colorRanges={colorRanges}
+          home={homeBoxScore}
+          away={bothBoxScores.find((row) => row.teamId === homeBoxScore.awayId)}
+          homeProj={projScores.find(
+            (row) => row.teamId === homeBoxScore.teamId
+          )}
+          awayProj={projScores.find(
+            (row) => row.teamId === homeBoxScore.awayId
+          )}
+          diff={diff.find((row) => row.teamId === homeBoxScore.teamId)}
+          diffProj={diffProj.find((row) => row.teamId === homeBoxScore.teamId)}
+          homePlayers={players.filter((p) => p.teamId === homeBoxScore.teamId)}
+          awayPlayers={players.filter((p) => p.teamId === homeBoxScore.awayId)}
+          checkedGames={checkedGames}
+          handleGameChange={handleGameChange}
+        />
       </TablesList>
     </Container>
   );
