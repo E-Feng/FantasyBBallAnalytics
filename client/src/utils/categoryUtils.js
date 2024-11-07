@@ -1,7 +1,7 @@
 export const categoryDetails = [
   {
     name: 'mins',
-    display: 'MINS',
+    display: 'MIN',
     espnId: 40,
     digits: 0,
   },
@@ -10,12 +10,14 @@ export const categoryDetails = [
     display: 'FGM',
     espnId: 13,
     digits: 0,
+    colorless: true,
   },
   {
     name: 'fgAtt',
     display: 'FGA',
     espnId: 14,
     digits: 0,
+    colorless: true,
   },
   {
     name: 'fgPer',
@@ -28,12 +30,14 @@ export const categoryDetails = [
     display: 'FTM',
     espnId: 15,
     digits: 0,
+    colorless: true,
   },
   {
     name: 'ftAtt',
     display: 'FTA',
     espnId: 16,
     digits: 0,
+    colorless: true,
   },
   {
     name: 'ftPer',
@@ -169,4 +173,15 @@ export const checkLeagueHasEjections = (categoryIds) => {
   const ejectionId = categoryDetails.filter((o) => o.name === 'ejs')[0].espnId;
 
   return categoryIds.includes(ejectionId);
+};
+
+export const calculatePercentageCats = (scores) => {
+  scores.forEach((score) => {
+    if (score.fgPer) {
+      score.fgPer = score.fgMade / score.fgAtt;
+    }
+    if (score.ftPer) {
+      score.ftPer = score.ftMade / score.ftAtt;
+    }
+  });
 };

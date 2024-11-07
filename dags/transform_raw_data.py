@@ -118,20 +118,22 @@ def transform_scoreboard_to_df(scoreboard: dict):
       # Iterate both home and away scores in each matchup
       for side in sides:
         # Check if scheduled matchup has occured
-        if 'cumulativeScore' in match[side]:
+        # if 'cumulativeScore' in match[side]:
+        week = math.ceil((match['id'] - num_byes)/(num_teams/2))
+        if week <= (current_week + 1):
           away = 'away' if (side == 'home') else 'home'
 
           row = {}
 
           row['teamId'] = match[side]['teamId']
           row['awayId'] = match[away]['teamId']
-          row['week'] = math.ceil((match['id'] - num_byes)/(num_teams/2))
+          row['week'] = week
           row['won'] = True if (match['winner'].lower() == side) else False
 
           # Category stats, using .get() for potential KeyErrors
-          scores = match[side]['cumulativeScore']['scoreByStat']
+          scores = match[side].get('cumulativeScore', {}).get('scoreByStat')
 
-          if scores or row['week'] == (current_week + 1):
+          if scores:
             scores = {} if scores is None else scores
 
             row['fgMade'] = scores.get(consts.FG_MADE, {}).get('score', 0)
@@ -159,8 +161,8 @@ def transform_scoreboard_to_df(scoreboard: dict):
             # Clean null values
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
 
-            # Appending full match details into df
-            data_array.append(row)
+          # Appending full match details into df
+          data_array.append(row)
 
     # Adjusting id/week for byes
     elif (sides[0] in match) & (sides[1] not in match):
@@ -243,6 +245,12 @@ def transform_players_to_df(ratings: dict):
         if not category_ids:
           category_ids = list(row['statRatings' + period].keys())
           category_ids.append(consts.MINS)
+
+          # Include fg/ft att/made if per exists
+          if consts.FG_PER in category_ids:
+            category_ids.extend([consts.FG_MADE, consts.FG_ATT])
+          if consts.FT_PER in category_ids:
+            category_ids.extend([consts.FT_MADE, consts.FT_ATT])
 
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
