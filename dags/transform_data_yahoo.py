@@ -51,6 +51,9 @@ def truncate_and_map_player_ids(league_data: dict):
     return pd.DataFrame()
   
   # Map yahoo ids
+  # Manual exceptions
+  players_id_map.loc[players_id_map["playerName"] == "Alex Sarr", "playerName"] = "Alexandre Sarr"
+
   players["playerName"] = players["playerName"].str.replace(".", "", regex=False)
   players_id_map["playerName"] = players_id_map["playerName"].str.replace(".", "", regex=False)
 
