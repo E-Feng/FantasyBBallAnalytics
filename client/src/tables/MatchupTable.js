@@ -30,7 +30,7 @@ function MatchupTable(props) {
           const awayData = props.row.original;
           const prob = props.row.original.firstName;
 
-          const isWinner = calculateMatchup(homeData, awayData);
+          const isWinner = calculateMatchup(homeData, awayData, cats);
 
           let color = 'black';
           color = isFirstRow ? 'gainsboro' : color;

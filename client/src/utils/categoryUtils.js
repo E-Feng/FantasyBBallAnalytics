@@ -52,6 +52,19 @@ export const categoryDetails = [
     digits: 0,
   },
   {
+    name: 'threesAtt',
+    display: '3PA',
+    espnId: 18,
+    digits: 0,
+    colorless: true,
+  },
+  {
+    name: 'threesPer',
+    display: '3P%',
+    espnId: 21,
+    digits: 4,
+  },
+  {
     name: 'orebs',
     display: 'OREB',
     espnId: 4,
@@ -74,6 +87,12 @@ export const categoryDetails = [
     display: 'AST',
     espnId: 3,
     digits: 0,
+  },
+  {
+    name: 'astsToRatio',
+    display: 'A/TO',
+    espnId: 35,
+    digits: 2,
   },
   {
     name: 'stls',
@@ -130,15 +149,39 @@ export const categoryDetails = [
     digits: 0,
   },
   {
+    name: 'dds',
+    display: 'DD',
+    espnId: 37,
+    digits: 0,
+  },
+  {
+    name: 'tds',
+    display: 'TD',
+    espnId: 38,
+    digits: 0,
+  },
+  {
+    name: 'qds',
+    display: 'QD',
+    espnId: 39,
+    digits: 0,
+  },
+  {
     name: 'pts',
     display: 'PTS',
     espnId: 0,
     digits: 0,
   },
   {
+    name: 'teamWins',
+    display: 'TW',
+    espnId: 43,
+    digits: 0,
+  },
+  {
     name: 'fpts',
     display: 'FPTS',
-    espnId: 41,
+    espnId: 99,
     digits: 0,
   },
   {

@@ -56,15 +56,15 @@ function BoxScoreTable(props) {
           let isWinner;
           if (isHome) {
             if (type === 'team' || type === 'diff') {
-              isWinner = calculateMatchup(home, away);
+              isWinner = calculateMatchup(home, away, cats);
             } else if (type === 'proj' || type === 'diffProj') {
-              isWinner = calculateMatchup(homeProj, awayProj);
+              isWinner = calculateMatchup(homeProj, awayProj, cats);
             }
           } else {
             if (type === 'team') {
-              isWinner = calculateMatchup(away, home);
+              isWinner = calculateMatchup(away, home, cats);
             } else if (type === 'proj') {
-              isWinner = calculateMatchup(awayProj, homeProj);
+              isWinner = calculateMatchup(awayProj, homeProj, cats);
             }
           }
 

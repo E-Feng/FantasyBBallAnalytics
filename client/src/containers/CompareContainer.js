@@ -41,7 +41,7 @@ function CompareContainer(props) {
         if (teamId === selectedTeams[0]) {
           const weekData = filteredData.filter((o) => o.week === week && o.teamId === teamId)?.[0];
           const oppWeekData = filteredData.filter((o) => o.week === week && o.teamId === selectedTeams[1])?.[0];
-          h2hRow[`week${week}`] = calculateMatchup(weekData, oppWeekData) ? 'Won' : '';
+          h2hRow[`week${week}`] = calculateMatchup(weekData, oppWeekData, cats) ? 'Won' : '';
         } else {
           h2hRow[`week${week}`] = (h2hData[0][`week${week}`] === 'Won') ? '' : 'Won';
         }
