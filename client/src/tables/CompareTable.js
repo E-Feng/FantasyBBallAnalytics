@@ -19,7 +19,6 @@ function CompareTable(props) {
       { length: currentWeek - startWeek + 1 },
       (_, i) => startWeek + i
     );
-    console.log(startWeek, currentWeek);
 
     return [
       {
