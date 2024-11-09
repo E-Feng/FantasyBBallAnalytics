@@ -128,7 +128,7 @@ function BoxScoresContainer(props) {
   };
 
   // Adding Att/Made to cats
-  const catIds = settings[0].categoryIds;
+  const catIds = [...settings[0].categoryIds];
   if (catIds.includes(categoryDetails.find((o) => o.name === 'fgPer').espnId)) {
     catIds.push(categoryDetails.find((o) => o.name === 'fgAtt').espnId);
     catIds.push(categoryDetails.find((o) => o.name === 'fgMade').espnId);

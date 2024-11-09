@@ -8,49 +8,55 @@ function CompareTable(props) {
   const data = props.data;
   const summaryData = props.summaryData;
   const currentWeek = props.currentWeek;
+  const startWeek = props.startWeek;
 
   const numCompare = data.filter(
     (row) => row.rowHeader === data[0].rowHeader
   ).length;
 
   const columns = React.useMemo(() => {
-    const weekArray = Array.from({ length: currentWeek }, (_, i) => i + 1);
+    const weekArray = Array.from(
+      { length: currentWeek - startWeek + 1 },
+      (_, i) => startWeek + i
+    );
+    console.log(startWeek, currentWeek);
 
     return [
       {
         Header: 'Week',
         columns: weekArray.map((week) => {
           return { Header: `${week}`, accessor: `week${week}` };
-          
         }),
       },
     ];
   }, [currentWeek]);
 
-  columns.push({
-    Header: 'Wins',
-    accessor: 'wins',
-  },
-  {
-    Header: 'Mean',
-    accessor: 'mean',
-  },
-  {
-    Header: 'Min',
-    accessor: 'min',
-  },
-  {
-    Header: 'Max',
-    accessor: 'max',
-  },
-  {
-    Header: 'StDev',
-    accessor: 'stdev',
-  },
-  {
-    Header: 'Win %',
-    accessor: 'winPer',
-  })
+  columns.push(
+    {
+      Header: 'Wins',
+      accessor: 'wins',
+    },
+    {
+      Header: 'Mean',
+      accessor: 'mean',
+    },
+    {
+      Header: 'Min',
+      accessor: 'min',
+    },
+    {
+      Header: 'Max',
+      accessor: 'max',
+    },
+    {
+      Header: 'StDev',
+      accessor: 'stdev',
+    },
+    {
+      Header: 'Win %',
+      accessor: 'winPer',
+    }
+  );
 
   columns.unshift({
     Header: '',
@@ -147,7 +153,7 @@ function CompareTable(props) {
 
                         let isLargest;
                         const catID = cell.row.original.catId;
-                        const isWinPer = headerId === 'winPer'
+                        const isWinPer = headerId === 'winPer';
                         if (getCatInverse(catID) & !isWinPer) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
@@ -160,19 +166,25 @@ function CompareTable(props) {
                         }
 
                         if (isWinPer & !isRowHeader) {
-                          color = getHSLColor(cell.value, 50, 100, false)
+                          color = getHSLColor(cell.value, 50, 100, false);
                         } else if (['wins', 'min', 'max'].includes(headerId)) {
                           color = 'limegreen';
                         } else if (!isRowHeader) {
-                          color = getHSLColor(cell.value, lo, hi, getCatInverse(catID))
-                        } 
+                          color = getHSLColor(
+                            cell.value,
+                            lo,
+                            hi,
+                            getCatInverse(catID)
+                          );
+                        }
 
                         // Apply the cell props
                         return (
                           <td
                             {...cell.getCellProps()}
                             style={{
-                              background: (!noColor && isLargest) ? color : 'gainsboro',
+                              background:
+                                !noColor && isLargest ? color : 'gainsboro',
                               fontWeight: isRowHeader ? 'bold' : 'normal',
                             }}
                             rowSpan={

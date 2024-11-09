@@ -6,9 +6,7 @@ import * as arrayMath from '../utils/arrayMath';
 import * as catUtils from '../utils/categoryUtils';
 import { calculateMatchup } from '../utils/matchupUtils';
 import CompareH2HTable from '../tables/CompareH2HTable';
-import {
-  getCatWinProbability,
-} from '../utils/probabilityMath';
+import { getCatWinProbability } from '../utils/probabilityMath';
 
 function CompareContainer(props) {
   const [selectedTeams, setSelectedTeams] = useState([0, 0]);
@@ -17,6 +15,7 @@ function CompareContainer(props) {
   const scoreboardData = props.data;
   const catSettings = props.settings[0].categoryIds;
   const currentWeek = props.currentWeek;
+  const startWeek = parseInt(props.settings[0].startWeek) || 1;
 
   const data = [];
   const h2hData = [];
@@ -28,22 +27,31 @@ function CompareContainer(props) {
   );
 
   // Filtering out the categories
-  const cats = catUtils.categoryDetails.filter(o => {
-    return catSettings.includes(o.espnId) && o.name !== 'mins'
-  })
-  
+  const cats = catUtils.categoryDetails.filter((o) => {
+    return catSettings.includes(o.espnId) && o.name !== 'mins';
+  });
+
   // Aggregate and compute relevant H2H Data
   if (!selectedTeams.includes(0)) {
     for (const teamId of selectedTeams) {
-      const h2hRow = {}
-      h2hRow["rowHeader"] = teams.filter((team) => team.teamId === teamId)?.[0]?.fullTeamName;
-      for (let week = 1; week <= currentWeek; week++) {
+      const h2hRow = {};
+      h2hRow['rowHeader'] = teams.filter(
+        (team) => team.teamId === teamId
+      )?.[0]?.fullTeamName;
+      for (let week = startWeek; week <= currentWeek; week++) {
         if (teamId === selectedTeams[0]) {
-          const weekData = filteredData.filter((o) => o.week === week && o.teamId === teamId)?.[0];
-          const oppWeekData = filteredData.filter((o) => o.week === week && o.teamId === selectedTeams[1])?.[0];
-          h2hRow[`week${week}`] = calculateMatchup(weekData, oppWeekData, cats) ? 'Won' : '';
+          const weekData = filteredData.filter(
+            (o) => o.week === week && o.teamId === teamId
+          )?.[0];
+          const oppWeekData = filteredData.filter(
+            (o) => o.week === week && o.teamId === selectedTeams[1]
+          )?.[0];
+          h2hRow[`week${week}`] = calculateMatchup(weekData, oppWeekData, cats)
+            ? 'Won'
+            : '';
         } else {
-          h2hRow[`week${week}`] = (h2hData[0][`week${week}`] === 'Won') ? '' : 'Won';
+          h2hRow[`week${week}`] =
+            h2hData[0][`week${week}`] === 'Won' ? '' : 'Won';
         }
       }
       h2hData.push(h2hRow);
@@ -95,23 +103,25 @@ function CompareContainer(props) {
   }
 
   // Calculating the wins between teams for each category
-  data.forEach(row => {
+  data.forEach((row) => {
     row.wins = 0;
-    const filteredCat = data.filter(o => o.rowHeader === row.rowHeader && o !== row)
+    const filteredCat = data.filter(
+      (o) => o.rowHeader === row.rowHeader && o !== row
+    );
 
     // Going through the weeks to add wins
     for (let week = 1; week <= currentWeek; week++) {
-      const weekKey = 'week' + week
+      const weekKey = 'week' + week;
 
-      const allCatValues = filteredCat.map(val => {
-        return val[weekKey]
-      })
+      const allCatValues = filteredCat.map((val) => {
+        return val[weekKey];
+      });
 
       if (catUtils.determineWinner(row[weekKey], allCatValues, row.catId)) {
         row.wins = row.wins + 1;
       }
     }
-  })
+  });
 
   // Aggregate and compute category win probabilities
   if (!selectedTeams.includes(0)) {
@@ -127,17 +137,13 @@ function CompareContainer(props) {
       cats.forEach((cat) => {
         const catHomeData = homeScoreboardData.map((d) => d[catID]);
         const catAwayData = awayScoreboardData.map((d) => d[catID]);
-        winProb = getCatWinProbability(
-          catHomeData,
-          catAwayData,
-          cat.inverse
-        );
+        winProb = getCatWinProbability(catHomeData, catAwayData, cat.inverse);
       });
       const winPer = Math.round(winProb * 100);
       data[i]['winPer'] = winPer;
-      data[i+1]['winPer'] = 100 - winPer;
-    };
-  };
+      data[i + 1]['winPer'] = 100 - winPer;
+    }
+  }
 
   const isDataLoaded = data.length !== 0 && !selectedTeams.includes(0);
 
@@ -186,16 +192,18 @@ function CompareContainer(props) {
         <TableContainer>
           <TopTableContainer>
             <CompareH2HTable
-                data={h2hData}
-                currentWeek={currentWeek - 1}
-              />
+              data={h2hData}
+              currentWeek={currentWeek - 1}
+              startWeek={startWeek}
+            />
           </TopTableContainer>
           <BottomTableContainer>
             <CompareTable
-                data={data}
-                summaryData={summaryData}
-                currentWeek={currentWeek - 1}
-              />
+              data={data}
+              summaryData={summaryData}
+              currentWeek={currentWeek - 1}
+              startWeek={startWeek}
+            />
           </BottomTableContainer>
         </TableContainer>
       ) : (
