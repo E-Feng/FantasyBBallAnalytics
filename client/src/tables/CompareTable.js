@@ -28,7 +28,7 @@ function CompareTable(props) {
         }),
       },
     ];
-  }, [currentWeek]);
+  }, [currentWeek, startWeek]);
 
   columns.push(
     {

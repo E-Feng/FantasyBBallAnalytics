@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaHome } from 'react-icons/fa';
-import { SiBuymeacoffee } from "react-icons/si";
+import { SiBuymeacoffee } from 'react-icons/si';
 
 import styled from 'styled-components';
 
@@ -20,7 +20,7 @@ function NavBar(props) {
           </li>
           <li>
             <Link to='/matchups'>Matchups</Link>
-          </li>          
+          </li>
           <li>
             <Link to='/teams'>Teams</Link>
           </li>
@@ -54,7 +54,7 @@ function NavBar(props) {
           <a href='https://www.buymeacoffee.com/fantasyef'>
             <SiBuymeacoffee title='BuyMeACoffee'></SiBuymeacoffee>
           </a>
-        </li>   
+        </li>
       </Icons>
     </NavContainer>
   );
@@ -92,6 +92,11 @@ const LinksList = styled.ul`
   flex-direction: row;
   justify-content: left;
   align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 450px) {
+    justify-content: center;
+  }
 
   font-size: 20px;
 
