@@ -26,7 +26,7 @@ function CompareH2HTable(props) {
         }),
       },
     ];
-  }, [currentWeek]);
+  }, [currentWeek, startWeek]);
 
   columns.unshift({
     Header: 'Team',
