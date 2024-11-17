@@ -57,8 +57,6 @@ function BoxScoreTable(props) {
           if (isHome) {
             if (type === 'team' || type === 'diff') {
               isWinner = calculateMatchup(home, away, cats);
-              console.log(home, away, cats)
-              console.log(isWinner)
             } else if (type === 'proj' || type === 'diffProj') {
               isWinner = calculateMatchup(homeProj, awayProj, cats);
             }
