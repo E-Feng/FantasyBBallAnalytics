@@ -130,12 +130,20 @@ function BoxScoresContainer(props) {
   // Adding Att/Made to cats
   const catIds = [...settings[0].categoryIds];
   if (catIds.includes(categoryDetails.find((o) => o.name === 'fgPer').espnId)) {
-    catIds.push(categoryDetails.find((o) => o.name === 'fgAtt').espnId);
-    catIds.push(categoryDetails.find((o) => o.name === 'fgMade').espnId);
+    const fgAttCat = categoryDetails.find((o) => o.name === 'fgAtt');
+    const fgMadeCat = categoryDetails.find((o) => o.name === 'fgMade');
+    fgAttCat.isDisplayOnly = true;
+    fgMadeCat.isDisplayOnly = true;
+    catIds.push(fgAttCat.espnId);
+    catIds.push(fgMadeCat.espnId);
   }
   if (catIds.includes(categoryDetails.find((o) => o.name === 'ftPer').espnId)) {
-    catIds.push(categoryDetails.find((o) => o.name === 'ftAtt').espnId);
-    catIds.push(categoryDetails.find((o) => o.name === 'ftMade').espnId);
+    const ftAttCat = categoryDetails.find((o) => o.name === 'ftAtt');
+    const ftMadeCat = categoryDetails.find((o) => o.name === 'ftMade');
+    ftAttCat.isDisplayOnly = true;
+    ftMadeCat.isDisplayOnly = true;
+    catIds.push(ftAttCat.espnId);
+    catIds.push(ftMadeCat.espnId);
   }
 
   const cats = categoryDetails.filter((o) => catIds.includes(o.espnId));

@@ -4,6 +4,7 @@ export const categoryDetails = [
     display: 'MIN',
     espnId: 40,
     digits: 0,
+    isDisplayOnly: true,
   },
   {
     name: 'fgMade',
@@ -210,12 +211,6 @@ export const determineWinner = (a, b, cat) => {
   }
 
   return isWinner;
-};
-
-export const checkLeagueHasEjections = (categoryIds) => {
-  const ejectionId = categoryDetails.filter((o) => o.name === 'ejs')[0].espnId;
-
-  return categoryIds.includes(ejectionId);
 };
 
 export const calculatePercentageCats = (scores) => {

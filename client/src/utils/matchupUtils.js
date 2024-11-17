@@ -1,7 +1,7 @@
 export const calculateMatchup = (home, away, cats) => {
   let homeNetWins = 0;
 
-  const scoringCats = cats.filter((cat) => cat.name !== 'mins');
+  const scoringCats = cats.filter((cat) => !cat.isDisplayOnly);
 
   scoringCats.forEach((cat) => {
     const name = cat.name;
