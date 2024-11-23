@@ -56,7 +56,7 @@ function LeagueSettings() {
       <Label>League</Label>
       <Dropdown value={leagueId} onChange={handleLeagueChange}>
         {leagueDropdownValues.map((o) => {
-          const raw = o.includes('.l.') ? o.split('.l.')[1] : o;
+          const raw = o?.includes('.l.') ? o.split('.l.')[1] : o;
           return (
             <option value={o} key={o}>
               {raw}

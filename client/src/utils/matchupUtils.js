@@ -1,50 +1,27 @@
-/**
- * Calculates the winner between two inputted objects with category
- * stats.
- * @param {*} home
- * @param {*} away
- */
-export const calculateMatchup = (home, away) => {
-  // Stat category for matchup
-  // key=id, value=higher value is win
-  const categories = {
-    fgPer: true,
-    ftPer: true,
-    threes: true,
-    asts: true,
-    rebs: true,
-    stls: true,
-    blks: true,
-    tos: false,
-    ejs: false,
-    pts: true,
-  };
+export const calculateMatchup = (home, away, cats) => {
+  let homeNetWins = 0;
 
-  let winLoss = 0;
+  const scoringCats = cats.filter((cat) => !cat.isDisplayOnly);
 
-  for (const cat in categories) {
-    let result;
+  scoringCats.forEach((cat) => {
+    const name = cat.name;
+    const inverse = cat.inverse;
 
-    if (home[cat] > away[cat]) {
-      result = 1;
-    } else if (home[cat] < away[cat]) {
-      result = -1;
-    } else {
-      continue;
+    let result = 0;
+
+    if (home[name] > away[name]) {
+      result = inverse ? -1 : 1;
+    } else if (home[name] < away[name]) {
+      result = inverse ? 1 : -1;
     }
 
-    // Reversing tos and ejs
-    if (categories[cat]) {
-      winLoss = winLoss + result;
-    } else {
-      winLoss = winLoss - result;
-    }
-  }
+    homeNetWins += result;
+  });
 
   // Calculating overall win-loss, points is tiebreaker
-  if (winLoss > 0) {
+  if (homeNetWins > 0) {
     return true;
-  } else if (winLoss < 0) {
+  } else if (homeNetWins < 0) {
     return false;
   } else {
     if (home.pts > away.pts) {

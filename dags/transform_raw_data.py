@@ -118,20 +118,22 @@ def transform_scoreboard_to_df(scoreboard: dict):
       # Iterate both home and away scores in each matchup
       for side in sides:
         # Check if scheduled matchup has occured
-        if 'cumulativeScore' in match[side]:
+        # if 'cumulativeScore' in match[side]:
+        week = math.ceil((match['id'] - num_byes)/(num_teams/2))
+        if week <= (current_week + 1):
           away = 'away' if (side == 'home') else 'home'
 
           row = {}
 
           row['teamId'] = match[side]['teamId']
           row['awayId'] = match[away]['teamId']
-          row['week'] = math.ceil((match['id'] - num_byes)/(num_teams/2))
+          row['week'] = week
           row['won'] = True if (match['winner'].lower() == side) else False
 
           # Category stats, using .get() for potential KeyErrors
-          scores = match[side]['cumulativeScore']['scoreByStat']
+          scores = match[side].get('cumulativeScore', {}).get('scoreByStat')
 
-          if scores or row['week'] == (current_week + 1):
+          if scores:
             scores = {} if scores is None else scores
 
             row['fgMade'] = scores.get(consts.FG_MADE, {}).get('score', 0)
@@ -141,10 +143,13 @@ def transform_scoreboard_to_df(scoreboard: dict):
             row['ftAtt'] = scores.get(consts.FT_ATT, {}).get('score', 0)
             row['ftPer'] = scores.get(consts.FT_PER, {}).get('score', 0)
             row['threes'] = scores.get(consts.THREES, {}).get('score', 0)
+            row['threesAtt'] = scores.get(consts.THREE_ATT, {}).get('score', 0)
+            row['threesPer'] = scores.get(consts.THREE_PER, {}).get('score', 0)
             row['orebs'] = scores.get(consts.OREBS, {}).get('score', 0)
             row['drebs'] = scores.get(consts.DREBS, {}).get('score', 0)
             row['rebs'] = scores.get(consts.REBS, {}).get('score', 0)
             row['asts'] = scores.get(consts.ASTS, {}).get('score', 0)
+            row['astsToRatio'] = scores.get(consts.AST_TO_R, {}).get('score', 0)
             row['stls'] = scores.get(consts.STLS, {}).get('score', 0)
             row['blks'] = scores.get(consts.BLKS, {}).get('score', 0)
             row['tos'] = scores.get(consts.TOS, {}).get('score', 0)
@@ -153,14 +158,18 @@ def transform_scoreboard_to_df(scoreboard: dict):
             row['flags'] = scores.get(consts.FLAGS, {}).get('score', 0)
             row['pfs'] = scores.get(consts.PFS, {}).get('score', 0)
             row['techs'] = scores.get(consts.TECHS, {}).get('score', 0)
+            row['dds'] = scores.get(consts.DDS, {}).get('score', 0)
+            row['tds'] = scores.get(consts.TDS, {}).get('score', 0)
+            row['qds'] = scores.get(consts.QDS, {}).get('score', 0)            
             row['pts'] = scores.get(consts.PTS, {}).get('score', 0)
+            row['teamWins'] = scores.get(consts.TWS, {}).get('score', 0)
             row['fpts'] = match[side]['totalPoints']
 
             # Clean null values
             row = {k: v for k, v in row.items() if (type(v) == int or type(v) == float)}
 
-            # Appending full match details into df
-            data_array.append(row)
+          # Appending full match details into df
+          data_array.append(row)
 
     # Adjusting id/week for byes
     elif (sides[0] in match) & (sides[1] not in match):
@@ -244,6 +253,12 @@ def transform_players_to_df(ratings: dict):
           category_ids = list(row['statRatings' + period].keys())
           category_ids.append(consts.MINS)
 
+          # Include fg/ft att/made if per exists
+          if consts.FG_PER in category_ids:
+            category_ids.extend([consts.FG_MADE, consts.FG_ATT])
+          if consts.FT_PER in category_ids:
+            category_ids.extend([consts.FT_MADE, consts.FT_ATT])
+
       # Stats, dynamic filtering out right dict that matches id field
       if player["player"].get("stats"):
         year = max([d["seasonId"] for d in player["player"]["stats"]])
@@ -299,7 +314,7 @@ def transform_daily_to_df(daily_score: dict):
         row['ftAtt'] = stats.get(consts.FT_ATT, 0)
         row['ftMade'] = stats.get(consts.FT_MADE, 0)
         row['threes'] = stats.get(consts.THREES, 0)
-        row['threesAtt'] = stats.get(consts.THREEA, 0)
+        row['threesAtt'] = stats.get(consts.THREE_ATT, 0)
         row['rebs'] = stats.get(consts.REBS, 0)
         row['asts'] = stats.get(consts.ASTS, 0)
         row['stls'] = stats.get(consts.STLS, 0)

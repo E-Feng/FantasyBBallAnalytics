@@ -3,39 +3,74 @@ import { useTable } from 'react-table';
 import styled from 'styled-components';
 
 import { calculateMatchup } from '../utils/matchupUtils';
-import { getCatInverse } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
-function MatchupTable(props) {
-  const cats = props.cats;
+function BoxScoreTable(props) {
+  const {
+    cats,
+    colorRanges,
+    home,
+    away,
+    diff,
+    homeProj,
+    awayProj,
+    diffProj,
+    homePlayers,
+    awayPlayers,
+    checkedGames,
+    handleGameChange,
+  } = props;
 
   const filler = [{ type: 'filler' }];
-  const data = [].concat([props.home], props.away, filler, props.stats);
 
-  const numTeams = props.away.length + 1;
+  const data = [].concat(
+    home,
+    away,
+    filler,
+    homeProj,
+    awayProj,
+    filler,
+    diff,
+    diffProj,
+    filler,
+    homePlayers,
+    filler,
+    awayPlayers
+  );
 
   const columns = React.useMemo(() => {
     const teamHeaders = [
       {
-        Header: 'Team',
-        accessor: 'fullTeamName',
+        Header: 'Team/Player',
+        accessor: 'name',
 
         Cell: (props) => {
           const val = props.value;
-          const isFirstRow = props.cell.row.index === 0;
-          const isAwayTeam = props.row.index < numTeams && !isFirstRow;
-          const isProbability = props.row.original.type === 'prob';
+          const type = props.row.original.type;
 
-          const homeData = props.rows[0].original;
-          const awayData = props.row.original;
-          const prob = props.row.original.firstName;
+          const isSeparator = type === 'filler';
+          const isPlayer = type === 'player';
+          const isTeam = !isSeparator && !isPlayer;
+          const isHome = props.row.original.teamId === home.teamId;
 
-          const isWinner = calculateMatchup(homeData, awayData, cats);
+          let isWinner;
+          if (isHome) {
+            if (type === 'team' || type === 'diff') {
+              isWinner = calculateMatchup(home, away, cats);
+            } else if (type === 'proj' || type === 'diffProj') {
+              isWinner = calculateMatchup(homeProj, awayProj, cats);
+            }
+          } else {
+            if (type === 'team') {
+              isWinner = calculateMatchup(away, home, cats);
+            } else if (type === 'proj') {
+              isWinner = calculateMatchup(awayProj, homeProj, cats);
+            }
+          }
 
-          let color = 'black';
-          color = isFirstRow ? 'gainsboro' : color;
-          color = isAwayTeam ? (isWinner ? 'limegreen' : 'salmon') : color;
-          color = isProbability ? (prob >= 50 ? 'limegreen' : 'salmon') : color;
+          let color = 'gainsboro';
+          color = isTeam ? (isWinner ? 'limegreen' : 'salmon') : color;
+          color = isSeparator ? 'black' : color;
 
           return (
             <div style={{ background: color }}>
@@ -45,21 +80,37 @@ function MatchupTable(props) {
         },
       },
       {
-        Header: 'Name',
-        accessor: 'firstName',
+        Header: 'Games',
+        accessor: 'gamesStatus',
 
         Cell: (props) => {
-          const val = props.value;
-          const isAwayTeam = props.row.index < numTeams;
-          const isProbability = props.row.original.type === 'prob';
+          const playerId = props.row.original.playerId;
+          const val = checkedGames[playerId] || [];
 
-          let color = 'black';
-          color = isAwayTeam ? 'gainsboro' : color;
-          color = isProbability ? getHSLColor(val, 0, 100) : color;
+          const isSeparator = props.row.original.type === 'filler';
+
+          let color = 'gainsboro';
+          color = isSeparator ? 'black' : color;
 
           return (
-            <div style={{ background: color }}>
-              <p>{typeof val === 'string' ? val.substring(0, 8) : ''}</p>
+            <div style={{ background: color, padding: '2px' }}>
+              {val.map((v, i) => {
+                return (
+                  <input
+                    key={i}
+                    type='checkbox'
+                    checked={v > 0}
+                    disabled={v === 2}
+                    onChange={(e) => handleGameChange(e, playerId, i)}
+                    style={{
+                      visibility: v !== null ? 'visible' : 'hidden',
+                      height: '13px',
+                      width: '13px',
+                      marginLeft: '1px',
+                    }}
+                  />
+                );
+              })}
             </div>
           );
         },
@@ -72,26 +123,22 @@ function MatchupTable(props) {
 
         Cell: (props) => {
           const val = props.value;
+          const type = props.row.original.type;
 
-          const catId = props.cell.column.id;
-          const isFirstRow = props.cell.row.index === 0;
-          const isSeparator = props.row.original.type === 'filler';
-          const firstRowVal = props.rows[0].original[catId];
+          const isPlayer = type === 'player';
+          const isSeparator = type === 'filler';
 
-          const inverse = getCatInverse(catId);
-          const isTied = val === firstRowVal;
-          const isWinner = inverse ? val > firstRowVal : val < firstRowVal;
+          let color = 'gainsboro';
 
-          let color;
-          color = isTied ? 'yellow' : isWinner ? 'limegreen' : 'salmon';
-          color = isFirstRow ? 'gainsboro' : color;
-          color = isSeparator ? 'black' : color;
-
-          if (props.row.original.type === 'prob') {
-            color = getHSLColor(val, 0, 100);
+          if (!isSeparator && val !== null) {
+            const range = colorRanges[type][cat.name];
+            color = getHSLColor(val, range[0], range[1], cat.inverse);
           }
 
-          const digits = props.row.index < numTeams ? cat.digits : 0;
+          color = cat.colorless ? 'gainsboro' : color;
+          color = isSeparator ? 'black' : color;
+
+          const digits = isPlayer ? Math.max(1, cat.digits) : cat.digits;
 
           return (
             <div style={{ background: color }}>
@@ -114,7 +161,7 @@ function MatchupTable(props) {
   return (
     <Container>
       <Title>
-        {props.home.fullTeamName} - Week {props.home.week}
+        {props.home.name} - Week {props.home.week}
       </Title>
       <TableContainer>
         <Table {...getTableProps()}>
@@ -146,21 +193,19 @@ function MatchupTable(props) {
               // Loop over the table rows
               rows.map((row) => {
                 // Conditional borders for matching matchup
-                const isMatchup = props.home.awayId === row.original.teamId;
                 const isSeparator = row.original.type === 'filler';
 
                 let rowStyle;
                 let cellStyle;
 
-                if (isMatchup) {
-                  rowStyle = {
-                    background: 'gainsboro',
-                    border: '3px dashed blue',
-                  };
-                }
+                rowStyle = {
+                  background: 'gainsboro',
+                };
+
                 if (isSeparator) {
                   cellStyle = {
                     height: '20px',
+                    background: 'black',
                     borderLeft: '0',
                     borderRight: '0',
                   };
@@ -271,4 +316,4 @@ const Table = styled.table`
   }
 `;
 
-export default MatchupTable;
+export default BoxScoreTable;
