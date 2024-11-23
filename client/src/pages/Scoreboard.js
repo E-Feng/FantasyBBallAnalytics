@@ -8,6 +8,7 @@ import MatchupTablesContainer from '../containers/MatchupTablesContainer';
 import TotalsContainer from '../containers/TotalsContainer';
 import TooltipHeader from '../components/TooltipHeader';
 import LoadingIcon from '../components/LoadingIcon';
+import RotoError from '../components/RotoError';
 
 function Scoreboard(props) {
   const { leagueState } = useContext(LeagueContext);
@@ -47,9 +48,7 @@ function Scoreboard(props) {
       {isLoading ? (
         <LoadingIcon />
       ) : isRotoLeague ? (
-        <RotoErrorContainer>
-          <RotoError>Team Stats not available for Roto leagues</RotoError>
-        </RotoErrorContainer>
+        <RotoError />
       ) : (
         <Container maxWidth={props.maxWidth}>
           <TooltipHeader
@@ -88,19 +87,6 @@ const Container = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
   }
-`;
-
-const RotoErrorContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-`;
-
-const RotoError = styled.p`
-  font-size: 36px;
 `;
 
 export default Scoreboard;
