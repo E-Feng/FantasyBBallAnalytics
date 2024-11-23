@@ -157,9 +157,10 @@ function BoxScoresContainer(props) {
     }
 
     cats.forEach((cat) => {
-      p[cat.name] = p.statsLast15
-        ? p.statsLast15[cat.espnId] * p.gamesLeft
-        : null;
+      p[cat.name] =
+        p.statsLast15 && p.gamesLeft > 0
+          ? p.statsLast15[cat.espnId] * p.gamesLeft
+          : null;
     });
   });
   calculatePercentageCats(players);
