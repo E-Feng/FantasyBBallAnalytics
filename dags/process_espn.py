@@ -141,6 +141,7 @@ def process_espn_common():
   last_scoring_period = get_last_posted_scoring_period(current_year)
 
   if int(scoring_period) <= int(last_scoring_period):
+    print("ESPN common data already processed")
     return
 
   common_api_endpoints = {
@@ -207,6 +208,7 @@ def process_espn_common():
       df = transform_raw_to_df(k, v)
 
       if df.empty:
+        print("No daily stats available")
         continue
 
       top_studs = df[(df['mins'] > minutes_cutoff) & (df['gs'] >= studs_gs_cutoff)]
@@ -247,7 +249,7 @@ def process_espn_common():
       upload_data_to_s3(daily_json, "daily.json", bucket_name)
 
       upload_to_firebase('alert', alert_data)   
-      upload_to_firebase('scoring_period', {"scoring_period": scoring_period})    
+      upload_to_firebase('scoring_period', {"scoring_period": scoring_period}) 
 
   return {
     'statusCode': 200,

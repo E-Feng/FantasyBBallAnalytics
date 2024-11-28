@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 
 import Home from './pages/Home';
 import Teams from './pages/Teams';
+import Matchups from './pages/Matchups';
 import Scoreboard from './pages/Scoreboard';
 import Compare from './pages/Compare';
 import DraftRecap from './pages/DraftRecap';
@@ -15,7 +16,7 @@ import { fetchDynamo, fetchFirebase } from './utils/webAPI';
 const maxWidth = 1200;
 
 const defaultLeagueId = '00000001';
-const defaultLeagueYear = 2024;
+const defaultLeagueYear = 2025;
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,6 +88,10 @@ function App() {
           <Route
             path='/scoreboard'
             render={(props) => <Scoreboard {...props} maxWidth={maxWidth} />}
+          />
+          <Route
+            path='/matchups'
+            render={(props) => <Matchups {...props} maxWidth={maxWidth} />}
           />
           <Route
             path='/compare'
