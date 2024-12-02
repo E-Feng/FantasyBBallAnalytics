@@ -26,9 +26,8 @@ def upload_league_data_to_dynamo(data: dict):
 
   r = requests.put(AWS_DDB_URL, data=payload, headers=headers)
 
-  print(r)
-
-  if r.status_code == 500:
+  if r.status_code != 200:
+    print(f"Error uploading to dynamodb: {r.status_code}, {r.text}")
     raise ValueError("Error uploading to dynamodb")
   return
 
