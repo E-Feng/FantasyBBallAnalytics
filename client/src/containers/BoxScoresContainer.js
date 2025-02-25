@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+
 import {
   categoryDetails,
   calculatePercentageCats,
 } from '../utils/categoryUtils';
-
 import BoxScoreTable from '../tables/BoxScoreTable';
-import { PRO_TEAM_IDS } from '../utils/consts';
+import { SCHEDULE_DATES, PRO_TEAM_IDS } from '../utils/consts';
 import { getStdRange } from '../utils/arrayMath';
 
 function BoxScoresContainer(props) {
@@ -22,7 +22,8 @@ function BoxScoresContainer(props) {
     return newCheckedGames;
   };
 
-  const { teams, players, rosters, scoreboard, settings } = props.data;
+  const { teams, players, rosters, platform, scoreboard, settings } =
+    props.data;
   const { schedule } = props.commonData;
 
   // Init data transformations
@@ -40,6 +41,9 @@ function BoxScoresContainer(props) {
   // Init states
   const [week, setWeek] = useState(currentWeek);
   const [teamId, setTeamId] = useState(teams[0].teamId);
+
+  const startDate = SCHEDULE_DATES[platform][week][0];
+  const endDate = SCHEDULE_DATES[platform][week][1];
 
   schedule.forEach((g) => {
     g.teamIds = g.teams.map((t) => PRO_TEAM_IDS[t]);
@@ -61,7 +65,7 @@ function BoxScoresContainer(props) {
 
     const datesPlayed = {};
     schedule
-      .filter((g) => g.week === week)
+      .filter((g) => g.date >= startDate && g.date <= endDate)
       .forEach((g) => {
         datesPlayed[g.date] =
           datesPlayed[g.date] !== undefined ? datesPlayed[g.date] : null;
