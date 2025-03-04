@@ -46,7 +46,9 @@ function BoxScoresContainer(props) {
     .toLocaleString('en-CA', { timeZone: 'America/New_York' })
     .split(',')[0];
 
-  const matchupPeriods = settings[0].matchupPeriods[week];
+  const matchupPeriods = settings[0].matchupPeriods
+    ? settings[0].matchupPeriods[week]
+    : [week];
   let startDate;
   let endDate;
 
