@@ -367,6 +367,9 @@ def transform_settings_to_df(settings: dict):
   if scoring_type == 'H2H_POINTS':
     row['categoryIds'].append(int(consts.FPTS))
 
+  # Playoff matchup weeks
+  row['matchupPeriods'] = data['settings']['scheduleSettings']['matchupPeriods']
+
   data_array.append(row)
 
   df = pd.DataFrame.from_records(data_array)
