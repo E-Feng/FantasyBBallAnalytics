@@ -42,16 +42,27 @@ function BoxScoresContainer(props) {
   const [week, setWeek] = useState(currentWeek);
   const [teamId, setTeamId] = useState(teams[0].teamId);
 
-  const startDate = SCHEDULE_DATES[platform][week][0];
-  const endDate = SCHEDULE_DATES[platform][week][1];
+  const todayDate = new Date()
+    .toLocaleString('en-CA', { timeZone: 'America/New_York' })
+    .split(',')[0];
+
+  const matchupPeriods = settings[0].matchupPeriods[week];
+  let startDate;
+  let endDate;
+
+  matchupPeriods.forEach((period) => {
+    const scheduleDates = SCHEDULE_DATES[platform][period];
+
+    startDate = startDate ? startDate : scheduleDates[0];
+    endDate = endDate ? endDate : scheduleDates[1];
+
+    startDate = scheduleDates[0] < startDate ? scheduleDates[0] : startDate;
+    endDate = scheduleDates[1] > endDate ? scheduleDates[1] : endDate;
+  });
 
   schedule.forEach((g) => {
     g.teamIds = g.teams.map((t) => PRO_TEAM_IDS[t]);
   });
-
-  const todayDate = new Date()
-    .toLocaleString('en-CA', { timeZone: 'America/New_York' })
-    .split(',')[0];
 
   players.forEach((p) => {
     p.type = 'player';
