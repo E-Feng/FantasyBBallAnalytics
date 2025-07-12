@@ -39,3 +39,19 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
     print(f"Failed fetching {view} from ESPN")
     print(r.json())
     raise ValueError(f"Error obtaining {view} from ESPN API")  
+  
+
+def extract_from_nba_schedule(year):
+  base_url = f"https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/{year - 1}/league/00_full_schedule.json"
+
+  r = requests.get(base_url)
+
+  if r.status_code == 200:
+    data = r.json()
+    
+    print(f"Successfully fetched NBA schedule for {year}")
+    return data
+  else:
+    print(f"Failed fetching NBA schedule for {year}")
+    print(r.json())
+    raise ValueError(f"Error obtaining NBA schedule for {year}")
