@@ -345,5 +345,4 @@ def update_nba_schedule():
       }
       schedule.append(game_info)
 
-  print(schedule)
-  upload_to_firebase('schedule', schedule)   
+  upload_to_firebase('nba_schedule', schedule)   
