@@ -6,7 +6,7 @@ import {
   calculatePercentageCats,
 } from '../utils/categoryUtils';
 import BoxScoreTable from '../tables/BoxScoreTable';
-import { SCHEDULE_DATES, PRO_TEAM_IDS } from '../utils/consts';
+import { PRO_TEAM_IDS } from '../utils/consts';
 import { getStdRange } from '../utils/arrayMath';
 
 function BoxScoresContainer(props) {
@@ -24,7 +24,7 @@ function BoxScoresContainer(props) {
 
   const { teams, players, rosters, platform, scoreboard, settings } =
     props.data;
-  const { schedule } = props.commonData;
+  const { nbaSchedule, matchupsSchedule } = props.commonData;
 
   // Init data transformations
   const currentWeek = settings[0].currentWeek;
@@ -53,7 +53,7 @@ function BoxScoresContainer(props) {
   let endDate;
 
   matchupPeriods.forEach((period) => {
-    const scheduleDates = SCHEDULE_DATES[platform][period];
+    const scheduleDates = matchupsSchedule[platform][period];
 
     startDate = startDate ? startDate : scheduleDates[0];
     endDate = endDate ? endDate : scheduleDates[1];
@@ -62,7 +62,7 @@ function BoxScoresContainer(props) {
     endDate = scheduleDates[1] > endDate ? scheduleDates[1] : endDate;
   });
 
-  schedule.forEach((g) => {
+  nbaSchedule.forEach((g) => {
     g.teamIds = g.teams.map((t) => PRO_TEAM_IDS[t]);
   });
 
@@ -77,7 +77,7 @@ function BoxScoresContainer(props) {
     p.teamId = teamId;
 
     const datesPlayed = {};
-    schedule
+    nbaSchedule
       .filter((g) => g.date >= startDate && g.date <= endDate)
       .forEach((g) => {
         datesPlayed[g.date] =
