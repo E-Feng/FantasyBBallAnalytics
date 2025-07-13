@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
+import styled from 'styled-components';
 
 import LeagueContext from './LeagueContext';
 import LeagueChangeModal from './LeagueChangeModal';
 import OutdatedIndicator from './OutdatedIndicator';
-
-import styled from 'styled-components';
+import SyncButton from './SyncButton';
 
 function LeagueSettings() {
   const { leagueState, modalState } = useContext(LeagueContext);
@@ -53,6 +53,7 @@ function LeagueSettings() {
 
   return (
     <Container>
+      <SyncButton updatedAt={data?.updatedAt} />
       <Label>League</Label>
       <Dropdown value={leagueId} onChange={handleLeagueChange}>
         {leagueDropdownValues.map((o) => {
