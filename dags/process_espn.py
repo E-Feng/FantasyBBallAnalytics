@@ -331,6 +331,10 @@ def update_espn_leagues(event, context):
 def update_nba_schedule():
   data = extract_from_nba_schedule(current_year)
 
+  if not data:
+    print("No NBA schedule data available")
+    return
+
   schedule = []
   
   for month_data in data["lscd"]:

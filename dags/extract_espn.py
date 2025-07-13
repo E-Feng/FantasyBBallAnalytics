@@ -52,6 +52,5 @@ def extract_from_nba_schedule(year):
     print(f"Successfully fetched NBA schedule for {year}")
     return data
   else:
-    print(f"Failed fetching NBA schedule for {year}")
-    print(r.json())
-    raise ValueError(f"Error obtaining NBA schedule for {year}")
+    print(f"Failed fetching / Not Available - NBA schedule for {year}")
+    return []
