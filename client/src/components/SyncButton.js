@@ -18,8 +18,6 @@ function SyncButton(props) {
     now - updatedAt > outdatedInterval || Number.isNaN(updatedAt);
 
   const onClick = async () => {
-    console.log('Syncing league data...');
-
     const reqPayload = {
       leagueId: props.leagueId,
       platform: '',
