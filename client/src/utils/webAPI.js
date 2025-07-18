@@ -21,11 +21,13 @@ export const fetchDynamo = async ({ queryKey }) => {
   console.log('Fetching from dynamo with key: ', queryKey);
   const [leagueId, leagueYear] = queryKey;
 
+  const rawLeagueId = leagueId.trim();
+
   const fullURL =
     awsURL +
     'data?' +
     new URLSearchParams({
-      leagueId: leagueId,
+      leagueId: rawLeagueId,
       leagueYear: leagueYear,
     });
 
@@ -43,6 +45,7 @@ export const fetchDynamo = async ({ queryKey }) => {
 };
 
 export const requestLeagueId = async (payload) => {
+  payload.leagueId = payload.leagueId.trim();
   const fullURL = awsURL + 'leagues?' + new URLSearchParams(payload);
 
   const res = await fetch(fullURL, {
@@ -50,13 +53,13 @@ export const requestLeagueId = async (payload) => {
   });
 
   if (res.status !== 200) {
-    return ["SERVER_ERROR"]
+    return ['SERVER_ERROR'];
   }
 
   const data = await res.json();
-  const values = data.split(":");
+  const values = data.split(':');
 
-  if (data.includes(".l.")) {
+  if (data.includes('.l.')) {
     // Temp mapping
     const yearMap = {
       353: 2016,
@@ -68,10 +71,10 @@ export const requestLeagueId = async (payload) => {
       410: 2022,
       418: 2023,
       428: 2024,
-      454: 2025
-    }
-    const prefix = values[1].split(".l.")[0]
-    values.push(yearMap[prefix]) 
+      454: 2025,
+    };
+    const prefix = values[1].split('.l.')[0];
+    values.push(yearMap[prefix]);
   }
 
   return values;
@@ -94,11 +97,11 @@ const anonymizeTeams = (data) => {
     ['MMMM', 'Thirteen', 'Mike'],
     ['NNNN', 'Fourteen', 'Nina'],
   ];
-  
+
   data.teams.forEach((team, i) => {
     team.abbrev = anonTeams[i][0];
     team.fullTeamName = `Team ${anonTeams[i][1]}`;
     team.firstName = anonTeams[i][2];
     team.lastName = anonTeams[i][2];
-  })
+  });
 };

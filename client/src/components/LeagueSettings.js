@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { useQueryClient, useIsFetching } from 'react-query';
 import styled from 'styled-components';
 
 import LeagueContext from './LeagueContext';
 import LeagueChangeModal from './LeagueChangeModal';
-import OutdatedIndicator from './OutdatedIndicator';
+import StatusIndicator from './StatusIndicator';
 import SyncButton from './SyncButton';
 
 function LeagueSettings() {
@@ -13,6 +13,8 @@ function LeagueSettings() {
   const [showModal, setShowModal] = modalState;
 
   const [leagueId, leagueYear] = leagueKey;
+
+  const forceRerender = () => setLeagueKey([leagueId + ' ', leagueYear]);
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
@@ -28,12 +30,11 @@ function LeagueSettings() {
   const leagueIdList = leagueKeysList.map((o) => o[0]);
   const leagueYearList = leagueKeysList.map((o) => o[1]);
 
-  const isSameLeagueId = leagueIdList.every(v => v === leagueIdList[0])
+  const isSameLeagueId = leagueIdList.every((v) => v === leagueIdList[0]);
 
-  const leagueDropdownValues =
-    isSameLeagueId
-      ? [leagueIdList[0], 'Change']
-      : [...leagueIdList, 'Change'];
+  const leagueDropdownValues = isSameLeagueId
+    ? [leagueIdList[0], 'Change']
+    : [...leagueIdList, 'Change'];
 
   // Functions to handle dropdown changes
   const handleLeagueChange = (e) => {
@@ -53,7 +54,6 @@ function LeagueSettings() {
 
   return (
     <Container>
-      <SyncButton updatedAt={data?.updatedAt} />
       <Label>League</Label>
       <Dropdown value={leagueId} onChange={handleLeagueChange}>
         {leagueDropdownValues.map((o) => {
@@ -65,7 +65,12 @@ function LeagueSettings() {
           );
         })}
       </Dropdown>
-      <OutdatedIndicator updatedAt={data?.updatedAt}/>
+      <StatusIndicator updatedAt={data?.updatedAt} />
+      <SyncButton
+        leagueId={leagueId}
+        updatedAt={data?.updatedAt}
+        forceRerender={forceRerender}
+      />
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
         {leagueYearList.map((year, i) => {
