@@ -1,29 +1,35 @@
-import React from 'react';
-
 import styled from 'styled-components';
 
-function OutdatedIndicator(props) {
+function StatusIndicator(props) {
   const updatedAt = Date.parse(props.updatedAt + 'Z');
   const now = Date.now();
+  const hoursAgo = Math.floor((now - updatedAt) / (1000 * 60 * 60));
 
-  const interval = 1 * 24 * 60 * 60 * 1000; // 1 day in milliseconds
+  const outdatedIntervalDays = 1;
+  const outdatedInterval = outdatedIntervalDays * 24 * 60 * 60 * 1000;
 
-  const isOutdated = now - updatedAt > interval || Number.isNaN(updatedAt);
+  const isOutdated =
+    now - updatedAt > outdatedInterval || Number.isNaN(updatedAt);
 
-  const info = `Refresh to fetch updated league data. If this warning is
+  const outdatedInfo = `Sync to fetch updated league data. If this warning is
     still here your league is outdated due to failed authorization, open the 
     'Change' league option to the left and redo authorization to update, 
     then refresh again.
   `;
+  const info = `League data is up to date, last updated at ${new Date(
+    updatedAt
+  ).toLocaleString()} (${hoursAgo} hour${hoursAgo !== 1 ? 's' : ''} ago).`;
 
   return (
     <Container>
       {isOutdated ? (
         <Indicator>
-          ⚠️<PopUp>{info}</PopUp>
+          ⚠️<PopUp>{outdatedInfo}</PopUp>
         </Indicator>
       ) : (
-        <></>
+        <Indicator>
+          ✔️<PopUp>{info}</PopUp>
+        </Indicator>
       )}
     </Container>
   );
@@ -65,4 +71,4 @@ const Indicator = styled.div`
   }
 `;
 
-export default OutdatedIndicator;
+export default StatusIndicator;
