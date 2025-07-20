@@ -1,27 +1,39 @@
 # Fantasy Basketball Analytics
 
-![ExampleGif](https://i.imgur.com/30O0wGO.gif)
+![Demo](./images/Demo1.gif)
 
-Check it out here: [Fantasy Basketball Visualized](https://fantasy.elvinfeng.com)
+Explore the project: [Fantasy Basketball Visualized](https://fantasy.elvinfeng.com)
 
-My first and personal project involving my hobby of basketball and fantasy sports. Using the API provided by ESPN, I created an ETL datapipeline to create interesting visuals to provide better informed decisions. These include daily alerts of high scoring games and color coded tables to show teams strengths and weaknesses. This project was first written in vanilla javascript using Windows scheduler to run Python scripts. Later it was fully rewritten using modern web designs and serverless methods with React, Apache Airflow, Lambda, DynamoDB, and hosted on Google Cloud Platform using Docker containers.
+## Overview
 
-## Technology/Stack
+Fantasy Basketball Analytics is a personal project that leverages ESPN’s and Yahoo's API to provide actionable insights and visualizations for fantasy basketball leagues. Hundreds of daily users use this platform to generate personal insights, alerts, and visual tables to highlight team strengths and weaknesses. Originally built with vanilla JavaScript and Python scripts, the project has evolved to use modern web technologies and cloud-native infrastructure.
 
-### Frontend
-HTML5\
-CSS3\
-JavaScript\
-React
+## Architecture
+![Architecture Diagram](./images/Fantasy.drawio.png)
 
-### Backend
-Python\
-Airflow\
-Lambda\
-DynamoDB\
-Firebase
 
-### Deployment
-Docker\
-AWS\
-GCP
+## Technology Stack
+
+Frontend - JavaScript, React \
+Backend - Python, Lambda, DynamoDB, API Gateway \
+Deployment - Docker, Github Actions
+
+## Getting Started (Client)
+
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/E-Feng/FantasyBBallAnalytics.git
+   cd FantasyBBallAnalytics
+   ```
+
+2. **Install dependencies:**
+   ```sh
+   cd client
+   npm install
+   cd ..
+   npm run dev
+   ```
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
