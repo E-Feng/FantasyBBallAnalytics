@@ -32,6 +32,12 @@ def get_current_espn_league_year():
     return league_year
 
 
+def get_current_yahoo_league_year():
+  espn_year = get_current_espn_league_year()
+
+  return str(espn_year - 1)
+
+
 def get_default_league_info():
   league_id = '1978554631'
 

@@ -1,7 +1,8 @@
 import boto3
 import requests
 
-from util import invoke_lambda, strip_character_accents
+from consts import YAHOO_DUMMY_LEAGUE_IDS
+from util import invoke_lambda, strip_character_accents, get_current_yahoo_league_year
 from upload_to_aws import upload_data_to_s3
 
 
@@ -77,7 +78,8 @@ def update_player_list():
     refresh_token = invoke_lambda(lambda_client, "get_secret", {"key": "yahoo_refresh_token"})
     access_token = get_yahoo_access_token(refresh_token)["yahoo_access_token"]
 
-    url = "https://fantasysports.yahooapis.com/fantasy/v2/league/454.l.52531/players;start=%s/?format=json_f"
+    league_id = YAHOO_DUMMY_LEAGUE_IDS[get_current_yahoo_league_year()]
+
     headers = {"Authorization": f"Bearer {access_token}"}
 
     inc = 25
@@ -86,7 +88,7 @@ def update_player_list():
 
     players_data = []
     while cont:
-        url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/454.l.52531/players;start={start}/?format=json_f"
+        url = f"https://fantasysports.yahooapis.com/fantasy/v2/league/{league_id}/players;start={start}/?format=json_f"
 
         res = requests.get(url=url, headers=headers)
 
