@@ -72,6 +72,7 @@ export const requestLeagueId = async (payload) => {
       418: 2023,
       428: 2024,
       454: 2025,
+      466: 2026,
     };
     const prefix = values[1].split('.l.')[0];
     values.push(yearMap[prefix]);

@@ -2,11 +2,15 @@ import json
 import boto3
 import requests
 
+from consts import YAHOO_SEASON_GAME_IDS
+
 
 base_url = "https://fantasysports.yahooapis.com/fantasy/v2/{}?format=json_f"
 
 
 def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, url_params: list):
+    yahoo_game_id = int(YAHOO_SEASON_GAME_IDS['2024'])
+
     if url_params:
         url_suffix = ""
         for param in url_params:
@@ -30,8 +34,8 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
           print(res.text)
           raise ValueError(f"Error obtaining {url_params} from Yahoo API")
     
-    # Handling player data, grabbing from ESPN process. Only for 2025 ?
-    elif int(league_key[0:3].replace(".", "")) >= 454:
+    # Handling player data, grabbing from ESPN process. Only for 2024-2025 onward
+    elif int(league_key[0:3].replace(".", "")) >= yahoo_game_id:
         s3 = boto3.resource("s3")
 
         if endpoint == "players":

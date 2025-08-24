@@ -16,7 +16,7 @@ import { fetchDynamo, fetchFirebase } from './utils/webAPI';
 const maxWidth = 1200;
 
 const defaultLeagueId = '00000001';
-const defaultLeagueYear = 2025;
+const defaultLeagueYear = 2026;
 
 const queryClient = new QueryClient({
   defaultOptions: {

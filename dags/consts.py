@@ -96,3 +96,14 @@ STAT_IDS_MAP_TO_ESPN = {
   DDS_Y: DDS,
   TDS_Y: TDS,
 }
+
+# Yahoo season game ids
+YAHOO_SEASON_GAME_IDS = {
+    '2023': '428',
+    '2024': '454',
+    '2025': '466',
+}
+YAHOO_DUMMY_LEAGUE_IDS = {
+    '2024': '454.l.52531',
+    '2025': '466.l.9359',
+}

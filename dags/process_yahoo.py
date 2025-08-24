@@ -17,7 +17,10 @@ from yahoo_helper import (
   update_player_list
 )
 from upload_to_aws import upload_league_data_to_dynamo
-from util import invoke_lambda
+from util import (
+  invoke_lambda,
+  get_current_espn_league_year
+)
 
 
 league_api_endpoints = {
@@ -87,6 +90,8 @@ def process_yahoo_league(event, context):
 
 
 def process_all_yahoo_leagues(event, context):
+    current_year = get_current_espn_league_year()
+
     update_player_list()
     
     lambda_client = boto3.client('lambda', region_name='us-east-1')
@@ -131,7 +136,7 @@ def process_all_yahoo_leagues(event, context):
             process_payload = {
                 "queryStringParameters": {
                     "leagueId": league_id,
-                    "leagueYear": 2025,
+                    "leagueYear": current_year,
                     "allLeagueKeys": get_all_league_ids(access_token),
                     "yahooAccessToken": access_token,
                     "updatedAt": datetime.utcnow().isoformat()
