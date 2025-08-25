@@ -39,8 +39,11 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
         s3 = boto3.resource("s3")
 
         if endpoint == "players":
-            obj = s3.Object("nba-player-stats", "espn_players.json")
-            players = json.loads(obj.get()["Body"].read().decode("utf-8"))
+            try:
+                obj = s3.Object("nba-player-stats", "espn_players.json")
+                players = json.loads(obj.get()["Body"].read().decode("utf-8"))
+            except:
+                players = []
 
             return players
         
@@ -51,9 +54,12 @@ def extract_from_yahoo_api(access_token: str, league_key: str, endpoint: str, ur
             return players_id_map
         
         elif endpoint == "daily":
-            obj = s3.Object("nba-player-stats", "daily.json")
-            daily = json.loads(obj.get()["Body"].read().decode("utf-8"))
-                               
+            try:
+                obj = s3.Object("nba-player-stats", "daily.json")
+                daily = json.loads(obj.get()["Body"].read().decode("utf-8"))
+            except:
+                daily = []
+
             return daily
 
     else:
