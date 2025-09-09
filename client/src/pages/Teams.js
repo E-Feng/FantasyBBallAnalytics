@@ -20,16 +20,21 @@ function Teams(props) {
 
   const isLoading = !isDataLoaded || isFetching;
 
+  const isMissingRosterData = isLoading ? null : data.rosters.length === 0;
   const isMissingPlayerData = isLoading ? null : data.players.length === 0;
+
+  const errorMsg = isMissingRosterData
+    ? 'No roster data available for this league'
+    : isMissingPlayerData
+    ? 'Player Data not available for previous Yahoo leagues'
+    : '';
 
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
-      ) : isMissingPlayerData ? (
-        <MissingDataContainer>
-          Player Data not available for previous Yahoo leagues
-        </MissingDataContainer>
+      ) : isMissingRosterData || isMissingPlayerData ? (
+        <MissingDataContainer>{errorMsg}</MissingDataContainer>
       ) : (
         <Container maxWidth={props.maxWidth}>
           <TeamRankingsContainer leagueData={data} />
