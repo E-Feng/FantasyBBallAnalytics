@@ -12,7 +12,7 @@ import styled from 'styled-components';
 function DraftRecap(props) {
   const { leagueState } = useContext(LeagueContext);
   const leagueKey = leagueState[0];
-  
+
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(leagueKey);
 
@@ -26,6 +26,7 @@ function DraftRecap(props) {
   const settingsData = isLoading ? null : data.settings;
   const playersData = isLoading ? null : data.players;
 
+  const isMissingDraftData = isLoading ? null : draftData.length === 0;
   const isMissingPlayerData = isLoading ? null : playersData.length === 0;
 
   const draftRecapInfo = `This table shows a recap of the draft with the end of
@@ -35,14 +36,18 @@ function DraftRecap(props) {
     and rankings do not factor in ejections as it is heavily weighted but the option
     to include it is available.`;
 
+  const errorMsg = isMissingDraftData
+    ? 'No draft data available for this league'
+    : isMissingPlayerData
+    ? 'Player Data not available for previous Yahoo leagues'
+    : '';
+
   return (
     <Layout maxWidth={props.maxWidth}>
       {isLoading ? (
         <LoadingIcon />
-      ) : isMissingPlayerData ? (
-        <MissingDataContainer>
-          Player Data not available for previous Yahoo leagues
-        </MissingDataContainer>
+      ) : isMissingDraftData || isMissingPlayerData ? (
+        <MissingDataContainer>{errorMsg}</MissingDataContainer>
       ) : (
         <Container>
           <TooltipHeader title='Draft Recap' info={draftRecapInfo} />
