@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { requestLeagueId } from '../utils/webAPI';
 
 function SyncButton(props) {
-  const [hasSynced, setHasSynced] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null);
   const { handleSubmit, formState } = useForm();
 
   const updatedAt = Date.parse(props.updatedAt + 'Z');
@@ -18,6 +18,8 @@ function SyncButton(props) {
     now - updatedAt > outdatedInterval || Number.isNaN(updatedAt);
 
   const onClick = async () => {
+    setSyncStatus(true);
+
     const reqPayload = {
       leagueId: props.leagueId,
       platform: '',
@@ -28,7 +30,8 @@ function SyncButton(props) {
     if (leagueStatus === 'ACTIVE') {
       props.forceRerender();
     } else {
-      setHasSynced(true);
+      setSyncStatus(false);
+      props.setShowModal(true);
     }
   };
 
@@ -38,8 +41,9 @@ function SyncButton(props) {
         <SyncForm onSubmit={handleSubmit(onClick)}>
           <Button
             type='submit'
-            disabled={formState.isSubmitting || hasSynced}
+            disabled={formState.isSubmitting || syncStatus !== null}
             value='&#8634; Sync'
+            syncStatus={syncStatus}
           />
         </SyncForm>
       ) : (
@@ -62,7 +66,7 @@ const SyncForm = styled.form`
 `;
 
 const Button = styled.input`
-  /* margin: 4px 4px; */
+  /* background-color: ${(props) => (props.syncStatus === false ? 'red' : '#fff')}; */
 `;
 
 export default SyncButton;
