@@ -70,6 +70,7 @@ function LeagueSettings() {
         leagueId={leagueId}
         updatedAt={data?.updatedAt}
         forceRerender={forceRerender}
+        setShowModal={setShowModal}
       />
       <Label>Season</Label>
       <Dropdown value={leagueYear} onChange={handleSeasonChange}>
