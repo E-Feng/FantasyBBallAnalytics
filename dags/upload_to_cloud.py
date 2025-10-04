@@ -31,6 +31,8 @@ def upload_to_firebase(type: str, payload: dict):
     url = FIREBASE_URL + '/messageboard.json'
   elif type == "scoring_period":
     url = FIREBASE_URL + '.json'
+  elif type == "nba_schedule":
+    url = FIREBASE_URL + '/nbaSchedule.json'
 
   r = authed_session.patch(url, data=json.dumps(payload))
 

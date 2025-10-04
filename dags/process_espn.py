@@ -5,7 +5,8 @@ import pandas as pd
 from datetime import datetime, date
 
 from extract_espn import (
-  extract_from_espn_api
+  extract_from_espn_api,
+  extract_from_nba_schedule
 )
 from transform_raw_data import (
   transform_raw_to_df
@@ -261,6 +262,7 @@ def update_espn_leagues(event, context):
   print(event)
   lambda_client = boto3.client('lambda', region_name='us-east-1')
 
+  update_nba_schedule()
   process_espn_common()
 
   db_pass = invoke_lambda(lambda_client, 'get_secret', {'key': 'supabase_password'})
@@ -324,3 +326,27 @@ def update_espn_leagues(event, context):
     'statusCode': 200,
     'body': "Test response"
   }
+
+
+def update_nba_schedule():
+  data = extract_from_nba_schedule(current_year)
+
+  if not data:
+    print("No NBA schedule data available")
+    return
+
+  schedule = []
+  
+  for month_data in data["lscd"]:
+    for game in month_data["mscd"]["g"]:
+      date = game["gdte"]
+      team_1 = game["v"]["ta"]
+      team_2 = game["h"]["ta"]
+
+      game_info = {
+        "date": date,
+        "teams": [team_1, team_2],
+      }
+      schedule.append(game_info)
+
+  upload_to_firebase('nba_schedule', schedule)   
