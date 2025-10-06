@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 from google.oauth2 import service_account
 from google.auth.transport.requests import AuthorizedSession
 
@@ -34,11 +33,15 @@ def upload_to_firebase(type: str, payload: dict):
   elif type == "nba_schedule":
     url = FIREBASE_URL + '/nbaSchedule.json'
 
-  r = authed_session.patch(url, data=json.dumps(payload))
+  if isinstance(payload, list):
+    r = authed_session.put(url, data=json.dumps(payload))
+  else:
+    r = authed_session.patch(url, data=json.dumps(payload))
 
   if r.status_code == 200:
     print("Data successfully sent to firebase")
   else:
+    print("Error sending data to firebase")
     print(r.status_code, r.text)
 
   return
