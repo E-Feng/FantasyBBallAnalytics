@@ -26,7 +26,9 @@ function DraftRecap(props) {
   const settingsData = isLoading ? null : data.settings;
   const playersData = isLoading ? null : data.players;
 
-  const isMissingDraftData = isLoading ? null : draftData.length === 0;
+  const isMissingDraftData = isLoading
+    ? null
+    : draftData.length === 0 || draftData[0].playerId === '-1';
   const isMissingPlayerData = isLoading ? null : playersData.length === 0;
 
   const draftRecapInfo = `This table shows a recap of the draft with the end of

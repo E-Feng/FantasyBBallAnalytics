@@ -107,3 +107,6 @@ YAHOO_DUMMY_LEAGUE_IDS = {
     '2024': '454.l.52531',
     '2025': '466.l.9359',
 }
+
+# Public league to get player data
+ESPN_DATA_FETCH_LEAGUE_ID = '1978554631'
