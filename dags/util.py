@@ -2,6 +2,8 @@ import json
 import requests
 import unicodedata
 
+from consts import ESPN_DATA_FETCH_LEAGUE_ID
+
 
 def invoke_lambda(client, function_name, payload):
   if not isinstance(payload, str):
@@ -39,7 +41,7 @@ def get_current_yahoo_league_year():
 
 
 def get_default_league_info():
-  league_id = '1978554631'
+  league_id = ESPN_DATA_FETCH_LEAGUE_ID
 
   league_info = {
     "leagueId": league_id,
