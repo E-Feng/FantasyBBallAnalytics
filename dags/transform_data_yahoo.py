@@ -64,7 +64,10 @@ def truncate_and_map_player_ids(league_data: dict):
   is_owned = players["playerId"].isin(rosters["playerId"])
   is_drafted = players["playerId"].isin(draft["playerId"])
 
-  all_cond = is_owned | is_drafted
+  trending_players = players[~is_owned].sort_values("percentChange", ascending=False).head(5)
+  is_trending = players["playerId"].isin(trending_players["playerId"])
+
+  all_cond = is_owned | is_drafted | is_trending
   players = players[all_cond]
 
   return players

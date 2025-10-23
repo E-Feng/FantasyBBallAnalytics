@@ -23,6 +23,8 @@ function MessageBoard() {
 
   const messageData = isLoading ? null : commonData?.messageboard;
   const unrosteredData = isLoading ? null : data?.daily;
+  const rostersData = isLoading ? null : data?.rosters;
+  const playersData = isLoading ? null : data?.players;
 
   const messageArray = [];
 
@@ -68,14 +70,14 @@ function MessageBoard() {
     });
 
     if (res.status === 200) {
-      console.log('Message sent')
+      console.log('Message sent');
       // Updating messageData
       messageData[date] = messageData[date] ? messageData[date] : [];
       messageData[date][time] = payload;
 
       reset({ name: name, msg: '' });
     } else {
-      reset({ name: name, msg: msg })
+      reset({ name: name, msg: msg });
     }
 
     return;
@@ -134,7 +136,7 @@ function MessageBoard() {
         content = msg.msg;
     }
     return (
-      <li key={msg.time + '-' + msg.gs}>
+      <li key={msg.time || Math.random()}>
         <b>{msg.user}: </b>
         {content}
       </li>
@@ -172,6 +174,23 @@ function MessageBoard() {
         });
       });
     }
+
+    // Appending messages for trending players
+    const trendingNumShow = 3;
+    const trendingPlayers = playersData
+      .filter(
+        (p) => !rostersData.some((roster) => roster.playerId === p.playerId)
+      )
+      .sort((a, b) => b.percentChange - a.percentChange)
+      .slice(0, trendingNumShow);
+
+    trendingPlayers.forEach((p) => {
+      messageArray.push({
+        msg: `[+${p.percentChange.toFixed(1)}%] ${p.playerName}`,
+        type: 'msg',
+        user: 'BOT',
+      });
+    });
   }
 
   return (
