@@ -13,8 +13,11 @@ def transform_players_truncate(league_data: dict):
 
   is_owned = players['playerId'].isin(rosters["playerId"])
   is_drafted = players["playerId"].isin(draft["playerId"])
+  
+  trending_players = players[~is_owned].sort_values("percentChange", ascending=False).head(5)
+  is_trending = players["playerId"].isin(trending_players["playerId"])
 
-  all_cond = is_owned | is_drafted
+  all_cond = is_owned | is_drafted | is_trending
 
   return players[all_cond]
 
