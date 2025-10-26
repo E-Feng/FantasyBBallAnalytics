@@ -191,7 +191,7 @@ function BoxScoresContainer(props) {
         });
         return acc;
       },
-      { ...row, name: `${row.name} [PROJ]`, type: 'proj' }
+      { ...row, name: `${row.name}`, type: 'proj' }
     );
   });
   calculatePercentageCats(projScores);

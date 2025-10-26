@@ -2,7 +2,7 @@ import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
 
-import { calculateMatchup } from '../utils/matchupUtils';
+import { isHomeTeamWinner } from '../utils/matchupUtils';
 import { getCatInverse } from '../utils/categoryUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
@@ -30,7 +30,7 @@ function MatchupTable(props) {
           const awayData = props.row.original;
           const prob = props.row.original.firstName;
 
-          const isWinner = calculateMatchup(homeData, awayData, cats);
+          const isWinner = isHomeTeamWinner(homeData, awayData, cats);
 
           let color = 'black';
           color = isFirstRow ? 'gainsboro' : color;

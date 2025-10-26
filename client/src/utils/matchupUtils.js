@@ -1,5 +1,6 @@
 export const calculateMatchup = (home, away, cats) => {
-  let homeNetWins = 0;
+  let homeWins = 0;
+  let awayWins = 0;
 
   const scoringCats = cats.filter((cat) => !cat.isDisplayOnly);
 
@@ -7,27 +8,33 @@ export const calculateMatchup = (home, away, cats) => {
     const name = cat.name;
     const inverse = cat.inverse;
 
-    let result = 0;
-
     if (home[name] > away[name]) {
-      result = inverse ? -1 : 1;
+      if (inverse) {
+        awayWins++;
+      } else {
+        homeWins++;
+      }
     } else if (home[name] < away[name]) {
-      result = inverse ? 1 : -1;
+      if (inverse) {
+        homeWins++;
+      } else {
+        awayWins++;
+      }
     }
-
-    homeNetWins += result;
   });
 
-  // Calculating overall win-loss, points is tiebreaker
-  if (homeNetWins > 0) {
-    return true;
-  } else if (homeNetWins < 0) {
-    return false;
-  } else {
-    if (home.pts > away.pts) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  return {
+    homeWins,
+    awayWins,
+  };
+};
+
+export const isHomeTeamWinner = (home, away, cats) => {
+  const matchupResult = calculateMatchup(home, away, cats);
+
+  if (matchupResult.homeWins > matchupResult.awayWins) return true;
+  if (matchupResult.awayWins > matchupResult.homeWins) return false;
+
+  // Tie-breaker logic
+  return home.pts > away.pts;
 };
