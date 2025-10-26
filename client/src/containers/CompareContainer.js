@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import CompareTable from '../tables/CompareTable';
 import * as arrayMath from '../utils/arrayMath';
 import * as catUtils from '../utils/categoryUtils';
-import { calculateMatchup } from '../utils/matchupUtils';
+import { isHomeTeamWinner } from '../utils/matchupUtils';
 import CompareH2HTable from '../tables/CompareH2HTable';
 import { getCatWinProbability } from '../utils/probabilityMath';
 
@@ -46,7 +46,7 @@ function CompareContainer(props) {
           const oppWeekData = filteredData.filter(
             (o) => o.week === week && o.teamId === selectedTeams[1]
           )?.[0];
-          h2hRow[`week${week}`] = calculateMatchup(weekData, oppWeekData, cats)
+          h2hRow[`week${week}`] = isHomeTeamWinner(weekData, oppWeekData, cats)
             ? 'Won'
             : '';
         } else {

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTable } from 'react-table';
 import styled from 'styled-components';
 
-import { calculateMatchup } from '../utils/matchupUtils';
+import { calculateMatchup, isHomeTeamWinner } from '../utils/matchupUtils';
 import { getHSLColor } from '../utils/colorsUtil';
 
 function BoxScoreTable(props) {
@@ -26,11 +26,10 @@ function BoxScoreTable(props) {
   const data = [].concat(
     home,
     away,
+    diff,
     filler,
     homeProj,
     awayProj,
-    filler,
-    diff,
     diffProj,
     filler,
     homePlayers,
@@ -49,27 +48,19 @@ function BoxScoreTable(props) {
           const type = props.row.original.type;
 
           const isSeparator = type === 'filler';
-          const isPlayer = type === 'player';
-          const isTeam = !isSeparator && !isPlayer;
-          const isHome = props.row.original.teamId === home.teamId;
+          const isDiff = type === 'diff' || type === 'diffProj';
 
           let isWinner;
-          if (isHome) {
-            if (type === 'team' || type === 'diff') {
-              isWinner = calculateMatchup(home, away, cats);
-            } else if (type === 'proj' || type === 'diffProj') {
-              isWinner = calculateMatchup(homeProj, awayProj, cats);
-            }
-          } else {
-            if (type === 'team') {
-              isWinner = calculateMatchup(away, home, cats);
-            } else if (type === 'proj') {
-              isWinner = calculateMatchup(awayProj, homeProj, cats);
+          if (isDiff) {
+            if (type === 'diff') {
+              isWinner = isHomeTeamWinner(home, away, cats);
+            } else if (type === 'diffProj') {
+              isWinner = isHomeTeamWinner(homeProj, awayProj, cats);
             }
           }
 
           let color = 'gainsboro';
-          color = isTeam ? (isWinner ? 'limegreen' : 'salmon') : color;
+          color = isDiff ? (isWinner ? 'limegreen' : 'salmon') : color;
           color = isSeparator ? 'black' : color;
 
           return (
@@ -86,14 +77,28 @@ function BoxScoreTable(props) {
         Cell: (props) => {
           const playerId = props.row.original.playerId;
           const val = checkedGames[playerId] || [];
+          const type = props.row.original.type;
 
           const isSeparator = props.row.original.type === 'filler';
+          const isDiff = type === 'diff' || type === 'diffProj';
+
+          let matchupResult;
+          let matchupText;
+          if (isDiff) {
+            if (type === 'diff') {
+              matchupResult = calculateMatchup(home, away, cats);
+            } else if (type === 'diffProj') {
+              matchupResult = calculateMatchup(homeProj, awayProj, cats);
+            }
+            matchupText = `${matchupResult.homeWins}-${matchupResult.awayWins}`;
+          }
 
           let color = 'gainsboro';
           color = isSeparator ? 'black' : color;
 
           return (
             <div style={{ background: color, padding: '2px' }}>
+              <p>{matchupText}</p>
               {val.map((v, i) => {
                 return (
                   <input

@@ -20,11 +20,10 @@ export const getHSLColor = (val, start, end, inverse) => {
   val = Math.min(val, end);
   val = Math.max(val, start);
 
-  let mappedVal =
-    hueA + ((hueB - hueA) / (end - start)) * (val - start);
+  let mappedVal = hueA + ((hueB - hueA) / (end - start)) * (val - start);
 
   if (inverse) {
-    mappedVal = 100 - mappedVal;
+    mappedVal = hueA + hueB - mappedVal;
   }
 
   // Return a CSS HSL string
