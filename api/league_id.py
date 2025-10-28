@@ -27,12 +27,12 @@ def get_league_id_status(event, context):
     
     cursor = conn.cursor()
 
-    league_id = event["queryStringParameters"]['leagueId']
-    platform = event["queryStringParameters"]["platform"]
-    league_auth_code = event["queryStringParameters"]["leagueAuthCode"]
+    query_league_id = event["queryStringParameters"]['leagueId']
+    query_platform = event["queryStringParameters"]["platform"]
+    query_league_auth_code = event["queryStringParameters"]["leagueAuthCode"]
 
     get_query = open("sql/get_league_info.sql", "r").read()
-    get_params = {"league_id_re": f"(?<![0-9]){league_id}(?![0-9])"}
+    get_params = {"league_id_re": f"(?<![0-9]){query_league_id}(?![0-9])"}
 
     cursor.execute(get_query, get_params)
 
@@ -44,9 +44,9 @@ def get_league_id_status(event, context):
     
     league_exists = bool(res)
     league_updated = league_exists and res[0][0]
-    league_auth_code = res[0][1] if not league_auth_code and league_exists else league_auth_code
-    platform = res[0][2] if league_exists else (platform or "espn")
-    league_id = res[0][3] if league_exists else league_id
+    league_auth_code = query_league_auth_code if query_league_auth_code else res[0][1]
+    platform = res[0][2] if league_exists else (query_platform or "espn")
+    league_id = res[0][3] if league_exists else query_league_id
 
     print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
