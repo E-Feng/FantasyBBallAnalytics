@@ -44,7 +44,7 @@ def get_league_id_status(event, context):
     
     league_exists = bool(res)
     league_updated = league_exists and res[0][0]
-    league_auth_code = query_league_auth_code if query_league_auth_code else res[0][1]
+    league_auth_code = query_league_auth_code if query_league_auth_code or not league_exists else res[0][1]
     platform = res[0][2] if league_exists else (query_platform or "espn")
     league_id = res[0][3] if league_exists else query_league_id
 
