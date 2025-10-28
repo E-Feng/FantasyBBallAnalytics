@@ -50,7 +50,7 @@ def get_league_id_status(event, context):
 
     print(f"League {league_id} on {platform}, exists {league_exists}, updated {league_updated}")
 
-    if league_updated:
+    if league_updated and not query_league_auth_code:
         print("League already updated, returning active")
         return {"statusCode": 200, "body": json.dumps(f"ACTIVE:{league_id}")}
     
