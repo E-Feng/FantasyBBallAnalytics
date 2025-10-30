@@ -10,9 +10,12 @@ import RosterTable from '../tables/RosterTable';
 function RosterContainer(props) {
   const teams = props.leagueData.teams;
 
+  const initTeamId =
+    parseInt(localStorage.getItem('teamId')) || teams[0].teamId;
+
   const [period, setPeriod] = useState('Season');
   const [statType, setStatType] = useState('statRatings');
-  const [displayList, setDisplayList] = useState([teams[0].teamId]);
+  const [displayList, setDisplayList] = useState([initTeamId]);
 
   const players = props.leagueData.players;
   const rosters = props.leagueData.rosters;
