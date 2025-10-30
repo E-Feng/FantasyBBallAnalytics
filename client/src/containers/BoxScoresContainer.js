@@ -39,8 +39,10 @@ function BoxScoresContainer(props) {
   const weekArray = [currentWeek, currentWeek + 1];
 
   // Init states
+  const initTeamId = parseInt(localStorage.getItem('teamId')) || teams[0].teamId;
+
   const [week, setWeek] = useState(currentWeek);
-  const [teamId, setTeamId] = useState(teams[0].teamId);
+  const [teamId, setTeamId] = useState(initTeamId);
 
   const todayDate = new Date()
     .toLocaleString('en-CA', { timeZone: 'America/New_York' })
@@ -128,6 +130,7 @@ function BoxScoresContainer(props) {
     if (isNaN(newTeamId)) return;
 
     setTeamId(newTeamId);
+    localStorage.setItem('teamId', newTeamId);
 
     const newCheckedGames = getCheckedGames(newTeamId, week);
 
