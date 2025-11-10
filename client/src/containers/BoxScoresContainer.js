@@ -39,7 +39,8 @@ function BoxScoresContainer(props) {
   const weekArray = [currentWeek, currentWeek + 1];
 
   // Init states
-  const initTeamId = parseInt(localStorage.getItem('teamId')) || teams[0].teamId;
+  const storageTeamId = parseInt(localStorage.getItem('teamId'));
+  const initTeamId = teams.some(t => t.teamId === storageTeamId) ? storageTeamId : teams[0].teamId;
 
   const [week, setWeek] = useState(currentWeek);
   const [teamId, setTeamId] = useState(initTeamId);
@@ -106,7 +107,6 @@ function BoxScoresContainer(props) {
   );
 
   const weekBoxScores = fullScoreboard.filter((row) => row.week === week);
-
   const homeBoxScore = weekBoxScores.find((row) => row.teamId === teamId);
   const bothTeamIds = [homeBoxScore.teamId, homeBoxScore.awayId];
 
