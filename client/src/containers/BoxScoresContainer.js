@@ -40,12 +40,14 @@ function BoxScoresContainer(props) {
 
   // Init states
   const storageTeamId = parseInt(localStorage.getItem('teamId'));
-  const initTeamId = teams.some(t => t.teamId === storageTeamId) ? storageTeamId : teams[0].teamId;
+  const initTeamId = teams.some((t) => t.teamId === storageTeamId)
+    ? storageTeamId
+    : teams[0].teamId;
 
   const [week, setWeek] = useState(currentWeek);
   const [teamId, setTeamId] = useState(initTeamId);
 
-  const todayDate = new Date()
+  const updatedDate = new Date(props.data.updatedAt)
     .toLocaleString('en-CA', { timeZone: 'America/New_York' })
     .split(',')[0];
 
@@ -87,7 +89,7 @@ function BoxScoresContainer(props) {
           datesPlayed[g.date] !== undefined ? datesPlayed[g.date] : null;
 
         const isPlaying = g.teamIds.includes(p.proTeamId);
-        const isCompleted = g.date < todayDate;
+        const isCompleted = g.date < updatedDate;
 
         if (isPlaying && isCompleted) {
           datesPlayed[g.date] = isPlaying + isCompleted;
