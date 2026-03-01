@@ -44,7 +44,11 @@ def extract_from_espn_api(league_info: dict, view: list, header: dict = {}):
 def extract_from_nba_schedule(year):
   base_url = f"https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/{year - 1}/league/00_full_schedule.json"
 
-  r = requests.get(base_url)
+  try:
+    r = requests.get(base_url)
+  except Exception as e:
+    print(f"Failed fetching NBA schedule for {year}: {e}")
+    return []
 
   if r.status_code == 200:
     data = r.json()
