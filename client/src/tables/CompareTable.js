@@ -11,13 +11,13 @@ function CompareTable(props) {
   const startWeek = props.startWeek;
 
   const numCompare = data.filter(
-    (row) => row.rowHeader === data[0].rowHeader
+    (row) => row.rowHeader === data[0].rowHeader,
   ).length;
 
   const columns = React.useMemo(() => {
     const weekArray = Array.from(
       { length: currentWeek - startWeek + 1 },
-      (_, i) => startWeek + i
+      (_, i) => startWeek + i,
     );
 
     return [
@@ -54,7 +54,7 @@ function CompareTable(props) {
     {
       Header: 'Win %',
       accessor: 'winPer',
-    }
+    },
   );
 
   columns.unshift({
@@ -152,8 +152,10 @@ function CompareTable(props) {
 
                         let isLargest;
                         const catID = cell.row.original.catId;
-                        const isWinPer = headerId === 'winPer';
-                        if (getCatInverse(catID) & !isWinPer) {
+                        const isNonInverseCol = ['wins', 'winPer'].includes(
+                          headerId,
+                        );
+                        if (getCatInverse(catID) & !isNonInverseCol) {
                           isLargest = cell.value < Math.min(...compare);
                         } else {
                           isLargest = cell.value >= Math.max(...compare);
@@ -164,16 +166,16 @@ function CompareTable(props) {
                           noColor = true;
                         }
 
-                        if (isWinPer & !isRowHeader) {
-                          color = getHSLColor(cell.value, 50, 100, false);
-                        } else if (['wins', 'min', 'max'].includes(headerId)) {
+                        if (['wins', 'min', 'max'].includes(headerId)) {
                           color = 'limegreen';
+                        } else if (isNonInverseCol & !isRowHeader) {
+                          color = getHSLColor(cell.value, 25, 100, false);
                         } else if (!isRowHeader) {
                           color = getHSLColor(
                             cell.value,
                             lo,
                             hi,
-                            getCatInverse(catID)
+                            getCatInverse(catID),
                           );
                         }
 

@@ -132,13 +132,15 @@ function CompareContainer(props) {
       (d) => d.teamId === selectedTeams[1] && d.week < currentWeek
     );
     for (let i = 0; i < data.length; i += 2) {
-      let winProb;
       const catID = data[i].catId;
-      cats.forEach((cat) => {
-        const catHomeData = homeScoreboardData.map((d) => d[catID]);
-        const catAwayData = awayScoreboardData.map((d) => d[catID]);
-        winProb = getCatWinProbability(catHomeData, catAwayData, cat.inverse);
-      });
+      const cat = cats.find((cat) => cat.name === catID);
+      const catHomeData = homeScoreboardData.map((d) => d[catID]);
+      const catAwayData = awayScoreboardData.map((d) => d[catID]);
+      const winProb = getCatWinProbability(
+        catHomeData,
+        catAwayData,
+        cat?.inverse
+      );
       const winPer = Math.round(winProb * 100);
       data[i]['winPer'] = winPer;
       data[i + 1]['winPer'] = 100 - winPer;
