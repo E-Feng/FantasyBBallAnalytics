@@ -14,11 +14,10 @@ export const getCatWinProbability = (dataA, dataB, inverse) => {
   } else if (stdDevA === 0 && stdDevB === 0) {
     if (meanA === meanB) {
       return 0.5;
-    } else if (meanA > meanB) {
-      return 1.0;
-    } else {
-      return 0;
     }
+
+    const isTeamABetter = inverse ? meanA < meanB : meanA > meanB;
+    return isTeamABetter ? 1.0 : 0;
   }
 
   const zScore = (meanA - meanB) / Math.sqrt(stdDevA ** 2 + stdDevB ** 2);
