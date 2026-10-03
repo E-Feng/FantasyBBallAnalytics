@@ -9,7 +9,7 @@ dynamodb_table_name = 'fantasyLeagueData'
 
 
 def get_league_data(league_id, league_year):
-  table = boto3.resource('dynamodb').Table(dynamodb_table_name)
+  table = boto3.resource('dynamodb', region_name='us-east-1').Table(dynamodb_table_name)
 
   get_league_id = '48375511' if league_id == '00000001' else league_id
 
