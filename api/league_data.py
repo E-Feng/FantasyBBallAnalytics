@@ -7,6 +7,8 @@ from .util import invoke_lambda
 
 dynamodb_table_name = 'fantasyLeagueData'
 
+lambda_client = boto3.client('lambda', region_name='us-east-1')
+
 
 def get_league_data(league_id, league_year):
   table = boto3.resource('dynamodb', region_name='us-east-1').Table(dynamodb_table_name)
@@ -20,7 +22,6 @@ def get_league_data(league_id, league_year):
 
 def get_league_data_from_ddb(event, context):
   print(event)
-  lambda_client = boto3.client('lambda', region_name='us-east-1')
 
   # Obtaining parameters from query, initializing boto
   league_id = str(event["queryStringParameters"]['leagueId'])
