@@ -32,9 +32,14 @@ jobs:  #Workflow run is made up of one or more jobs
           aws lambda update-function-code --function-name=process_yahoo_league --zip-file=fileb://dags.zip 
           aws lambda update-function-code --function-name=process_all_yahoo_leagues --zip-file=fileb://dags.zip 
 
-          cd ../api && zip -r api.zip ./*
-          aws lambda update-function-code --function-name=post_chat_message_to_firebase --zip-file=fileb://api.zip
-          aws lambda update-function-code --function-name=get_league_data_from_ddb --zip-file=fileb://api.zip
-          aws lambda update-function-code --function-name=put_league_data_to_ddb --zip-file=fileb://api.zip
-          aws lambda update-function-code --function-name=get_league_id_status --zip-file=fileb://api.zip 
-          aws lambda update-function-code --function-name=update_league_info --zip-file=fileb://api.zip 
+          cd .. && zip -r api.zip api -x "api/__pycache__/*"
+          for handler in messageboard.post_chat_message_to_firebase \
+                        league_data.get_league_data_from_ddb \
+                        league_data.put_league_data_to_ddb \
+                        league_id.get_league_id_status \
+                        league_id.update_league_info; do
+            fn=${handler#*.}
+            aws lambda update-function-code --function-name=$fn --zip-file=fileb://api.zip
+            aws lambda wait function-updated --function-name=$fn
+            aws lambda update-function-configuration --function-name=$fn --handler=api.$handler
+          done

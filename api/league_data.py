@@ -2,12 +2,23 @@ import json
 import boto3
 from decimal import Decimal
 
-from util import invoke_lambda
+from .util import invoke_lambda
 
 
 dynamodb_table_name = 'fantasyLeagueData'
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
+
+
+def get_league_data(league_id, league_year):
+  table = boto3.resource('dynamodb', region_name='us-east-1').Table(dynamodb_table_name)
+
+  get_league_id = '48375511' if league_id == '00000001' else league_id
+
+  item = table.get_item(Key={"leagueId": get_league_id, "leagueYear": league_year})
+
+  return item.get('Item')
+
 
 def get_league_data_from_ddb(event, context):
   print(event)
@@ -16,23 +27,10 @@ def get_league_data_from_ddb(event, context):
   league_id = str(event["queryStringParameters"]['leagueId'])
   league_year = int(event["queryStringParameters"]['leagueYear'])
   
-  get_league_id = '48375511' if league_id == '00000001' else league_id
-  
-  dynamodb = boto3.resource('dynamodb')
-  
-  table = dynamodb.Table(dynamodb_table_name)
-  
-  # Getting item from dynamoDB
-  item = table.get_item(Key={"leagueId": get_league_id, "leagueYear": league_year})
+  data = get_league_data(league_id, league_year)
 
-  statusCode = 400
-  body = None
-  if 'Item' in item:
-    statusCode = 200
-    body = item['Item']
-      
   # Run update last viewed lambda
-  if statusCode == 200:
+  if data:
     payload = {
       "queryStringParameters": {
         "leagueId": league_id,
@@ -42,7 +40,7 @@ def get_league_data_from_ddb(event, context):
 
     invoke_lambda(lambda_client, "update_league_info", payload)
       
-  return body
+  return data
 
 
 def put_league_data_to_ddb(event, context):

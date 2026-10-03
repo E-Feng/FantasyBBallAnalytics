@@ -3,7 +3,7 @@ import json
 from google.oauth2 import service_account
 from google.auth.transport.requests import AuthorizedSession
 
-from util import get_current_espn_league_year
+from .util import get_current_espn_league_year
 
 
 LEAGUE_YEAR = get_current_espn_league_year()

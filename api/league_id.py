@@ -1,13 +1,16 @@
 import json
 import boto3
+from pathlib import Path
 import psycopg2
 import psycopg2.extras
 
-from util import invoke_lambda
-from espn_helper import get_espn_league_status
-from yahoo_auth import get_yahoo_access_token
-from yahoo_helper import get_all_league_ids
+from .util import invoke_lambda
+from .espn_helper import get_espn_league_status
+from .yahoo_auth import get_yahoo_access_token
+from .yahoo_helper import get_all_league_ids
 
+
+SQL_DIR = Path(__file__).parent / "sql"
 
 lambda_client = boto3.client('lambda', region_name='us-east-1')
 
@@ -31,7 +34,7 @@ def get_league_id_status(event, context):
     query_platform = event["queryStringParameters"]["platform"]
     query_league_auth_code = event["queryStringParameters"]["leagueAuthCode"]
 
-    get_query = open("sql/get_league_info.sql", "r").read()
+    get_query = (SQL_DIR / "get_league_info.sql").read_text()
     get_params = {"league_id_re": f"(?<![0-9]){query_league_id}(?![0-9])"}
 
     cursor.execute(get_query, get_params)
@@ -76,8 +79,7 @@ def get_league_id_status(event, context):
                 print("ERROR: Process ESPN lambda failed")
                 raise Exception
 
-            sql_file = "sql/update_espn_league_after_process.sql"
-            update_query = open(sql_file, "r").read()
+            update_query = (SQL_DIR / "update_espn_league_after_process.sql").read_text()
             update_params["cookie_espn"] = league_auth_code
 
             cursor.execute(update_query, update_params)
@@ -112,13 +114,11 @@ def get_league_id_status(event, context):
         if ".l." not in full_league_id:
             full_league_id = main_league_id
         
-        sql_file = "sql/update_yahoo_league_after_process.sql"
-        update_query = open(sql_file, "r").read()
+        update_query = (SQL_DIR / "update_yahoo_league_after_process.sql").read_text()
         update_params["league_id"] = full_league_id
         update_params["yahoo_refresh_token"] = yahoo_refresh_token
 
-        sql_file_linked = "sql/update_yahoo_linked_leagues.sql"
-        update_query_linked = open(sql_file_linked, "r").read()
+        update_query_linked = (SQL_DIR / "update_yahoo_linked_leagues.sql").read_text()
         update_data = []
 
         for league in all_leagues:
