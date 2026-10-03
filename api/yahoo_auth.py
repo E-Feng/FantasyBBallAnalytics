@@ -1,7 +1,7 @@
 import boto3
 import requests
 
-from util import invoke_lambda
+from .util import invoke_lambda
 
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
