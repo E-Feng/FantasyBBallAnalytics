@@ -145,10 +145,12 @@ YAHOO_SEASON_GAME_IDS = {
     '2023': '428',
     '2024': '454',
     '2025': '466',
+    '2026': '999'
 }
 YAHOO_DUMMY_LEAGUE_IDS = {
     '2024': '454.l.52531',
     '2025': '466.l.9359',
+    '2026': '999.l.58546'
 }
 
 # Public league to get player data
