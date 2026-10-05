@@ -2,7 +2,7 @@ import json
 import requests
 import unicodedata
 
-from consts import ESPN_DATA_FETCH_LEAGUE_ID
+from consts import ESPN_DATA_FETCH_LEAGUE_ID, SLOT_IDS_MAP_TO_ESPN
 
 
 def invoke_lambda(client, function_name, payload):
@@ -126,3 +126,24 @@ def capitalize_dict_keys(data):
 def strip_character_accents(s):
     nfkd_form = unicodedata.normalize('NFKD', s)
     return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+
+def map_yahoo_positions_to_espn(positions):
+  """
+  Maps Yahoo eligible positions to ESPN lineup slot ids, dropping unknowns
+  """
+  if isinstance(positions, (dict, str)):
+    positions = [positions]
+
+  slot_ids = []
+
+  for position in positions:
+    if isinstance(position, dict):
+      position = position.get("position")
+
+    slot_id = SLOT_IDS_MAP_TO_ESPN.get(position, -1)
+
+    if slot_id >= 0 and slot_id not in slot_ids:
+      slot_ids.append(slot_id)
+
+  return slot_ids

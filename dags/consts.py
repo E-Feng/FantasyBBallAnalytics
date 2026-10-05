@@ -97,6 +97,49 @@ STAT_IDS_MAP_TO_ESPN = {
   TDS_Y: TDS,
 }
 
+# Constants for ESPN API lineup slot ids
+SLOT_PG = 0
+SLOT_SG = 1
+SLOT_SF = 2
+SLOT_PF = 3
+SLOT_C = 4
+SLOT_G = 5
+SLOT_F = 6
+SLOT_SG_SF = 7
+SLOT_G_F = 8
+SLOT_PF_C = 9
+SLOT_F_C = 10
+SLOT_UTIL = 11
+SLOT_BENCH = 12
+SLOT_IR = 13
+
+# Constants for Yahoo API roster positions
+SLOT_PG_Y = 'PG'
+SLOT_SG_Y = 'SG'
+SLOT_G_Y = 'G'
+SLOT_SF_Y = 'SF'
+SLOT_PF_Y = 'PF'
+SLOT_F_Y = 'F'
+SLOT_C_Y = 'C'
+SLOT_UTIL_Y = 'Util'
+SLOT_BENCH_Y = 'BN'
+SLOT_IL_Y = 'IL'
+SLOT_IL_PLUS_Y = 'IL+'
+
+SLOT_IDS_MAP_TO_ESPN = {
+  SLOT_PG_Y: SLOT_PG,
+  SLOT_SG_Y: SLOT_SG,
+  SLOT_G_Y: SLOT_G,
+  SLOT_SF_Y: SLOT_SF,
+  SLOT_PF_Y: SLOT_PF,
+  SLOT_F_Y: SLOT_F,
+  SLOT_C_Y: SLOT_C,
+  SLOT_UTIL_Y: SLOT_UTIL,
+  SLOT_BENCH_Y: SLOT_BENCH,
+  SLOT_IL_Y: SLOT_IR,
+  SLOT_IL_PLUS_Y: SLOT_IR,
+}
+
 # Yahoo season game ids
 YAHOO_SEASON_GAME_IDS = {
     '2023': '428',

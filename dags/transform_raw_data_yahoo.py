@@ -1,6 +1,7 @@
 import pandas as pd
 
 import consts
+from util import map_yahoo_positions_to_espn
 
 
 def transform_yahoo_raw_to_df(endpoint: str, raw_data: dict):
@@ -71,7 +72,8 @@ def transform_roster_to_df(data: dict):
             player = player["player"]
 
             row["playerId"] = player["player_id"]
-            row["lineupSlotId"] = player["selected_position"]["position"]
+            row["lineupSlotId"] = consts.SLOT_IDS_MAP_TO_ESPNget(player["selected_position"]["position"])
+            row["eligibleSlots"] = map_yahoo_positions_to_espn(player["eligible_positions"])
             row["acquisitionType"] = ""
 
             data_array.append(row)
