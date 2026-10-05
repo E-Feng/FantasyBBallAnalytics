@@ -238,6 +238,8 @@ def transform_players_to_df(ratings: dict):
     # row['onTeamId'] = player['onTeamId']
     row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
     row['proTeamId'] = player['player']['proTeamId']
+    row['eligibleSlots'] = player['player'].get('eligibleSlots', [])
+    # row['defaultPositionId'] = player['player'].get('defaultPositionId')
 
     row['percentOwned'] = round(player['player'].get('ownership', {}).get('percentOwned', 0.0), 2)
     row['percentChange'] = round(player['player'].get('ownership', {}).get('percentChange', 0.0), 2)
