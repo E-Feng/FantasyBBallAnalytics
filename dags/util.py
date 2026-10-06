@@ -143,7 +143,7 @@ def map_yahoo_positions_to_espn(positions):
 
     slot_id = SLOT_IDS_MAP_TO_ESPN.get(position, -1)
 
-    if slot_id >= 0 and slot_id not in slot_ids:
+    if slot_id >= 0 and slot_id <= 4 and slot_id not in slot_ids:
       slot_ids.append(slot_id)
 
   return slot_ids
