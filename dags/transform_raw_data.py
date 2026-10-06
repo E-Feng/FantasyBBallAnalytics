@@ -370,6 +370,9 @@ def transform_settings_to_df(settings: dict):
   if scoring_type == 'H2H_POINTS':
     row['categoryIds'].append(int(consts.FPTS))
 
+  # Lineup slot id (as string) to number of slots, e.g. {"0": 1, "11": 3}
+  row['lineupSlotCounts'] = data['settings']['rosterSettings']['lineupSlotCounts']
+
   # Playoff matchup weeks
   row['matchupPeriods'] = data['settings']['scheduleSettings']['matchupPeriods']
 
