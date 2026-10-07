@@ -140,6 +140,15 @@ SLOT_IDS_MAP_TO_ESPN = {
   SLOT_IL_PLUS_Y: SLOT_IR,
 }
 
+# ESPN proTeamId -> NBA tricode (matches PRO_TEAM_IDS in client/src/utils/consts.js)
+ESPN_PRO_TEAM_TO_NBA = {
+  1: 'ATL', 2: 'BOS', 3: 'NOP', 4: 'CHI', 5: 'CLE', 6: 'DAL', 7: 'DEN', 8: 'DET',
+  9: 'GSW', 10: 'HOU', 11: 'IND', 12: 'LAC', 13: 'LAL', 14: 'MIA', 15: 'MIL',
+  16: 'MIN', 17: 'BKN', 18: 'NYK', 19: 'ORL', 20: 'PHI', 21: 'PHX', 22: 'POR',
+  23: 'SAC', 24: 'SAS', 25: 'OKC', 26: 'UTA', 27: 'WAS', 28: 'TOR', 29: 'MEM',
+  30: 'CHA',
+}
+
 # Yahoo season game ids
 YAHOO_SEASON_GAME_IDS = {
     '2023': '428',
