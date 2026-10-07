@@ -1,9 +1,9 @@
-import json
 import boto3
 import psycopg2
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, timezone
 
+from consts import ESPN_PRO_TEAM_TO_NBA
 from extract_espn import (
   extract_from_espn_api,
   extract_from_nba_schedule
@@ -329,24 +329,37 @@ def update_espn_leagues(event, context):
 
 
 def update_nba_schedule():
-  data = extract_from_nba_schedule(current_year)
+  data = extract_from_nba_schedule(default_league_info)
 
   if not data:
     print("No NBA schedule data available")
     return
 
+  # Each game is listed under both teams, so dedupe by game id
+  games = {}
+
+  for pro_team in data["settings"]["proTeams"]:
+    for period_games in (pro_team.get("proGamesByScoringPeriod") or {}).values():
+      for game in period_games:
+        games[game["id"]] = game
+
+  # ESPN dates are UTC ms; shift to Eastern so late tip-offs keep their local date.
+  # A fixed -5h avoids needing tzdata on Lambda and matches America/New_York for every tip time.
+  eastern = timezone(timedelta(hours=-5))
+
   schedule = []
   
-  for month_data in data["lscd"]:
-    for game in month_data["mscd"]["g"]:
-      date = game["gdte"]
-      team_1 = game["v"]["ta"]
-      team_2 = game["h"]["ta"]
+  for game in sorted(games.values(), key=lambda g: g["date"]):
+    date = datetime.fromtimestamp(game["date"] / 1000, eastern).strftime("%Y-%m-%d")
+    team_1 = ESPN_PRO_TEAM_TO_NBA[game["awayProTeamId"]]
+    team_2 = ESPN_PRO_TEAM_TO_NBA[game["homeProTeamId"]]
+    scoring_period = game["scoringPeriodId"]
 
-      game_info = {
-        "date": date,
-        "teams": [team_1, team_2],
-      }
-      schedule.append(game_info)
+    game_info = {
+      "date": date,
+      "teams": [team_1, team_2],
+      "scoringPeriod": scoring_period
+    }
+    schedule.append(game_info)
 
   upload_to_firebase('nba_schedule', schedule)   

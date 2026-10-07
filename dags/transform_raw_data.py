@@ -238,6 +238,9 @@ def transform_players_to_df(ratings: dict):
     # row['onTeamId'] = player['onTeamId']
     row['injuryStatus'] = player['player'].get('injuryStatus', 'ACTIVE')
     row['proTeamId'] = player['player']['proTeamId']
+    # Keep only base positions (PG, SG, SF, PF, C); combo/UT/BE/IR slots are derivable
+    row['eligibleSlots'] = [slot for slot in player['player'].get('eligibleSlots', []) if slot <= 4]
+    # row['defaultPositionId'] = player['player'].get('defaultPositionId')
 
     row['percentOwned'] = round(player['player'].get('ownership', {}).get('percentOwned', 0.0), 2)
     row['percentChange'] = round(player['player'].get('ownership', {}).get('percentChange', 0.0), 2)
@@ -367,6 +370,9 @@ def transform_settings_to_df(settings: dict):
   # Check if points league, fantasy points will be appended as -1
   if scoring_type == 'H2H_POINTS':
     row['categoryIds'].append(int(consts.FPTS))
+
+  # Lineup slot id (as string) to number of slots, e.g. {"0": 1, "11": 3}
+  row['lineupSlotCounts'] = data['settings']['rosterSettings']['lineupSlotCounts']
 
   # Playoff matchup weeks
   row['matchupPeriods'] = data['settings']['scheduleSettings']['matchupPeriods']
