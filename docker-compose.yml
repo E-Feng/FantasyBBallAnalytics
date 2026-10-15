@@ -9,7 +9,7 @@ services:
       context: ./client
     labels:
     - traefik.enable=true
-    - traefik.http.routers.fantasy.rule=Host(`fantasy.elvinfeng.com`)
+    - traefik.http.routers.fantasy.rule=Host(`fantasy.elvinfeng.com`) || Host(`fantasyvizlab.com`) || Host(`www.fantasyvizlab.com`)
     - traefik.http.routers.fantasy.tls=true
     - traefik.http.routers.fantasy.tls.certresolver=lets-encrypt
     - traefik.port=80
