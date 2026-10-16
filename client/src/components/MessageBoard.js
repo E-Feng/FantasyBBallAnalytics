@@ -159,7 +159,7 @@ function MessageBoard() {
     });
 
     // Appending messages for unrostered daily players
-    if (unrosteredData) {
+    if (unrosteredData?.length > 0) {
       messageArray.push({
         type: 'dailyHeader',
         user: 'BOT',
