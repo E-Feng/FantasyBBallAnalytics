@@ -108,6 +108,8 @@ def update_player_list():
                     players_data.append(row)
             else:
                 cont = False
+        else:
+            cont = False
 
         start += inc
 
