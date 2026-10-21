@@ -1,6 +1,7 @@
 import json
 import requests
 import unicodedata
+from datetime import datetime, timedelta, timezone
 
 from consts import ESPN_DATA_FETCH_LEAGUE_ID, SLOT_IDS_MAP_TO_ESPN
 
@@ -147,3 +148,18 @@ def map_yahoo_positions_to_espn(positions):
       slot_ids.append(slot_id)
 
   return slot_ids
+
+
+def to_eastern_date(utc: datetime):
+  """
+  UTC datetime -> US Eastern calendar date, DST aware without needing tzdata on Lambda
+  """
+  # DST: second Sunday of March 2am ET (07:00 UTC) to first Sunday of November 2am ET (06:00 UTC)
+  march = datetime(utc.year, 3, 8, 7, tzinfo=timezone.utc)
+  dst_start = march + timedelta(days=(6 - march.weekday()) % 7)
+  november = datetime(utc.year, 11, 1, 6, tzinfo=timezone.utc)
+  dst_end = november + timedelta(days=(6 - november.weekday()) % 7)
+
+  offset = -4 if dst_start <= utc < dst_end else -5
+
+  return (utc + timedelta(hours=offset)).date()
