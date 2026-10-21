@@ -158,8 +158,17 @@ function MessageBoard() {
       unsortedMessages.forEach((o) => messageArray.push(o));
     });
 
-    // Appending messages for unrostered daily players
-    if (unrosteredData?.length > 0) {
+    // Calculating trending players
+    const trendingNumShow = 3;
+    const trendingPlayers = playersData
+      .filter(
+        (p) => !rostersData.some((roster) => roster.playerId === p.playerId),
+      )
+      .sort((a, b) => b.percentChange - a.percentChange)
+      .slice(0, trendingNumShow);
+
+    // Appending messages for free agents
+    if (unrosteredData?.length > 0 || trendingPlayers?.length > 0) {
       messageArray.push({
         type: 'dailyHeader',
         user: 'BOT',
@@ -173,24 +182,15 @@ function MessageBoard() {
           user: 'BOT',
         });
       });
-    }
 
-    // Appending messages for trending players
-    const trendingNumShow = 3;
-    const trendingPlayers = playersData
-      .filter(
-        (p) => !rostersData.some((roster) => roster.playerId === p.playerId)
-      )
-      .sort((a, b) => b.percentChange - a.percentChange)
-      .slice(0, trendingNumShow);
-
-    trendingPlayers.forEach((p) => {
-      messageArray.push({
-        msg: `[+${p.percentChange.toFixed(1)}%] ${p.playerName}`,
-        type: 'msg',
-        user: 'BOT',
+      trendingPlayers.forEach((p) => {
+        messageArray.push({
+          msg: `[+${p.percentChange.toFixed(1)}%] ${p.playerName}`,
+          type: 'msg',
+          user: 'BOT',
+        });
       });
-    });
+    }
   }
 
   return (
