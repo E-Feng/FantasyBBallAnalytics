@@ -115,6 +115,9 @@ function LeagueChangeModal(props) {
   return ReactDOM.createPortal(
     <>
       <Modal>
+        <Warning>
+          Yahoo leagues currently not working due to API request access issues
+        </Warning>
         <Header>View/Process League Id</Header>
         <Text>{description}</Text>
         <URLExample>
@@ -216,7 +219,7 @@ const Modal = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  max-height: 480px;
+  max-height: 560px;
   width: 600px;
   max-width: 95%;
   background-color: black;
@@ -229,6 +232,14 @@ const Modal = styled.div`
   @media (max-width: 450px) {
     height: 600px;
   }
+`;
+
+const Warning = styled.p`
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  max-width: 85%;
+  margin: 1rem auto 0 auto;
 `;
 
 const Header = styled.h1`
